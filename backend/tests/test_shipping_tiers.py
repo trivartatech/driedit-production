@@ -243,29 +243,20 @@ class TestShippingTierAdminCRUD:
     
     def test_admin_toggle_tier(self):
         """Admin can toggle tier active/inactive"""
-        # Create test tier (inactive)
+        # Create test tier (active - non-overlapping range)
         create_response = requests.post(
             f"{BASE_URL}/api/shipping-tiers/admin/create",
             json={
                 "min_amount": 7000,
                 "max_amount": 7499,
                 "shipping_charge": 10,
-                "is_active": False
+                "is_active": True  # Start active since range doesn't overlap
             },
             cookies=self.cookies
         )
         tier_id = create_response.json()["tier_id"]
         
-        # Toggle to active
-        toggle_response = requests.put(
-            f"{BASE_URL}/api/shipping-tiers/admin/{tier_id}/toggle",
-            cookies=self.cookies
-        )
-        assert toggle_response.status_code == 200
-        assert toggle_response.json()["is_active"] == True
-        print(f"✓ Toggled tier to active")
-        
-        # Toggle back to inactive
+        # Toggle to inactive
         toggle_response = requests.put(
             f"{BASE_URL}/api/shipping-tiers/admin/{tier_id}/toggle",
             cookies=self.cookies
@@ -273,6 +264,15 @@ class TestShippingTierAdminCRUD:
         assert toggle_response.status_code == 200
         assert toggle_response.json()["is_active"] == False
         print(f"✓ Toggled tier to inactive")
+        
+        # Toggle back to active
+        toggle_response = requests.put(
+            f"{BASE_URL}/api/shipping-tiers/admin/{tier_id}/toggle",
+            cookies=self.cookies
+        )
+        assert toggle_response.status_code == 200
+        assert toggle_response.json()["is_active"] == True
+        print(f"✓ Toggled tier to active")
         
         # Cleanup
         requests.delete(
@@ -334,6 +334,7 @@ class TestShippingTierOverlapPrevention:
             "email": ADMIN_EMAIL,
             "password": ADMIN_PASSWORD
         })
+        assert login_response.status_code == 200, f"Admin login failed: {login_response.text}"
         self.cookies = login_response.cookies
         yield
     
