@@ -48,6 +48,21 @@ function AppRouter() {
             <CartPage />
           </ProtectedRoute>
         } />
+        <Route path="/checkout" element={
+          <ProtectedRoute>
+            <CheckoutPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/order-success/:orderId" element={
+          <ProtectedRoute>
+            <OrderSuccessPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/my-orders" element={
+          <ProtectedRoute>
+            <MyOrdersPage />
+          </ProtectedRoute>
+        } />
         <Route path="/wishlist" element={
           <ProtectedRoute>
             <WishlistPage />
