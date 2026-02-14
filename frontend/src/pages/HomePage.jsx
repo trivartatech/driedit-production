@@ -3,18 +3,66 @@ import { motion } from 'framer-motion';
 import HeroSlider from '../components/HeroSlider';
 import ProductCard from '../components/ProductCard';
 import { ArrowRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { productsAPI, categoriesAPI } from '../services/api';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { productsAPI, categoriesAPI, authAPI } from '../services/api';
+import { useAuth } from '../context/AuthContext';
+import { toast } from '../hooks/use-toast';
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { setUser, setIsAuthenticated, isAuthenticated } = useAuth();
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchData();
-  }, []);
+    
+    // Handle Google OAuth success redirect
+    const loginParam = searchParams.get('login');
+    const errorParam = searchParams.get('error');
+    
+    if (loginParam === 'success') {
+      // Fetch user data after OAuth redirect
+      authAPI.getMe()
+        .then(response => {
+          setUser(response.data);
+          setIsAuthenticated(true);
+          toast({ title: 'Welcome to DRIEDIT!' });
+        })
+        .catch(err => {
+          console.error('Failed to fetch user after OAuth:', err);
+        });
+      
+      // Clean up URL
+      searchParams.delete('login');
+      setSearchParams(searchParams);
+    }
+    
+    if (errorParam) {
+      const errorMessages = {
+        'oauth_denied': 'Google sign-in was cancelled',
+        'no_code': 'Authentication failed - no code received',
+        'invalid_state': 'Authentication failed - invalid state',
+        'token_exchange_failed': 'Authentication failed - please try again',
+        'no_access_token': 'Authentication failed - no token received',
+        'userinfo_failed': 'Failed to get user information',
+        'no_email': 'Email not provided by Google',
+        'network_error': 'Network error - please try again',
+        'server_error': 'Server error - please try again'
+      };
+      
+      toast({ 
+        title: errorMessages[errorParam] || 'Authentication failed',
+        variant: 'destructive'
+      });
+      
+      // Clean up URL
+      searchParams.delete('error');
+      setSearchParams(searchParams);
+    }
+  }, [searchParams, setSearchParams, setUser, setIsAuthenticated]);
 
   const fetchData = async () => {
     try {
