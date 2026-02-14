@@ -171,7 +171,7 @@ async def create_return_request(return_data: ReturnRequestCreate, request: Reque
     
     return return_request
 
-@router.get("/my-requests", response_model=List[ReturnRequest])
+@router.get("/my-requests")
 async def get_my_return_requests(request: Request):
     """
     Get current user's return requests.
