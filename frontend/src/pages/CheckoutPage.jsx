@@ -102,9 +102,43 @@ const CheckoutPage = () => {
     );
     const gstAmount = Math.round(subtotal * (gstPercentage / 100));
     const shipping = pincodeData ? (subtotal > 999 ? 0 : pincodeData.shipping_charge) : 0;
-    const total = subtotal + gstAmount + shipping;
+    const subtotalWithGst = subtotal + gstAmount + shipping;
+    const discount = couponApplied ? couponApplied.discount_amount : 0;
+    const total = subtotalWithGst - discount;
 
-    return { subtotal, gstAmount, shipping, total };
+    return { subtotal, gstAmount, shipping, discount, total, subtotalWithGst };
+  };
+
+  // Coupon functions
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      toast.error('Please enter a coupon code');
+      return;
+    }
+
+    setCouponLoading(true);
+    try {
+      const { subtotalWithGst } = calculateTotals();
+      const response = await couponsAPI.validate(couponCode, subtotalWithGst);
+      
+      setCouponApplied({
+        code: response.data.coupon_code,
+        discount_amount: response.data.discount_amount,
+        message: response.data.message
+      });
+      toast.success(response.data.message);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Invalid coupon code');
+      setCouponApplied(null);
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setCouponApplied(null);
+    setCouponCode('');
+    toast.info('Coupon removed');
   };
 
   const validateForm = () => {
