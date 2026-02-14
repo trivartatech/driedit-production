@@ -13,7 +13,7 @@ const Footer = () => {
               <span className="text-[#E10600]">D</span>RIEDIT
             </h3>
             <p className="text-sm text-gray-400 mb-4">
-              Minimal Gen-Z streetwear for the culture.
+              Stay raw stay real.
             </p>
             <div className="flex items-start space-x-2 text-sm text-gray-400 mb-4">
               <MapPin size={16} className="text-[#E10600] flex-shrink-0 mt-0.5" />
