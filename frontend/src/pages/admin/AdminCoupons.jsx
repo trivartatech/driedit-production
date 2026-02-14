@@ -261,12 +261,19 @@ const AdminCoupons = () => {
                   data-testid={`coupon-row-${coupon.coupon_id}`}
                 >
                   <td className="p-4">
-                    <button 
-                      onClick={() => viewDetails(coupon.coupon_id)}
-                      className="font-mono font-bold text-[#E10600] hover:underline"
-                    >
-                      {coupon.code}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => viewDetails(coupon.coupon_id)}
+                        className="font-mono font-bold text-[#E10600] hover:underline"
+                      >
+                        {coupon.code}
+                      </button>
+                      {coupon.auto_apply && (
+                        <span className="text-xs px-1.5 py-0.5 bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center gap-1">
+                          <Zap size={10} /> AUTO
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="p-4">
                     <span className="flex items-center gap-1 text-sm">
@@ -296,6 +303,11 @@ const AdminCoupons = () => {
                     <span className="text-xs text-gray-400 block">
                       {formatPrice(coupon.total_discount_given || 0)} given
                     </span>
+                    {(coupon.auto_uses > 0 || coupon.manual_uses > 0) && (
+                      <span className="text-xs text-gray-500 block">
+                        {coupon.auto_uses || 0} auto / {coupon.manual_uses || 0} manual
+                      </span>
+                    )}
                   </td>
                   <td className="p-4">
                     {coupon.is_expired ? (
