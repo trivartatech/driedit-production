@@ -313,7 +313,22 @@ const ProductDetailPage = () => {
 
             {/* Size Selection */}
             <div className="mb-6">
-              <label className="block text-sm font-bold mb-3">SELECT SIZE</label>
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-bold">SELECT SIZE</label>
+                {product.size_chart_pdf && (
+                  <a
+                    href={product.size_chart_pdf}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-1 text-sm text-[#E10600] hover:underline"
+                    data-testid="view-size-chart-btn"
+                  >
+                    <FileText size={14} />
+                    <span>View Size Chart</span>
+                    <ExternalLink size={12} />
+                  </a>
+                )}
+              </div>
               <div className="grid grid-cols-4 gap-2">
                 {product.sizes.map(size => (
                   <button
