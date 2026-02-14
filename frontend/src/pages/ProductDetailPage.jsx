@@ -554,21 +554,6 @@ const ShareProduct = ({ product }) => {
     window.open(whatsappUrl, '_blank');
   };
 
-  const shareOnFacebook = () => {
-    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productUrl)}`;
-    window.open(facebookUrl, '_blank');
-  };
-
-  const shareOnInstagram = () => {
-    // Instagram doesn't have a direct share URL, so we copy the link and show instructions
-    const success = copyToClipboard(productUrl);
-    if (success) {
-      toast.success('Link copied! Share it on Instagram');
-    } else {
-      toast.info('Copy the URL from browser to share on Instagram');
-    }
-  };
-
   return (
     <div className="border-t border-white/10 pt-6 mt-6">
       <div className="flex items-center space-x-3 mb-4">
