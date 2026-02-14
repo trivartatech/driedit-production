@@ -48,13 +48,13 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 - [x] Cart page with real-time updates
 - [x] Header cart/wishlist count badges
 
-### Phase 5: Checkout Flow (Completed - Feb 14, 2026)
+### Phase 5: Checkout Flow (Completed)
 - [x] Checkout page with address form
 - [x] Pincode validation API
 - [x] GST calculation (public endpoint)
 - [x] Shipping charge calculation
 - [x] COD payment option
-- [x] Razorpay integration (MOCKED)
+- [x] Razorpay integration (TEST MODE - requires production keys)
 - [x] Order creation API
 - [x] Order success page
 - [x] My Orders page with order history
@@ -63,8 +63,10 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 - [x] Review submission API
 - [x] Verified buyer badge
 - [x] Product reviews display
+- [x] Star rating system (1-5 stars)
+- [x] One review per user per product restriction
 
-### Phase 7: Admin Dashboard (Completed - Feb 14, 2026)
+### Phase 7: Admin Dashboard (Completed)
 - [x] Admin-only route protection
 - [x] Dashboard with stats overview (Revenue, Orders, Products, Low Stock)
 - [x] **Orders Management**
@@ -100,9 +102,7 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
   - [x] Add admin notes
   - [x] Filter by status
 
----
-
-### Phase 8: Customer Return Request Flow (Completed - Feb 14, 2026)
+### Phase 8: Customer Return Request Flow (Completed)
 - [x] Return eligibility check API (7-day window from delivery)
 - [x] Return request creation API with validation
 - [x] Per-item return selection
@@ -115,7 +115,7 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 - [x] "Return request pending review" status display
 - [x] Mobile-first Return Request Modal
 
-### Phase 9: Product Image Upload (Completed - Feb 14, 2026)
+### Phase 9: Product Image Upload (Completed)
 - [x] Server-side image storage in `/uploads/products/`
 - [x] Image upload API with validation (JPG, PNG, WebP, GIF)
 - [x] Max 5MB per image, max 5 images per product
@@ -125,7 +125,7 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 - [x] Image deletion API
 - [x] Static file serving with caching headers
 
-### Phase 10: Email Notifications (Completed - Feb 14, 2026)
+### Phase 10: Email Notifications (Completed - PENDING API KEY)
 - [x] Email service with Resend integration
 - [x] Order confirmation email (on payment success)
 - [x] Order shipped email (with tracking ID)
@@ -135,6 +135,7 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 - [x] Non-blocking email sending (asyncio.create_task)
 - [x] DRIEDIT branded HTML templates
 - [x] Graceful fallback when email not configured
+- **⚠️ STATUS**: Code complete, awaiting RESEND_API_KEY in backend/.env
 
 ### Phase 11: Discount Coupon System (Completed - Feb 14, 2026)
 - [x] Percentage and Fixed amount coupons
@@ -145,8 +146,13 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 - [x] Expiry date support
 - [x] Active/Inactive toggle
 - [x] Admin management panel with stats
+  - Active coupons count
+  - Total redemptions
+  - Total discount given
+  - Per-coupon usage history
 - [x] Usage history tracking
 - [x] Checkout integration with discount display
+- **Tested**: 23/23 backend tests passed, 100% frontend tests passed
 
 ### Phase 12: Forgot Password Flow (Completed - Feb 14, 2026)
 - [x] Forgot password page
@@ -157,20 +163,25 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 - [x] One-time token use
 - [x] Auto-invalidate old tokens
 - [x] Email enumeration protection
+- **Tested**: All backend tests passed, frontend UI verified
 
 ---
 
 ## Pending Tasks 📋
 
+### P1 - High Priority
+- [ ] Activate email notifications (add RESEND_API_KEY)
+
 ### P2 - Nice to Have
 - [ ] Email verification for new registrations
 - [ ] Search with autocomplete
 - [ ] Order tracking with courier APIs
-- [ ] Email verification for new registrations
-- [ ] Search functionality with autocomplete
-- [ ] Order tracking integration with courier APIs
 - [ ] Product recommendations engine
 - [ ] Analytics dashboard
+
+### P3 - Future
+- [ ] SMS Notifications
+- [ ] Production deployment checklist
 
 ---
 
@@ -181,13 +192,13 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 
 ---
 
-## Mocked Integrations
-- **Razorpay**: Payment gateway is in mock mode until real keys are configured.
-  - To enable: Add `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` to `/app/backend/.env`
-  - Add `REACT_APP_RAZORPAY_KEY_ID` to `/app/frontend/.env` (same key_id, safe for frontend)
-  - Restart backend after adding keys
-  - Check status: `GET /api/orders/payment-config`
-  - Supports both Test (`rzp_test_*`) and Live (`rzp_live_*`) keys
+## Integration Status
+
+| Integration | Status | Notes |
+|-------------|--------|-------|
+| Razorpay | ✅ TEST MODE | Working with test keys. Add production keys for live payments |
+| Resend Email | ⚠️ PENDING | Code complete. Add RESEND_API_KEY to activate |
+| Google OAuth | ✅ ACTIVE | Via Emergent Auth system |
 
 ---
 
@@ -201,10 +212,18 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 ### Auth
 - `POST /api/auth/register`, `/api/auth/login`, `/api/auth/logout`
 - `GET /api/auth/me`
+- `POST /api/auth/forgot-password`
+- `POST /api/auth/reset-password`
+- `GET /api/auth/verify-reset-token/{token}`
 
 ### Products & Categories
 - `GET/POST/PUT/DELETE /api/products`
 - `GET/POST/PUT/DELETE /api/categories`
+
+### Reviews
+- `GET /api/reviews/product/{product_id}` - Get product reviews
+- `POST /api/reviews` - Create review (authenticated)
+- `DELETE /api/reviews/admin/{id}` - Delete review (admin)
 
 ### Cart
 - `GET/POST/PUT/DELETE /api/cart/*`
@@ -212,7 +231,7 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 ### Orders
 - `POST /api/orders` - Create order
 - `GET /api/orders` - User's orders
-- `GET /api/orders/payment-config` - Get payment gateway status (public)
+- `GET /api/orders/payment-config` - Get payment gateway status
 - `POST /api/orders/create-razorpay-order` - Create Razorpay order
 - `POST /api/orders/verify-payment` - Verify payment signature
 - `GET /api/orders/admin/all` - All orders (Admin)
@@ -232,12 +251,20 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 - `GET /api/uploads/images/{filename}` - Serve uploaded image
 - `DELETE /api/uploads/images/{filename}` - Delete image (Admin)
 
+### Coupons
+- `POST /api/coupons/validate` - Validate coupon for order
+- `POST /api/coupons/admin/create` - Create coupon (Admin)
+- `GET /api/coupons/admin/all` - Get all coupons (Admin)
+- `GET /api/coupons/admin/{id}` - Get coupon details (Admin)
+- `PUT /api/coupons/admin/{id}` - Update coupon (Admin)
+- `DELETE /api/coupons/admin/{id}` - Delete coupon (Admin)
+- `PUT /api/coupons/admin/{id}/toggle` - Toggle status (Admin)
+
 ### Admin
 - `GET/POST/PUT/DELETE /api/admin/pincodes`
 - `GET/PUT /api/admin/gst`
 - `GET/POST/PUT/DELETE /api/admin/banners`
 - `GET/POST/PUT/DELETE /api/admin/popups`
-- `GET/PUT /api/returns/admin/*`
 
 ---
 
@@ -252,10 +279,17 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 │   │   ├── order_routes.py
 │   │   ├── admin_routes.py
 │   │   ├── return_routes.py
+│   │   ├── review_routes.py
+│   │   ├── coupon_routes.py
+│   │   ├── password_reset_routes.py
+│   │   ├── upload_routes.py
 │   │   └── public_routes.py
+│   ├── services/
+│   │   └── email_service.py
 │   ├── models.py
 │   ├── server.py
-│   └── auth.py
+│   ├── auth.py
+│   └── uploads/products/
 ├── frontend/
 │   ├── src/
 │   │   ├── pages/
@@ -266,6 +300,8 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 │   │   │   ├── CheckoutPage.jsx
 │   │   │   ├── OrderSuccessPage.jsx
 │   │   │   ├── MyOrdersPage.jsx
+│   │   │   ├── ForgotPasswordPage.jsx
+│   │   │   ├── ResetPasswordPage.jsx
 │   │   │   └── admin/
 │   │   │       ├── AdminLayout.jsx
 │   │   │       ├── AdminDashboard.jsx
@@ -275,7 +311,8 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 │   │   │       ├── AdminPincode.jsx
 │   │   │       ├── AdminBanners.jsx
 │   │   │       ├── AdminPopups.jsx
-│   │   │       └── AdminReturns.jsx
+│   │   │       ├── AdminReturns.jsx
+│   │   │       └── AdminCoupons.jsx
 │   │   ├── components/
 │   │   │   └── ReturnRequestModal.jsx
 │   │   ├── services/api.js
@@ -287,8 +324,13 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 ---
 
 ## Testing Results (Feb 14, 2026)
-- **Backend Tests**: 42/42 passed (100%)
-- **Frontend Tests**: All 8 admin pages + Return flow tested
-- **Checkout Flow**: Fully tested
-- **Return Request Flow**: Fully tested (15/15 tests passed)
+- **Coupon System**: 23/23 backend tests passed, 100% frontend tests passed
+- **Password Reset**: All tests passed
+- **Return Flow**: 15/15 tests passed
 - **Access Control**: Working (401 for unauth, 403 for non-admin)
+
+---
+
+## Last Updated
+**Date**: February 14, 2026
+**Session**: Testing & verification of Coupon System, Forgot Password, and User Reviews
