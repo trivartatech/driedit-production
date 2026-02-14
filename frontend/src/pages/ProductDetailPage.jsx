@@ -108,21 +108,38 @@ const ProductDetailPage = () => {
     }
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      toast.error('Please login to add items to cart');
+      navigate('/login');
+      return;
+    }
+
     if (!selectedSize) {
-      toast({ title: 'Please select a size', variant: 'destructive' });
+      toast.error('Please select a size');
       return;
     }
     
     if (product.stock < quantity) {
-      toast({ title: 'Insufficient stock', variant: 'destructive' });
+      toast.error('Insufficient stock');
       return;
     }
 
-    // Using localStorage cart for now (will be backend in checkout)
-    addToCart(id, selectedSize, quantity);
-    toast({ title: 'Added to cart!' });
-    window.dispatchEvent(new Event('cartUpdated'));
+    setAddingToCart(true);
+    try {
+      await cartAPI.add({
+        product_id: product.product_id,
+        size: selectedSize,
+        quantity: quantity
+      });
+      toast.success('Added to cart!');
+      window.dispatchEvent(new Event('cartUpdated'));
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      toast.error(error.response?.data?.detail || 'Failed to add to cart');
+    } finally {
+      setAddingToCart(false);
+    }
   };
 
   const handleSubmitReview = async () => {
