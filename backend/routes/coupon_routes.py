@@ -1,11 +1,15 @@
 """
 Coupon System Routes
-Full-featured discount coupon system with percentage and fixed discounts.
+Full-featured discount coupon system with:
+- Percentage and fixed discounts
+- Auto-apply for marketing campaigns
+- Manual entry for influencer/affiliate codes
+- No stacking - best auto coupon or user choice
 """
 from fastapi import APIRouter, HTTPException, Request
 from auth import get_current_user, require_admin, db
 from models import Coupon, CouponCreate, CouponType, CouponUsage
-from typing import Optional
+from typing import Optional, List
 import uuid
 from datetime import datetime, timezone
 from pydantic import BaseModel
@@ -29,86 +33,151 @@ class CouponUpdateRequest(BaseModel):
     max_discount: Optional[float] = None
     usage_limit: Optional[int] = None
     one_time_per_user: Optional[bool] = None
+    auto_apply: Optional[bool] = None
     is_active: Optional[bool] = None
     expires_at: Optional[datetime] = None
 
 
-# ============================================
-# PUBLIC ENDPOINTS
-# ============================================
+def calculate_discount(coupon: dict, subtotal: float) -> float:
+    """Calculate discount amount for a coupon given subtotal."""
+    discount_value = coupon.get("discount_value", 0)
+    coupon_type = coupon.get("coupon_type")
+    
+    if coupon_type == CouponType.PERCENTAGE.value:
+        discount_amount = (subtotal * discount_value) / 100
+        max_discount = coupon.get("max_discount")
+        if max_discount and discount_amount > max_discount:
+            discount_amount = max_discount
+    else:  # FIXED
+        discount_amount = min(discount_value, subtotal)
+    
+    return round(discount_amount, 2)
 
-@router.post("/validate")
-async def validate_coupon(data: CouponApplyRequest, request: Request):
+
+async def check_coupon_eligibility(coupon: dict, user_id: str, subtotal: float) -> tuple[bool, str]:
     """
-    Validate and calculate discount for a coupon code.
-    Returns discount details if valid.
+    Check if a coupon is eligible for a user and order.
+    Returns (is_eligible, error_message).
     """
-    user = await get_current_user(request)
-    code = data.code.strip().upper()
-    
-    # Find coupon
-    coupon = await db.coupons.find_one({"code": code}, {"_id": 0})
-    
-    if not coupon:
-        raise HTTPException(status_code=404, detail="Invalid coupon code")
-    
     # Check if active
     if not coupon.get("is_active", False):
-        raise HTTPException(status_code=400, detail="This coupon is no longer active")
+        return False, "Coupon is not active"
     
     # Check expiry
     expires_at = coupon.get("expires_at")
     if expires_at:
         if isinstance(expires_at, str):
             expires_at = datetime.fromisoformat(expires_at.replace('Z', '+00:00'))
-        if datetime.now(timezone.utc) > expires_at.replace(tzinfo=timezone.utc) if expires_at.tzinfo is None else expires_at:
-            raise HTTPException(status_code=400, detail="This coupon has expired")
+        exp_dt = expires_at.replace(tzinfo=timezone.utc) if expires_at.tzinfo is None else expires_at
+        if datetime.now(timezone.utc) > exp_dt:
+            return False, "Coupon has expired"
     
     # Check usage limit
     usage_limit = coupon.get("usage_limit")
     if usage_limit and coupon.get("used_count", 0) >= usage_limit:
-        raise HTTPException(status_code=400, detail="This coupon has reached its usage limit")
+        return False, "Coupon usage limit reached"
     
     # Check one-time per user
     if coupon.get("one_time_per_user", True):
         existing_usage = await db.coupon_usage.find_one({
             "coupon_id": coupon["coupon_id"],
-            "user_id": user["user_id"]
+            "user_id": user_id
         })
         if existing_usage:
-            raise HTTPException(status_code=400, detail="You have already used this coupon")
+            return False, "Already used this coupon"
     
     # Check minimum order value
     min_order = coupon.get("min_order_value", 0)
-    if data.order_total < min_order:
-        raise HTTPException(
-            status_code=400, 
-            detail=f"Minimum order value of ₹{min_order:.0f} required for this coupon"
-        )
+    if subtotal < min_order:
+        return False, f"Minimum order ₹{min_order:.0f} required"
     
-    # Calculate discount
-    discount_value = coupon.get("discount_value", 0)
-    coupon_type = coupon.get("coupon_type")
+    return True, ""
+
+
+# ============================================
+# PUBLIC ENDPOINTS
+# ============================================
+
+@router.get("/auto-apply")
+async def get_best_auto_coupon(subtotal: float, request: Request):
+    """
+    Get the best auto-apply coupon for the given subtotal.
+    Returns the coupon with highest discount among eligible auto-apply coupons.
+    """
+    user = await get_current_user(request)
     
-    if coupon_type == CouponType.PERCENTAGE.value:
-        discount_amount = (data.order_total * discount_value) / 100
-        # Apply max discount cap if set
-        max_discount = coupon.get("max_discount")
-        if max_discount and discount_amount > max_discount:
-            discount_amount = max_discount
-    else:  # FIXED
-        discount_amount = min(discount_value, data.order_total)  # Can't exceed order total
+    if subtotal <= 0:
+        return {"coupon": None, "message": "Invalid subtotal"}
     
-    # Round to 2 decimal places
-    discount_amount = round(discount_amount, 2)
+    # Find all active auto-apply coupons
+    coupons = await db.coupons.find({
+        "is_active": True,
+        "auto_apply": True,
+        "min_order_value": {"$lte": subtotal}
+    }, {"_id": 0}).to_list(50)
+    
+    best_coupon = None
+    best_discount = 0
+    
+    for coupon in coupons:
+        # Check eligibility
+        eligible, _ = await check_coupon_eligibility(coupon, user["user_id"], subtotal)
+        if not eligible:
+            continue
+        
+        # Calculate discount
+        discount = calculate_discount(coupon, subtotal)
+        
+        if discount > best_discount:
+            best_discount = discount
+            best_coupon = coupon
+    
+    if best_coupon:
+        return {
+            "coupon": {
+                "code": best_coupon["code"],
+                "coupon_type": best_coupon["coupon_type"],
+                "discount_value": best_coupon["discount_value"],
+                "discount_amount": best_discount,
+                "max_discount": best_coupon.get("max_discount"),
+                "auto_apply": True
+            },
+            "message": f"Auto-applied: {best_coupon['code']} saves ₹{best_discount:.0f}"
+        }
+    
+    return {"coupon": None, "message": "No auto-apply coupons available"}
+
+
+@router.post("/validate")
+async def validate_coupon(data: CouponApplyRequest, request: Request):
+    """
+    Validate and calculate discount for a coupon code.
+    Works for both manual and auto-apply coupons.
+    """
+    user = await get_current_user(request)
+    code = data.code.strip().upper()
+    
+    coupon = await db.coupons.find_one({"code": code}, {"_id": 0})
+    
+    if not coupon:
+        raise HTTPException(status_code=404, detail="Invalid coupon code")
+    
+    # Check eligibility
+    eligible, error_msg = await check_coupon_eligibility(coupon, user["user_id"], data.order_total)
+    if not eligible:
+        raise HTTPException(status_code=400, detail=error_msg)
+    
+    discount_amount = calculate_discount(coupon, data.order_total)
     new_total = round(data.order_total - discount_amount, 2)
     
     return {
         "valid": True,
         "coupon_code": code,
-        "coupon_type": coupon_type,
-        "discount_value": discount_value,
+        "coupon_type": coupon["coupon_type"],
+        "discount_value": coupon["discount_value"],
         "discount_amount": discount_amount,
+        "max_discount": coupon.get("max_discount"),
+        "auto_apply": coupon.get("auto_apply", False),
         "original_total": data.order_total,
         "new_total": new_total,
         "message": f"Coupon applied! You save ₹{discount_amount:.0f}"
