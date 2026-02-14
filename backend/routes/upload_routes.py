@@ -128,7 +128,7 @@ async def upload_multiple_product_images(
             
         except HTTPException as e:
             errors.append(f"{file.filename}: {e.detail}")
-        except Exception as e:
+        except Exception:
             errors.append(f"{file.filename}: Upload failed")
     
     return {
