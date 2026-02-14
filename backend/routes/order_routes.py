@@ -388,7 +388,7 @@ async def update_tracking(order_id: str, data: TrackingUpdate, request: Request)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     
-    result = await db.orders.update_one(
+    await db.orders.update_one(
         {"order_id": order_id},
         {"$set": {
             "tracking_id": data.tracking_id,
