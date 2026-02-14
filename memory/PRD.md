@@ -112,6 +112,25 @@ A complete, production-ready, minimalistic Gen-Z fashion e-commerce platform for
 - `DELETE /api/user/addresses/{id}` - Delete address
 - `PUT /api/user/addresses/{id}/set-default` - Set as default
 
+### Size Management (Admin)
+- `GET /api/admin/sizes` - Get all sizes (admin, with include_inactive param)
+- `GET /api/admin/sizes/active` - Get active sizes (public)
+- `POST /api/admin/sizes` - Create new size
+- `PUT /api/admin/sizes/{id}` - Update size
+- `DELETE /api/admin/sizes/{id}` - Delete size (fails if used in products)
+- `PUT /api/admin/sizes/{id}/toggle` - Toggle active status
+- `POST /api/admin/sizes/seed` - Seed default sizes
+
+### Uploads
+- `POST /api/uploads/product-image` - Upload product image
+- `POST /api/uploads/banner-image` - Upload banner image
+- `POST /api/uploads/popup-image` - Upload popup image
+- `POST /api/uploads/size-chart` - Upload size chart PDF
+- `GET /api/uploads/images/{filename}` - Serve product image
+- `GET /api/uploads/banners/{filename}` - Serve banner image
+- `GET /api/uploads/popups/{filename}` - Serve popup image
+- `GET /api/uploads/size-charts/{filename}` - Serve size chart PDF
+
 ---
 
 ## Test Credentials
