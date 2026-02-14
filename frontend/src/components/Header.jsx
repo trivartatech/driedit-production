@@ -158,14 +158,14 @@ const Header = () => {
             <nav className="px-4 py-4 space-y-4">
               <Link 
                 to="/products" 
-                className="block text-sm font-semibold hover:text-[#E10600] transition-colors"
+                className="block text-base font-semibold hover:text-[#E10600] transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 SHOP
               </Link>
               <Link 
                 to="/about" 
-                className="block text-sm font-semibold hover:text-[#E10600] transition-colors"
+                className="block text-base font-semibold hover:text-[#E10600] transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 ABOUT US
@@ -175,24 +175,24 @@ const Header = () => {
                   <>
                     <Link 
                       to="/profile"
-                      className="flex items-center space-x-2 text-sm font-semibold hover:text-[#E10600] transition-colors"
+                      className="flex items-center space-x-2 text-base font-semibold hover:text-[#E10600] transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <User size={18} />
+                      <User size={20} />
                       <span>MY ACCOUNT</span>
                     </Link>
                     <Link 
                       to="/my-orders"
-                      className="flex items-center space-x-2 text-sm font-semibold hover:text-[#E10600] transition-colors"
+                      className="flex items-center space-x-2 text-base font-semibold hover:text-[#E10600] transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <Package size={18} />
+                      <Package size={20} />
                       <span>MY ORDERS</span>
                     </Link>
                     {user?.role === 'admin' && (
                       <Link 
                         to="/admin"
-                        className="flex items-center space-x-2 text-sm font-semibold hover:text-[#E10600] transition-colors"
+                        className="flex items-center space-x-2 text-base font-semibold hover:text-[#E10600] transition-colors"
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         <span>ADMIN PANEL</span>
