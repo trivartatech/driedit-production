@@ -224,7 +224,7 @@ const GSTReport = ({ data, onExport, formatCurrency }) => {
             <TableRow label="Subtotal (Before Discount)" value={formatCurrency(data.taxable_value + data.total_discount)} />
             <TableRow label="Total Discount Given" value={`- ${formatCurrency(data.total_discount)}`} highlight />
             <TableRow label="Taxable Value" value={formatCurrency(data.taxable_value)} />
-            <TableRow label={`GST @ ${data.gst_percentage}%`} value={formatCurrency(data.gst_collected)} />
+            <TableRow label="GST Collected" value={formatCurrency(data.gst_collected)} />
             <TableRow label="Shipping Collected" value={formatCurrency(data.shipping_collected)} />
             <TableRow label="Gross Revenue" value={formatCurrency(data.gross_revenue)} bold />
           </tbody>
