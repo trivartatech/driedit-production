@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CreditCard, Truck, MapPin, Loader2, ArrowLeft, Tag, X, CheckCircle } from 'lucide-react';
-import { cartAPI, ordersAPI, publicAPI, couponsAPI } from '../services/api';
+import { cartAPI, ordersAPI, publicAPI, couponsAPI, shippingAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 
