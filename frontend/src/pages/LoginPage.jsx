@@ -109,6 +109,12 @@ const LoginPage = () => {
             >
               {loading ? 'SIGNING IN...' : 'SIGN IN'}
             </motion.button>
+            
+            <div className="text-right mt-2">
+              <Link to="/forgot-password" className="text-xs text-gray-400 hover:text-[#E10600]">
+                Forgot password?
+              </Link>
+            </div>
           </form>
 
           {/* Divider */}
