@@ -508,6 +508,45 @@ const CheckoutPage = () => {
                 ))}
               </div>
 
+              {/* Coupon Input */}
+              <div className="border-t border-white/10 pt-4 mb-4">
+                <label className="text-sm text-gray-400 mb-2 block">Have a coupon?</label>
+                {couponApplied ? (
+                  <div className="flex items-center justify-between bg-green-500/10 border border-green-500/30 p-3">
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle size={18} className="text-green-500" />
+                      <span className="font-mono font-bold text-green-500">{couponApplied.code}</span>
+                    </div>
+                    <button
+                      onClick={removeCoupon}
+                      className="text-gray-400 hover:text-white p-1"
+                      data-testid="remove-coupon-btn"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      placeholder="Enter code"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                      className="flex-1 bg-white/5 border border-white/10 p-3 text-sm font-mono focus:outline-none focus:border-[#E10600]"
+                      data-testid="coupon-input"
+                    />
+                    <button
+                      onClick={handleApplyCoupon}
+                      disabled={couponLoading}
+                      className="bg-white/10 border border-white/10 px-4 font-bold text-sm hover:bg-white/20 transition-colors disabled:opacity-50"
+                      data-testid="apply-coupon-btn"
+                    >
+                      {couponLoading ? <Loader2 size={16} className="animate-spin" /> : 'APPLY'}
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <div className="border-t border-white/10 pt-4 space-y-2 text-sm mb-4">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
@@ -521,6 +560,15 @@ const CheckoutPage = () => {
                   <span>Shipping</span>
                   <span className="font-bold">{shipping === 0 ? 'FREE' : formatPrice(shipping)}</span>
                 </div>
+                {discount > 0 && (
+                  <div className="flex justify-between text-green-500">
+                    <span className="flex items-center space-x-1">
+                      <Tag size={14} />
+                      <span>Coupon Discount</span>
+                    </span>
+                    <span className="font-bold">-{formatPrice(discount)}</span>
+                  </div>
+                )}
               </div>
 
               <div className="border-t border-white/10 pt-4 mb-6">
