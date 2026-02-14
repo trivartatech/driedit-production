@@ -143,6 +143,7 @@ export const uploadsAPI = {
 // Coupons API
 export const couponsAPI = {
   validate: (code, orderTotal) => axiosInstance.post('/coupons/validate', { code, order_total: orderTotal }),
+  getAutoCoupon: (subtotal) => axiosInstance.get(`/coupons/auto-apply?subtotal=${subtotal}`),
   // Admin
   create: (data) => axiosInstance.post('/coupons/admin/create', data),
   getAll: (includeInactive = true) => axiosInstance.get(`/coupons/admin/all?include_inactive=${includeInactive}`),
