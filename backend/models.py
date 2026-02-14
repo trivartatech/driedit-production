@@ -27,9 +27,48 @@ class PaymentStatus(str, Enum):
     SUCCESS = "success"
     FAILED = "failed"
 
+class CouponType(str, Enum):
+    PERCENTAGE = "percentage"
+    FIXED = "fixed"
+
 class UserRole(str, Enum):
     USER = "user"
     ADMIN = "admin"
+
+# Coupon Models
+class Coupon(BaseModel):
+    coupon_id: str
+    code: str  # Unique coupon code (e.g., "SAVE10")
+    coupon_type: CouponType
+    discount_value: float  # Percentage (0-100) or fixed amount
+    min_order_value: float = 0  # Minimum order value to apply
+    max_discount: Optional[float] = None  # Cap for percentage discounts
+    usage_limit: Optional[int] = None  # Total times coupon can be used
+    used_count: int = 0  # Current usage count
+    one_time_per_user: bool = True  # Each user can use only once
+    is_active: bool = True
+    expires_at: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class CouponCreate(BaseModel):
+    code: str
+    coupon_type: CouponType
+    discount_value: float
+    min_order_value: float = 0
+    max_discount: Optional[float] = None
+    usage_limit: Optional[int] = None
+    one_time_per_user: bool = True
+    is_active: bool = True
+    expires_at: Optional[datetime] = None
+
+class CouponUsage(BaseModel):
+    usage_id: str
+    coupon_id: str
+    coupon_code: str
+    user_id: str
+    order_id: str
+    discount_amount: float
+    used_at: datetime = Field(default_factory=datetime.utcnow)
 
 # User Models
 class User(BaseModel):
