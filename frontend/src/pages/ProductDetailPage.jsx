@@ -86,6 +86,12 @@ const ProductDetailPage = () => {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
 
+  // Calculate discount (0 if no product yet)
+  const discount = product ? calculateDiscount(product.regular_price, product.discounted_price) : 0;
+  
+  // Set meta tags for SEO & social sharing (must be called unconditionally)
+  useMetaTags(product, discount);
+
   useEffect(() => {
     fetchProduct();
     fetchReviews();
