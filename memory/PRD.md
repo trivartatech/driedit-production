@@ -25,7 +25,7 @@ A complete, production-ready, minimalistic Gen-Z fashion e-commerce platform for
 - [x] Forgot Password flow
 - [x] Password Reset
 
-### Google OAuth 2.0 (NEW) ✅
+### Google OAuth 2.0 ✅
 - [x] Backend-controlled OAuth flow (more secure)
 - [x] `/api/auth/google/login` - Initiates OAuth flow
 - [x] `/api/auth/google/callback` - Handles callback, creates session
@@ -33,21 +33,6 @@ A complete, production-ready, minimalistic Gen-Z fashion e-commerce platform for
 - [x] CSRF protection with state parameter
 - [x] Account linking by email
 - [x] Error handling with user-friendly messages
-- [x] Removed Emergent Auth dependency
-
-### Configuration Required
-```env
-# backend/.env
-GOOGLE_CLIENT_ID=your_client_id
-GOOGLE_CLIENT_SECRET=your_client_secret
-GOOGLE_REDIRECT_URI=https://driedit.in/api/auth/google/callback
-FRONTEND_URL=https://driedit.in
-```
-
-### Redirect URIs to Configure in Google Cloud Console
-- Production: `https://driedit.in/api/auth/google/callback`
-- Preview: `https://checkout-dev.preview.emergentagent.com/api/auth/google/callback`
-- Local: `http://localhost:8000/api/auth/google/callback`
 
 ---
 
@@ -63,6 +48,20 @@ FRONTEND_URL=https://driedit.in
 - [x] Order tracking
 - [x] Replace & Return system
 - [x] User Reviews (verified buyers only)
+
+### User Profile & Address Manager (NEW) ✅
+- [x] Profile page with tabbed layout (Profile Info, Saved Addresses)
+- [x] Profile update (name, phone)
+- [x] Phone validation (10-digit Indian mobile format, starts with 6-9)
+- [x] Multiple saved addresses (max 5 per user)
+- [x] Address CRUD (add, edit, delete)
+- [x] Default address selection
+- [x] Address labels (Home, Work, Other)
+- [x] Checkout integration with address selector dropdown
+- [x] Auto-select default address at checkout
+- [x] Pincode auto-check when selecting saved address
+- [x] Save address from checkout option
+- [x] "Manage Addresses" link in checkout
 
 ### Pricing Engine
 - [x] Dual pricing (regular + discounted)
@@ -102,6 +101,19 @@ FRONTEND_URL=https://driedit.in
 
 ---
 
+## API Endpoints
+
+### User Profile & Addresses
+- `GET /api/user/profile` - Get user profile with addresses
+- `PUT /api/user/profile` - Update profile (name, phone)
+- `GET /api/user/addresses` - Get all addresses
+- `POST /api/user/addresses` - Add new address
+- `PUT /api/user/addresses/{id}` - Update address
+- `DELETE /api/user/addresses/{id}` - Delete address
+- `PUT /api/user/addresses/{id}/set-default` - Set as default
+
+---
+
 ## Test Credentials
 
 **Admin User:**
@@ -114,24 +126,38 @@ FRONTEND_URL=https://driedit.in
 
 ---
 
-## Files Changed for Google OAuth
+## Files Changed for User Profile Feature
 
 ### New Files
-- `backend/routes/google_oauth_routes.py` - Complete OAuth flow implementation
+- `backend/routes/user_profile_routes.py` - Profile and address CRUD endpoints
+- `frontend/src/pages/ProfilePage.jsx` - Profile page with tabbed layout
+- `backend/tests/test_user_profile.py` - Test suite for profile feature
 
 ### Modified Files
-- `backend/server.py` - Added google_oauth_routes
-- `backend/auth.py` - Removed Emergent exchange_session_id function
-- `backend/routes/auth_routes.py` - Removed /session endpoint
-- `backend/.env` - Added Google OAuth variables
-- `frontend/src/pages/LoginPage.jsx` - Updated Google button to call backend
-- `frontend/src/pages/HomePage.jsx` - Added OAuth success handling
-- `frontend/src/App.js` - Removed AuthCallback
+- `backend/models.py` - Added Address, AddressCreate, AddressUpdate, UserProfileUpdate models
+- `backend/server.py` - Added user_profile_routes router
+- `frontend/src/App.js` - Added /profile route
+- `frontend/src/pages/CheckoutPage.jsx` - Integrated address selector
+- `frontend/src/services/api.js` - Added profileAPI
+- `frontend/src/components/Header.jsx` - Added Profile link in navigation
 
-### Deleted Files
-- `frontend/src/pages/AuthCallback.jsx` - No longer needed
+---
+
+## Upcoming Tasks
+
+### P1 - High Priority
+- [ ] Production Deployment Checklist execution
+- [ ] Email verification on user signup
+
+### P2 - Medium Priority  
+- [ ] SMS notifications for order updates
+- [ ] Inventory low-stock alerts
+
+### P3 - Low Priority
+- [ ] Advanced analytics filters
+- [ ] Customer segmentation
 
 ---
 
 *Last Updated: 2026-02-14*
-*Google OAuth: ✅ Implemented (pending credentials)*
+*User Profile & Address Manager: ✅ Complete*
