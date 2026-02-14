@@ -80,7 +80,7 @@ const WishlistPage = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {wishlistItems.map((product, index) => (
             <motion.div
-              key={product.id}
+              key={product.product_id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
