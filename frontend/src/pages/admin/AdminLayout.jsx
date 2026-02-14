@@ -91,6 +91,7 @@ const AdminLayout = () => {
         <div className="flex-1 p-8 min-h-screen">
           <Routes>
             <Route path="/" element={<AdminDashboard />} />
+            <Route path="/analytics" element={<AdminAnalytics />} />
             <Route path="/orders" element={<AdminOrders />} />
             <Route path="/products" element={<AdminProducts />} />
             <Route path="/categories" element={<AdminCategories />} />
