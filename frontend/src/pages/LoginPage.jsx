@@ -77,6 +77,7 @@ const LoginPage = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email"
                   required
+                  data-testid="email-input"
                   className="w-full bg-white/5 border border-white/10 pl-12 pr-4 py-3 focus:outline-none focus:border-[#E10600] text-white placeholder-gray-500"
                 />
               </div>
@@ -92,6 +93,7 @@ const LoginPage = () => {
                   placeholder="Password"
                   required
                   minLength="8"
+                  data-testid="password-input"
                   className="w-full bg-white/5 border border-white/10 pl-12 pr-4 py-3 focus:outline-none focus:border-[#E10600] text-white placeholder-gray-500"
                 />
               </div>
@@ -100,6 +102,7 @@ const LoginPage = () => {
             <motion.button
               type="submit"
               disabled={loading}
+              data-testid="login-btn"
               className="w-full bg-[#E10600] text-white py-3 font-bold hover:bg-white hover:text-black transition-all duration-300 disabled:opacity-50"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
