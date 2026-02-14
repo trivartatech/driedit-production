@@ -135,7 +135,7 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 ---
 
 ## Test Credentials
-- **Admin**: admin@driedit.in / admin123
+- **Admin**: admin@driedit.in / adminpassword
 - **User**: test@example.com / password123
 - **Test Pincode**: 110001
 
