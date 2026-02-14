@@ -166,6 +166,38 @@ const AdminProducts = () => {
     setShowUrlInput(false);
   };
 
+  // Size Chart PDF upload
+  const handlePdfUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.includes('pdf')) {
+      toast.error('Only PDF files are allowed');
+      return;
+    }
+
+    setUploadingPdf(true);
+    try {
+      const response = await uploadsAPI.uploadSizeChart(file);
+      if (response.data.success) {
+        const fullUrl = `${API}${response.data.url}`;
+        setFormData(prev => ({ ...prev, size_chart_pdf: fullUrl }));
+        toast.success('Size chart uploaded');
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to upload size chart');
+    } finally {
+      setUploadingPdf(false);
+      if (pdfInputRef.current) {
+        pdfInputRef.current.value = '';
+      }
+    }
+  };
+
+  const removeSizeChart = () => {
+    setFormData(prev => ({ ...prev, size_chart_pdf: '' }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
