@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, Edit2, Trash2, Search, Loader2, Package, 
-  AlertTriangle, X, Image as ImageIcon 
+  AlertTriangle, X, Upload, Image as ImageIcon, CheckCircle
 } from 'lucide-react';
-import { productsAPI, categoriesAPI } from '../../services/api';
+import { productsAPI, categoriesAPI, uploadsAPI } from '../../services/api';
 import { toast } from 'sonner';
+
+const API = process.env.REACT_APP_BACKEND_URL;
 
 const formatPrice = (price) => `₹${price?.toLocaleString('en-IN') || 0}`;
 
@@ -16,7 +18,7 @@ const INITIAL_PRODUCT = {
   discounted_price: '',
   sizes: [],
   stock: '',
-  images: [''],
+  images: [],
   description: ''
 };
 
@@ -33,6 +35,8 @@ const AdminProducts = () => {
   const [formData, setFormData] = useState(INITIAL_PRODUCT);
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     fetchData();
@@ -65,7 +69,7 @@ const AdminProducts = () => {
         discounted_price: product.discounted_price,
         sizes: product.sizes || [],
         stock: product.stock,
-        images: product.images?.length ? product.images : [''],
+        images: product.images || [],
         description: product.description
       });
     } else {
@@ -90,19 +94,71 @@ const AdminProducts = () => {
     }));
   };
 
-  const handleImageChange = (index, value) => {
-    const newImages = [...formData.images];
-    newImages[index] = value;
-    setFormData({ ...formData, images: newImages });
+  // Image upload handler
+  const handleImageUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    if (formData.images.length + files.length > 5) {
+      toast.error('Maximum 5 images allowed per product');
+      return;
+    }
+
+    setUploading(true);
+    const uploadedUrls = [];
+
+    for (const file of files) {
+      try {
+        const response = await uploadsAPI.uploadProductImage(file);
+        if (response.data.success) {
+          // Convert relative URL to full URL
+          const fullUrl = `${API}${response.data.url}`;
+          uploadedUrls.push(fullUrl);
+          toast.success(`Uploaded: ${file.name}`);
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        toast.error(`Failed to upload: ${file.name}`);
+      }
+    }
+
+    if (uploadedUrls.length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        images: [...prev.images, ...uploadedUrls]
+      }));
+    }
+
+    setUploading(false);
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
-  const addImageField = () => {
-    setFormData({ ...formData, images: [...formData.images, ''] });
+  const removeImage = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
   };
 
-  const removeImageField = (index) => {
-    const newImages = formData.images.filter((_, i) => i !== index);
-    setFormData({ ...formData, images: newImages.length ? newImages : [''] });
+  // Add URL manually
+  const [showUrlInput, setShowUrlInput] = useState(false);
+  const [urlInput, setUrlInput] = useState('');
+
+  const addImageUrl = () => {
+    if (!urlInput.trim()) return;
+    if (formData.images.length >= 5) {
+      toast.error('Maximum 5 images allowed');
+      return;
+    }
+    setFormData(prev => ({
+      ...prev,
+      images: [...prev.images, urlInput.trim()]
+    }));
+    setUrlInput('');
+    setShowUrlInput(false);
   };
 
   const handleSubmit = async (e) => {
@@ -118,8 +174,7 @@ const AdminProducts = () => {
       return;
     }
 
-    const validImages = formData.images.filter(img => img.trim());
-    if (validImages.length === 0) {
+    if (formData.images.length === 0) {
       toast.error('Please add at least one product image');
       return;
     }
@@ -130,8 +185,7 @@ const AdminProducts = () => {
         ...formData,
         regular_price: parseFloat(formData.regular_price),
         discounted_price: parseFloat(formData.discounted_price),
-        stock: parseInt(formData.stock) || 0,
-        images: validImages
+        stock: parseInt(formData.stock) || 0
       };
 
       if (editingProduct) {
@@ -415,35 +469,103 @@ const AdminProducts = () => {
                   </div>
                 </div>
 
+                {/* Image Upload Section */}
                 <div>
-                  <label className="block text-sm text-gray-400 mb-2">Product Images *</label>
-                  {formData.images.map((image, index) => (
-                    <div key={index} className="flex space-x-2 mb-2">
+                  <label className="block text-sm text-gray-400 mb-2">
+                    Product Images * <span className="text-xs">({formData.images.length}/5)</span>
+                  </label>
+                  
+                  {/* Image Preview Grid */}
+                  {formData.images.length > 0 && (
+                    <div className="grid grid-cols-5 gap-2 mb-3">
+                      {formData.images.map((image, index) => (
+                        <div key={index} className="relative group aspect-square">
+                          <img
+                            src={image}
+                            alt={`Product ${index + 1}`}
+                            className="w-full h-full object-cover border border-white/10"
+                            onError={(e) => { e.target.src = '/placeholder.jpg'; }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeImage(index)}
+                            className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X size={12} />
+                          </button>
+                          {index === 0 && (
+                            <span className="absolute bottom-0 left-0 right-0 bg-[#E10600] text-xs text-center py-0.5">
+                              Main
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Upload Buttons */}
+                  <div className="flex flex-wrap gap-2">
+                    {/* File Upload */}
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleImageUpload}
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      multiple
+                      className="hidden"
+                      data-testid="image-upload-input"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading || formData.images.length >= 5}
+                      className="flex items-center space-x-2 bg-[#E10600]/20 border border-[#E10600]/50 px-4 py-2 text-sm font-bold hover:bg-[#E10600]/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      data-testid="upload-image-btn"
+                    >
+                      {uploading ? (
+                        <Loader2 size={16} className="animate-spin" />
+                      ) : (
+                        <Upload size={16} />
+                      )}
+                      <span>{uploading ? 'Uploading...' : 'Upload Images'}</span>
+                    </button>
+
+                    {/* URL Input Toggle */}
+                    <button
+                      type="button"
+                      onClick={() => setShowUrlInput(!showUrlInput)}
+                      disabled={formData.images.length >= 5}
+                      className="flex items-center space-x-2 bg-white/5 border border-white/10 px-4 py-2 text-sm font-bold hover:bg-white/10 transition-colors disabled:opacity-50"
+                    >
+                      <ImageIcon size={16} />
+                      <span>Add URL</span>
+                    </button>
+                  </div>
+
+                  {/* URL Input Field */}
+                  {showUrlInput && (
+                    <div className="flex space-x-2 mt-2">
                       <input
                         type="url"
-                        value={image}
-                        onChange={(e) => handleImageChange(index, e.target.value)}
-                        className="flex-1 bg-white/5 border border-white/10 p-3 focus:outline-none focus:border-[#E10600]"
+                        value={urlInput}
+                        onChange={(e) => setUrlInput(e.target.value)}
+                        className="flex-1 bg-white/5 border border-white/10 p-2 text-sm focus:outline-none focus:border-[#E10600]"
                         placeholder="https://example.com/image.jpg"
-                        data-testid={`product-image-input-${index}`}
+                        data-testid="image-url-input"
                       />
                       <button
                         type="button"
-                        onClick={() => removeImageField(index)}
-                        className="bg-red-500/20 text-red-500 px-3 hover:bg-red-500/30 transition-colors"
+                        onClick={addImageUrl}
+                        className="bg-[#E10600] px-4 text-sm font-bold hover:bg-white hover:text-black transition-colors"
                       >
-                        <X size={18} />
+                        Add
                       </button>
                     </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={addImageField}
-                    className="text-sm text-[#E10600] hover:underline flex items-center space-x-1"
-                  >
-                    <Plus size={14} />
-                    <span>Add another image</span>
-                  </button>
+                  )}
+
+                  <p className="text-xs text-gray-500 mt-2">
+                    Supported: JPG, PNG, WebP, GIF (max 5MB each)
+                  </p>
                 </div>
 
                 <div>
