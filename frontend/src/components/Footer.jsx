@@ -95,6 +95,17 @@ const Footer = () => {
 
         <div className="border-t border-white/10 mt-12 pt-8 text-center text-sm text-gray-400">
           <p>&copy; 2025 DRIEDIT. All rights reserved.</p>
+          <p className="mt-2">
+            Crafted with ❤️ by{' '}
+            <a 
+              href="https://trivarta.in" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-[#E10600] hover:text-white transition-colors"
+            >
+              Trivarta Tech Pvt. Ltd.
+            </a>
+          </p>
         </div>
       </div>
     </footer>
