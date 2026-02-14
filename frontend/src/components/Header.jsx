@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, ShoppingCart, Heart, User, Search } from 'lucide-react';
+import { Menu, X, ShoppingCart, Heart, User, Search, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getCart, getWishlist } from '../mockData';
+import { getCart } from '../mockData';
+import { useAuth } from '../context/AuthContext';
+import { wishlistAPI } from '../services/api';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
   const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     updateCounts();
@@ -21,13 +24,29 @@ const Header = () => {
       window.removeEventListener('cartUpdated', updateCounts);
       window.removeEventListener('wishlistUpdated', updateCounts);
     };
-  }, []);
+  }, [isAuthenticated]);
 
-  const updateCounts = () => {
+  const updateCounts = async () => {
+    // Cart is still localStorage for now
     const cart = getCart();
-    const wishlist = getWishlist();
     setCartCount(cart.reduce((acc, item) => acc + item.quantity, 0));
-    setWishlistCount(wishlist.length);
+    
+    // Wishlist from backend if authenticated
+    if (isAuthenticated) {
+      try {
+        const response = await wishlistAPI.get();
+        setWishlistCount(response.data.length);
+      } catch (error) {
+        console.error('Error fetching wishlist:', error);
+      }
+    } else {
+      setWishlistCount(0);
+    }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
   };
 
   return (
