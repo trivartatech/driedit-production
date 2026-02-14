@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingCart, Star, ChevronLeft, ChevronRight, Truck, RefreshCcw, Shield, Loader2, FileText, ExternalLink, Share2, Copy, Check } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
