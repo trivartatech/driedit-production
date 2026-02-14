@@ -202,7 +202,7 @@ const GSTReport = ({ data, onExport, formatCurrency }) => {
           color="green"
         />
         <KPICard
-          title={`GST Collected (${data.gst_percentage}%)`}
+          title="GST Collected"
           value={formatCurrency(data.gst_collected)}
           icon={Percent}
           color="red"
