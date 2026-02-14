@@ -161,6 +161,8 @@ class Order(BaseModel):
     subtotal: float
     gst_amount: float
     shipping_charge: float
+    coupon_code: Optional[str] = None
+    coupon_discount: float = 0
     total: float
     payment_method: PaymentMethod
     payment_status: PaymentStatus
@@ -184,6 +186,8 @@ class OrderCreate(BaseModel):
     payment_method: PaymentMethod
     delivery_address: dict
     pincode: str
+    coupon_code: Optional[str] = None
+    coupon_discount: float = 0
 
 # Review Models
 class Review(BaseModel):
