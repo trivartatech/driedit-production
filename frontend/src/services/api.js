@@ -15,6 +15,7 @@ const axiosInstance = axios.create({
 export const productsAPI = {
   getAll: (params = {}) => axiosInstance.get('/products', { params }),
   getById: (id) => axiosInstance.get(`/products/${id}`),
+  getRecommendations: (id, limit = 4) => axiosInstance.get(`/products/${id}/recommendations`, { params: { limit } }),
   create: (data) => axiosInstance.post('/products', data),
   update: (id, data) => axiosInstance.put(`/products/${id}`, data),
   delete: (id) => axiosInstance.delete(`/products/${id}`)
