@@ -103,6 +103,7 @@ const AdminCoupons = () => {
         max_discount: formData.max_discount ? parseFloat(formData.max_discount) : null,
         usage_limit: formData.usage_limit ? parseInt(formData.usage_limit) : null,
         one_time_per_user: formData.one_time_per_user,
+        auto_apply: formData.auto_apply,
         is_active: formData.is_active,
         expires_at: formData.expires_at ? new Date(formData.expires_at).toISOString() : null
       };
