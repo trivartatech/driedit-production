@@ -15,54 +15,68 @@ The user wants to build a complete, production-ready, scalable, minimalistic Gen
 -   **Payment & Logistics**: Razorpay integration, Cash on Delivery (COD), Tier-based shipping, GST Management.
 -   **Marketing & Communication**: Order and return status email notifications via Resend.
 -   **User Account Management**: Forgot Password flow.
--   **New**: Product recommendation section on the product detail page.
+-   **New Features Added**:
+    -   Product recommendation section on the product detail page.
+    -   GST and Financial reporting module for admin.
+    -   Product sharing functionality (WhatsApp, Facebook, Instagram, Copy URL).
 
 **User's preferred language**: English
 
 **what currently exists?**
-A feature-rich e-commerce platform with a React frontend, FastAPI backend, and MongoDB database. It includes a full commerce flow, an advanced pricing engine, transactional emails via Resend, and production-hardened features like secure cookies and automated backups.
+A feature-rich e-commerce platform with a React frontend, FastAPI backend, and MongoDB database. It includes a full commerce flow, an advanced pricing engine, transactional emails, and an extensive admin panel.
 
 Key systems include:
 -   **Full Commerce Flow**: User registration/login (Email/Password & Google OAuth), product browsing, cart, and a complete checkout process using Razorpay (test mode) or COD.
--   **Admin Panel**: Role-protected dashboard for managing products, categories, orders, returns, shipping tiers, coupons, banners, popups, and delivery pincodes.
--   **Analytics Dashboard**: Admin dashboard with metrics for revenue, orders, AOV, top products, and more.
--   **User Profile & Address Manager**: A dedicated  page for users to manage their personal information and up to 5 shipping addresses. The checkout process is integrated to allow selection from saved addresses.
--   **Advanced Admin Controls**:
-    -   **Dynamic Size Management**: Admins can CRUD sizes (e.g., S, M, L, 30, 32), which dynamically populate in the product creation form.
-    -   **File Uploads**: Banners and popups now use direct image uploads instead of URL links.
-    -   **Size Chart Uploads**: Admins can upload a PDF size chart for each product.
+-   **Admin Panel**: Role-protected dashboard for managing products, categories, orders, analytics, and site content.
+-   **GST & Financial Reporting**: A dedicated admin section with date-filterable reports for GST, Sales, and Payments, including CSV export functionality.
+-   **User-Facing Features**: About Us page, legal pages (Privacy, T&C, Returns), product recommendations, product sharing, and a scroll-to-top navigation enhancement.
+-   **UI/UX**: The UI has been refined with a simplified header/footer, updated wishlist icon, clickable banner images, and a redesigned category section.
 
 **Last working item**:
--   Last item agent was working: The user requested a new feature: a product recommendation section to be added to the product detail page.
--   Status: NOT STARTED
+-   Last item agent was working: The user reported a runtime error after the implementation of the Share Product feature. The agent was in the process of debugging this error.
+-   Status: BLOCKED
 -   Agent Testing Done: N
--   Which testing method agent to use? both
+-   Which testing method agent to use? The next agent should manually test the fix in the browser. Since this is a browser security policy issue, automated testing agents may not be able to replicate or verify the fix correctly. The agent should check the browser console for errors.
 -   User Testing Done: N
 
 **All Pending/In progress Issue list**:
--   None. The agent is ready to start the next major feature.
+-   Issue 1: (P0) Clipboard API is blocked due to a permissions policy.
+
+  Issues Detail:
+  - Issue 1:
+     - **Description**: The Copy URL and Share on Instagram buttons on the product detail page are failing with the error:  This prevents users from copying the product URL.
+     - **Attempted fixes**: None yet. The agent was about to start debugging when the session ended.
+     - **Next debug checklist**:
+       1.  **Investigate the Error**: The error  points to a  issue. The Clipboard API requires a secure context (HTTPS) and must be triggered by a direct user action. The preview environment might be imposing a strict policy.
+       2.  **Examine Code**: Review the  component in .
+       3.  **Find Fallback**: If the policy cannot be changed, the agent must implement a fallback. Instead of directly writing to the clipboard, show a toast message like URL copied! but also consider a more robust solution like displaying a modal with the URL in a text field for the user to copy manually. This provides a better UX than a silently failing button.
+     - **Why fix this issue and what will be achieved with the fix?**: Fixing this will make the product sharing feature functional, improving user engagement and the potential for organic marketing.
+     - **Status**: IN PROGRESS
+     - **Is recurring issue?**: N
+     - **Should Test frontend/backend/both after fix?**: Frontend
+     - **Blocked on other issue**: None
 
 **In progress Task List**:
 -   None.
 
 **Upcoming and Future Tasks**
--   **Upcoming Tasks**:
-    -   (P0) **Implement Product Recommendation Section**: This is the immediate next task. It involves:
-        -   **Logic**: Decide on the recommendation strategy (e.g., same category, related products, recently viewed).
-        -   **Backend**: Create a new API endpoint () to fetch recommended products.
-        -   **Frontend**: Update  to fetch and display the recommendations below the main product details.
 -   **Future Tasks**:
     -   (P1) **Production Deployment Checklist Execution**: Review and execute the steps in .
     -   (P2) **Email Verification**: Add an email verification step on user signup.
     -   (P3) **SMS Notifications**: Integrate an SMS provider for order updates.
 
 **Completed work in this session**
--   **User Profile & Address Manager Module**: Implemented a full-stack module allowing users to manage their profile and multiple shipping addresses, with integration into the checkout page. (Files: , , ).
--   **Advanced Admin Enhancements Module**:
-    -   **Dynamic Size Management**: Created a new  collection and a full CRUD interface in the admin panel. (Files: , ).
-    -   **Banner & Popup Image Uploads**: Replaced URL inputs in the admin panel with a secure file upload system. (Files: , , ).
-    -   **Product Size Chart PDF Upload**: Added functionality for admins to upload a PDF size chart for each product, with a View Size Chart button on the product page. (Files: , ).
--   **Testing**: Successfully ran the testing agent twice to validate the completion and stability of the two major modules implemented.
+-   **Product Recommendation Section**: Implemented and tested a You May Also Like section on the product detail page () powered by a new backend endpoint ().
+-   **GST & Financial Reporting Module**: Built a comprehensive, India-compliant reporting system in the admin panel () with backend endpoints () for GST, Sales, and Payment data, including CSV export.
+-   **New Content Pages**: Created and routed an About Us page and essential legal pages: Privacy Policy, Terms & Conditions, and Return & Refund Policy.
+-   **Footer & Header Redesign**: Updated the  with full contact details, a credits link, and links to the new legal pages. Simplified the  navigation menu.
+-   **UI/UX Enhancements**:
+    -   Implemented a scroll to top feature on navigation ().
+    -   Made the main banner image a clickable link ().
+    -   Redesigned the wishlist icon for a cleaner look ().
+    -   Re-styled the Shop by Category section on the homepage ().
+    -   Increased mobile menu font size for better readability ().
+-   **Share Product Feature**: Added share buttons to the product page. (Currently has a bug).
 
 **Earlier issues found/mentioned but not fixed**
 -   None.
@@ -74,20 +88,17 @@ Key systems include:
 
 
 **Key Technical Concepts**
--   **Frontend**: React, React Router, Tailwind CSS, Recharts, Axios, Shadcn UI
--   **Backend**: FastAPI, Pydantic, Motor, MongoDB Aggregation Pipelines, FastAPI  for multipart/form-data.
+-   **Frontend**: React, React Router, Tailwind CSS, Shadcn UI, , 
+-   **Backend**: FastAPI, Pydantic, Motor, MongoDB Aggregation Pipelines
 -   **Database**: MongoDB
--   **Authentication**: JWTs (httpOnly cookies), bcrypt, Official Google OAuth 2.0
--   **DevOps**: Shell scripting for backups, logrotate, secure static file serving.
+-   **Authentication**: JWTs (httpOnly cookies), bcrypt, Google OAuth
+-   **Browser APIs**: Clipboard API (currently facing a permissions issue).
 
 **key DB schema**
--   **users**: , , , , , ..., ,  (String),  (Array of sub-documents: ).
--   **products**: , , , ,  (Array of String),  (String).
--   **sizes**:  (String),  (String),  (Boolean).
--   **banners/popups**: Schema now stores a file path  (String) instead of .
+-   No schema changes were made. The reporting module relies on existing financial fields within the  collection (, , , , etc.).
 
 **changes in tech stack**
--   No new third-party libraries were added. The changes focused on using existing FastAPI features (, ) for file handling.
+-   **Added**:  for icons and  for social sharing functionality.
 
 **All files of reference**
 -   **New/Created**:
@@ -95,68 +106,69 @@ Key systems include:
     -   
     -   
     -   
+    -   
+    -   
+    -   
 -   **Heavily Modified**:
-    -    (Added  sub-model, updated  and  models)
-    -    (Added endpoints for banner, popup, and size chart uploads)
-    -    (Integrated address selection)
-    -    (Integrated dynamic sizes and PDF upload)
-    -    &  (Switched from URL to file upload UI)
-    -    (Added View Size Chart button)
+    -    (Added recommendations and share buttons)
+    -    (Added contact info, legal links, credits)
+    -    (Simplified menu, adjusted mobile styles)
+    -    (Added routes for all new pages)
+    -    (Added recommendation endpoint)
+    -    (Registered the new reports router)
+    -    (Updated Shop by Category UI)
 
 **Areas that need refactoring**:
 -   None.
 
 **key api endpoints**
--    (GET, PUT)
--    (GET, POST)
--    (PUT, DELETE)
--    (GET, POST)
--    (PUT, DELETE)
--    (POST)
--    (POST)
--    (POST)
--    (GET for serving uploaded files)
+-    (GET)
+-    (GET)
+-    (GET)
+-    (GET)
+-    (GET)
+-    (GET)
 
 **Critical Info for New Agent**
--   Your immediate and highest priority task is to **implement the Product Recommendation feature** on the product detail page, as requested by the user.
--   You will need to define the recommendation logic (e.g., based on category), create a new backend endpoint, and integrate it into the  frontend component.
--   The two major modules implemented in the last session (User Profiles and Advanced Admin Controls) are stable and have been tested. Do not alter their core functionality unless necessary for the new task.
+-   Your immediate and highest priority task is to **fix the Share Product feature**.
+-   The root cause is a  blocking the Clipboard API () in the preview environment.
+-   You need to investigate a fallback solution for the copy functionality in the  component located inside . A simple failing button is a poor user experience.
 
 **documents and test reports created in this job**
 -    (updated)
 -   
--   
--   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  User asked how to access the admin panel.
-2.  User provided a detailed PRD for Advanced Admin Enhancements (Dynamic Sizes, Banner/Popup Uploads, Size Chart PDF).
-3.  User confirmed implementation choices (pre-seed sizes, open PDF in a new tab).
-4.  Agent began implementation of the advanced admin features.
-5.  Agent completed the full implementation.
-6.  Agent ran the testing agent, which passed with 100% success.
-7.  Agent updated PRD and finished the task.
-8.  User asked for test user login credentials.
-9.  Agent provided the credentials for both test and admin users.
-10. **(Pending)** User requested a new feature: Add recomondation inside the product page to show other products also below.
+1.  **User**: Reported the runtime error with the Clipboard API.
+2.  **User**: Requested share product buttons for social media.
+3.  **User**: Requested a centered and different UI for the Shop by Category section.
+4.  **User**: Requested the Shop by Category list on the home page to be displayed one by one.
+5.  **User**: Requested an increase in the mobile menu text size.
+6.  **User**: Requested removing the GST percentage from the admin report view.
+7.  **User**: Requested to build the comprehensive GST & Financial Reporting module.
+8.  **User**: Requested to change the wishlist heart icon style to be an outline.
+9.  **User**: Requested to remove the button from the banner and make the image clickable.
+10. **User**: Requested to make the logo link to the home page.
 
 **Project Health Check:**
--   **Broken**: None
+-   **Broken**: The Share Product feature on the product detail page due to the Clipboard API permissions error.
 -   **Mocked**: None
 
 **3rd Party Integrations**
--   **Google OAuth**: Official server-side implementation. Requires User-provided  and .
--   **Razorpay**: Live in test mode. Requires User API Key for production.
--   **Resend**: Fully integrated and tested. Requires User API Key.
+-   **Google OAuth**: Server-side implementation.
+-   **Razorpay**: Live in test mode.
+-   **Resend**: For transactional emails.
 -   **bcrypt**: For password hashing.
 -   **Framer Motion**: For frontend animations.
--   **Recharts**: For data visualization in the admin panel.
+-   **Recharts**: For data visualization.
+-   **lucide-react**: For UI icons.
+-   **react-share**: For social share links.
 
 **Testing status**
--   Testing agent used after significant changes: YES (Used twice for the two major modules).
+-   Testing agent used after significant changes: YES (For the product recommendation feature).
 -   Troubleshoot agent used after agent stuck in loop: NO
 -   Test files created: None.
--   Known regressions: None.
+-   Known regressions: The Share Product functionality is currently broken.
 
 **Credentials to test flow:**
 -   **Admin User**:
@@ -167,4 +179,4 @@ Key systems include:
     -   Password: 
 
 **What agent forgot to execute**
--   The agent correctly followed all user directives and did not miss any requested tasks.</analysis>
+-   The agent was executing user requests sequentially and was interrupted by a bug report. Nothing was forgotten.</analysis>
