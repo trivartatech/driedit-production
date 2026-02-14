@@ -1,34 +1,55 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* Global App Styles for DRIEDIT */
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+body {
+  background-color: #000000;
+  color: #ffffff;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+select {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: white;
 }
 
-.App-link {
-    color: #61dafb;
+select option {
+  background-color: #000000;
+  color: white;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #E10600;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ff0700;
+}
+
+/* Remove default img alt text style */
+img {
+  font-size: 0;
+}
+
+/* Remove focus outline on click but keep for keyboard navigation */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid #E10600;
+  outline-offset: 2px;
 }
