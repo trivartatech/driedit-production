@@ -481,7 +481,7 @@ const AdminCoupons = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-6">
+                <div className="flex flex-col space-y-3">
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <input
                       type="checkbox"
@@ -490,6 +490,19 @@ const AdminCoupons = () => {
                       className="w-4 h-4 accent-[#E10600]"
                     />
                     <span className="text-sm">One-time per user</span>
+                  </label>
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.auto_apply}
+                      onChange={(e) => setFormData({ ...formData, auto_apply: e.target.checked })}
+                      className="w-4 h-4 accent-blue-500"
+                    />
+                    <span className="text-sm flex items-center gap-1">
+                      <Zap size={14} className="text-blue-400" />
+                      Auto-apply at checkout
+                    </span>
+                    <span className="text-xs text-gray-500">(Best discount wins)</span>
                   </label>
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <input
