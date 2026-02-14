@@ -94,14 +94,17 @@ async def register(data: UserRegister, response: Response):
         raise HTTPException(status_code=500, detail="Registration failed")
 
 @router.post("/login")
-async def login(data: UserLogin, response: Response):
+@limiter.limit("5/15minutes")  # Rate limit: 5 attempts per 15 minutes
+async def login(data: UserLogin, request: Request, response: Response):
     """
     Login with email and password.
+    Rate limited to prevent brute force attacks.
     """
     try:
         # Find user by email
         user = await db.users.find_one({"email": data.email}, {"_id": 0})
         
+        # Account enumeration protection: same error for both cases
         if not user:
             raise HTTPException(status_code=401, detail="Invalid email or password")
         
@@ -109,7 +112,7 @@ async def login(data: UserLogin, response: Response):
         if not user.get("password"):
             raise HTTPException(status_code=400, detail="This email is registered with Google. Please use Google login.")
         
-        # Verify password
+        # Verify password - same error message for security
         if not verify_password(data.password, user["password"]):
             raise HTTPException(status_code=401, detail="Invalid email or password")
         
