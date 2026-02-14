@@ -35,7 +35,9 @@ const CheckoutPage = () => {
   // Coupon state
   const [couponCode, setCouponCode] = useState('');
   const [couponApplied, setCouponApplied] = useState(null);
+  const [autoCoupon, setAutoCoupon] = useState(null);
   const [couponLoading, setCouponLoading] = useState(false);
+  const [couponAppliedType, setCouponAppliedType] = useState('manual'); // 'auto' or 'manual'
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -50,6 +52,41 @@ const CheckoutPage = () => {
       setAddress(prev => ({ ...prev, name: user.name }));
     }
   }, [user]);
+
+  // Auto-apply coupon when cart loads or changes
+  useEffect(() => {
+    if (cartItems.length > 0 && !couponApplied) {
+      fetchAutoCoupon();
+    }
+  }, [cartItems]);
+
+  const fetchAutoCoupon = async () => {
+    try {
+      const subtotal = cartItems.reduce((acc, item) => 
+        acc + ((item.product?.discounted_price || 0) * item.quantity), 0
+      );
+      
+      const response = await couponsAPI.getAutoCoupon(subtotal);
+      
+      if (response.data.coupon) {
+        const autoCouponData = response.data.coupon;
+        setAutoCoupon(autoCouponData);
+        
+        // Auto-apply if no manual coupon is set
+        if (!couponApplied) {
+          setCouponApplied({
+            code: autoCouponData.code,
+            discount_amount: autoCouponData.discount_amount,
+            message: response.data.message,
+            auto_apply: true
+          });
+          setCouponAppliedType('auto');
+        }
+      }
+    } catch (error) {
+      console.log('No auto-apply coupons available');
+    }
+  };
 
   const loadData = async () => {
     try {
