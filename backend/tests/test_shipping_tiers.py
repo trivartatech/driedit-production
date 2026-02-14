@@ -243,17 +243,41 @@ class TestShippingTierAdminCRUD:
     
     def test_admin_toggle_tier(self):
         """Admin can toggle tier active/inactive"""
-        # Create test tier (active - non-overlapping range)
+        # First, deactivate one of the existing seeded tiers to make room
+        # Get all tiers to find the 1000+ tier
+        all_tiers_response = requests.get(
+            f"{BASE_URL}/api/shipping-tiers/admin/all",
+            cookies=self.cookies
+        )
+        assert all_tiers_response.status_code == 200
+        
+        # Find the 1000+ tier and store its ID for later restoration
+        tiers = all_tiers_response.json()
+        tier_1000_plus = None
+        for t in tiers:
+            if t["min_amount"] == 1000 and t["max_amount"] is None:
+                tier_1000_plus = t
+                break
+        
+        if tier_1000_plus and tier_1000_plus["is_active"]:
+            # Deactivate 1000+ tier temporarily
+            requests.put(
+                f"{BASE_URL}/api/shipping-tiers/admin/{tier_1000_plus['tier_id']}/toggle",
+                cookies=self.cookies
+            )
+        
+        # Create test tier in high range (now non-overlapping since 1000+ is inactive)
         create_response = requests.post(
             f"{BASE_URL}/api/shipping-tiers/admin/create",
             json={
                 "min_amount": 7000,
                 "max_amount": 7499,
                 "shipping_charge": 10,
-                "is_active": True  # Start active since range doesn't overlap
+                "is_active": True
             },
             cookies=self.cookies
         )
+        assert create_response.status_code == 200, f"Create failed: {create_response.text}"
         tier_id = create_response.json()["tier_id"]
         
         # Toggle to inactive
@@ -274,11 +298,18 @@ class TestShippingTierAdminCRUD:
         assert toggle_response.json()["is_active"] == True
         print(f"✓ Toggled tier to active")
         
-        # Cleanup
+        # Cleanup - delete test tier
         requests.delete(
             f"{BASE_URL}/api/shipping-tiers/admin/{tier_id}",
             cookies=self.cookies
         )
+        
+        # Restore 1000+ tier if we deactivated it
+        if tier_1000_plus:
+            requests.put(
+                f"{BASE_URL}/api/shipping-tiers/admin/{tier_1000_plus['tier_id']}/toggle",
+                cookies=self.cookies
+            )
     
     def test_admin_delete_tier(self):
         """Admin can delete shipping tier"""
