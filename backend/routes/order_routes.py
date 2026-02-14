@@ -337,19 +337,41 @@ class TrackingUpdate(BaseModel):
 async def update_order_status(order_id: str, data: OrderStatusUpdate, request: Request):
     """
     Update order status (Admin only).
+    Sends email notifications for shipped/delivered status changes.
     """
     await require_admin(request)
+    
+    # Get current order to check for status change
+    order = await db.orders.find_one({"order_id": order_id}, {"_id": 0})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    old_status = order.get("order_status")
+    new_status = data.order_status.value
     
     result = await db.orders.update_one(
         {"order_id": order_id},
         {"$set": {
-            "order_status": data.order_status.value,
+            "order_status": new_status,
             "updated_at": datetime.now(timezone.utc)
         }}
     )
     
-    if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Order not found")
+    # Send email notification for status changes
+    if old_status != new_status:
+        # Get user email
+        user = await db.users.find_one({"user_id": order.get("user_id")}, {"_id": 0, "email": 1})
+        user_email = user.get("email") if user else None
+        
+        if user_email:
+            updated_order = await db.orders.find_one({"order_id": order_id}, {"_id": 0})
+            
+            if new_status == OrderStatus.SHIPPED.value:
+                asyncio.create_task(send_order_shipped(updated_order, user_email))
+                logger.info(f"Shipping notification queued for {order_id}")
+            elif new_status == OrderStatus.DELIVERED.value:
+                asyncio.create_task(send_order_delivered(updated_order, user_email))
+                logger.info(f"Delivery notification queued for {order_id}")
     
     return {"message": "Order status updated"}
 
@@ -357,8 +379,14 @@ async def update_order_status(order_id: str, data: OrderStatusUpdate, request: R
 async def update_tracking(order_id: str, data: TrackingUpdate, request: Request):
     """
     Add tracking ID and courier (Admin only).
+    Automatically marks order as shipped and sends notification.
     """
     await require_admin(request)
+    
+    # Get current order
+    order = await db.orders.find_one({"order_id": order_id}, {"_id": 0})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
     
     result = await db.orders.update_one(
         {"order_id": order_id},
@@ -370,7 +398,11 @@ async def update_tracking(order_id: str, data: TrackingUpdate, request: Request)
         }}
     )
     
-    if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Order not found")
+    # Send shipping notification email
+    user = await db.users.find_one({"user_id": order.get("user_id")}, {"_id": 0, "email": 1})
+    if user and user.get("email"):
+        updated_order = await db.orders.find_one({"order_id": order_id}, {"_id": 0})
+        asyncio.create_task(send_order_shipped(updated_order, user.get("email")))
+        logger.info(f"Shipping notification queued for {order_id}")
     
     return {"message": "Tracking details updated"}
