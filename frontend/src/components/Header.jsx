@@ -111,7 +111,10 @@ const Header = () => {
               </Link>
               
               {isAuthenticated ? (
-                <div className="hidden md:flex items-center space-x-2">
+                <div className="hidden md:flex items-center space-x-3">
+                  <Link to="/my-orders" className="hover:text-[#E10600] transition-colors" title="My Orders">
+                    <Package size={20} />
+                  </Link>
                   {user?.role === 'admin' && (
                     <Link to="/admin" className="text-sm font-bold hover:text-[#E10600] transition-colors">
                       ADMIN
