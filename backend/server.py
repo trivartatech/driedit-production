@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import RedirectResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -6,7 +7,9 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 import os
 import logging
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
+from datetime import datetime, timezone
 
 # Import all route modules
 from routes import (
@@ -29,12 +32,47 @@ from routes import (
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# Configure logging
+# Environment configuration
+ENVIRONMENT = os.environ.get('ENVIRONMENT', 'development')
+IS_PRODUCTION = ENVIRONMENT == 'production'
+
+# Configure logging with rotation for production
+LOG_DIR = ROOT_DIR / 'logs'
+LOG_DIR.mkdir(exist_ok=True)
+
+# Set up rotating file handler for error logs
+error_handler = RotatingFileHandler(
+    LOG_DIR / 'error.log',
+    maxBytes=10*1024*1024,  # 10MB
+    backupCount=5
+)
+error_handler.setLevel(logging.ERROR)
+error_handler.setFormatter(logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+))
+
+# Set up rotating file handler for all logs
+access_handler = RotatingFileHandler(
+    LOG_DIR / 'access.log',
+    maxBytes=10*1024*1024,  # 10MB
+    backupCount=5
+)
+access_handler.setLevel(logging.INFO)
+access_handler.setFormatter(logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+))
+
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO if not IS_PRODUCTION else logging.WARNING,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),
+        error_handler,
+        access_handler
+    ]
 )
 logger = logging.getLogger(__name__)
+logger.info(f"Starting DRIEDIT API in {ENVIRONMENT} mode")
 
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address)
