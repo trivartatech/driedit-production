@@ -155,34 +155,6 @@ async def login(data: UserLogin, request: Request, response: Response):
         logger.error(f"Error in login: {e}")
         raise HTTPException(status_code=500, detail="Login failed")
 
-@router.post("/session")
-async def create_session(data: SessionExchange, response: Response):
-    """
-    Exchange session_id from Emergent Auth for user data and session_token.
-    Sets httpOnly cookie with session_token.
-    """
-    try:
-        result = await exchange_session_id(data.session_id)
-        
-        # Set httpOnly cookie with environment-aware settings
-        response.set_cookie(
-            key="session_token",
-            value=result["session_token"],
-            httponly=True,
-            secure=COOKIE_SECURE,
-            samesite=COOKIE_SAMESITE,
-            path="/",
-            max_age=7 * 24 * 60 * 60  # 7 days
-        )
-        
-        return {"user": result["user"]}
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error in create_session: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
-
 @router.get("/me")
 async def get_me(request: Request):
     """
