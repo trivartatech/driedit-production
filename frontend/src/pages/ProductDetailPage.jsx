@@ -48,7 +48,7 @@ const ProductDetailPage = () => {
     try {
       const response = await productsAPI.getById(id);
       setProduct(response.data);
-      fetchRelatedProducts(response.data.category_id);
+      fetchRecommendations();
     } catch (error) {
       console.error('Error fetching product:', error);
       toast.error('Product not found');
@@ -67,12 +67,12 @@ const ProductDetailPage = () => {
     }
   };
 
-  const fetchRelatedProducts = async (categoryId) => {
+  const fetchRecommendations = async () => {
     try {
-      const response = await productsAPI.getAll({ category: categoryId, limit: 4 });
-      setRelatedProducts(response.data.filter(p => p.product_id !== id));
+      const response = await productsAPI.getRecommendations(id, 4);
+      setRelatedProducts(response.data);
     } catch (error) {
-      console.error('Error fetching related products:', error);
+      console.error('Error fetching recommendations:', error);
     }
   };
 
