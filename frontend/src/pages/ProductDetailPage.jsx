@@ -355,18 +355,25 @@ const ProductDetailPage = () => {
             <div className="flex space-x-4 mb-8">
               <motion.button
                 onClick={handleAddToCart}
-                className="flex-1 bg-[#E10600] text-white py-4 font-black flex items-center justify-center space-x-2 hover:bg-white hover:text-black transition-colors"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                disabled={addingToCart || product.stock === 0}
+                className="flex-1 bg-[#E10600] text-white py-4 font-black flex items-center justify-center space-x-2 hover:bg-white hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                whileHover={{ scale: addingToCart ? 1 : 1.02 }}
+                whileTap={{ scale: addingToCart ? 1 : 0.98 }}
+                data-testid="add-to-cart-btn"
               >
-                <ShoppingCart size={20} />
-                <span>ADD TO CART</span>
+                {addingToCart ? (
+                  <Loader2 size={20} className="animate-spin" />
+                ) : (
+                  <ShoppingCart size={20} />
+                )}
+                <span>{addingToCart ? 'ADDING...' : 'ADD TO CART'}</span>
               </motion.button>
               <motion.button
                 onClick={handleWishlistToggle}
                 className="bg-white/5 px-6 py-4 hover:bg-[#E10600] transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                data-testid="wishlist-btn"
               >
                 <Heart
                   size={20}
