@@ -2,20 +2,42 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { heroSliders } from '../mockData';
+import { publicAPI } from '../services/api';
 
 const HeroSlider = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [banners, setBanners] = useState([]);
   const navigate = useNavigate();
-  const activeSliders = heroSliders.filter(slider => slider.active);
 
   useEffect(() => {
+    fetchBanners();
+  }, []);
+
+  const fetchBanners = async () => {
+    try {
+      const response = await publicAPI.getActiveBanners();
+      setBanners(response.data);
+    } catch (error) {
+      console.error('Error fetching banners:', error);
+      // Fallback to default banner if API fails
+      setBanners([{
+        banner_id: '1',
+        image: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=1200&h=600&fit=crop',
+        button_text: 'SHOP NOW',
+        redirect_url: '/products'
+      }]);
+    }
+  };
+
+  useEffect(() => {
+    if (banners.length === 0) return;
+    
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % activeSliders.length);
+      setCurrentSlide((prev) => (prev + 1) % banners.length);
     }, 5000);
 
     return () => clearInterval(timer);
-  }, [activeSliders.length]);
+  }, [banners.length]);
 
   const goToSlide = (index) => {
     setCurrentSlide(index);
