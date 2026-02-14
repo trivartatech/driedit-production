@@ -280,7 +280,8 @@ const CheckoutPage = () => {
         delivery_address: address,
         pincode: pincode,
         coupon_code: couponApplied?.code || null,
-        coupon_discount: couponApplied?.discount_amount || 0
+        coupon_discount: couponApplied?.discount_amount || 0,
+        coupon_applied_type: couponAppliedType
       };
 
       if (paymentMethod === 'razorpay') {
