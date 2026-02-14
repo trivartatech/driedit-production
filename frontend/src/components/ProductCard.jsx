@@ -85,14 +85,15 @@ const ProductCard = ({ product }) => {
         {/* Wishlist Button */}
         <motion.button
           onClick={handleWishlistToggle}
-          className="absolute top-2 right-2 bg-white/90 p-2 hover:bg-[#E10600] hover:text-white transition-colors"
+          className="absolute top-2 right-2 p-2"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
           <Heart 
-            size={18} 
+            size={22} 
             fill={isWishlisted ? '#E10600' : 'none'}
-            className={isWishlisted ? 'text-[#E10600]' : ''}
+            className={isWishlisted ? 'text-[#E10600]' : 'text-[#E10600]'}
+            strokeWidth={2}
           />
         </motion.button>
 
