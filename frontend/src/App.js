@@ -15,20 +15,14 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
-import AuthCallback from "@/pages/AuthCallback";
 import AdminLayout from "@/pages/admin/AdminLayout";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/context/AuthContext";
 
-// Router component to handle auth callback detection
+// Router component to handle route logic
 function AppRouter() {
   const location = useLocation();
-  
-  // Check URL fragment for session_id (synchronous, before render)
-  if (location.hash?.includes('session_id=')) {
-    return <AuthCallback />;
-  }
   
   // Check if on admin route
   const isAdmin = location.pathname.startsWith('/admin');
@@ -44,7 +38,6 @@ function AppRouter() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/auth/callback" element={<AuthCallback />} />
         
         {/* Protected Routes */}
         <Route path="/cart" element={
