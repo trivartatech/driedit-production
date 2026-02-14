@@ -783,18 +783,44 @@ const CheckoutPage = () => {
 
               {/* Pincode Status for Saved Address */}
               {addressMode === 'saved' && selectedAddressId && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-green-900/20 border border-green-500 p-3 text-sm"
-                    data-testid="pincode-success"
-                  >
-                    <p className="font-bold text-green-500">✓ Delivery Available</p>
-                    <p>Shipping: {shippingData?.shipping_charge === 0 ? 'FREE' : formatPrice(shippingData?.shipping_charge || 0)}</p>
-                    <p>COD: {pincodeData.cod_available ? 'Available' : 'Not Available'}</p>
-                  </motion.div>
-                )}
-              </div>
+                <div className="mt-4">
+                  {pincodeChecking ? (
+                    <div className="flex items-center space-x-2 text-gray-400">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span className="text-sm">Checking delivery availability...</span>
+                    </div>
+                  ) : pincodeData ? (
+                    <motion.div 
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-green-900/20 border border-green-500 p-3 text-sm"
+                      data-testid="pincode-success"
+                    >
+                      <p className="font-bold text-green-500">✓ Delivery Available</p>
+                      <p>Shipping: {shippingData?.shipping_charge === 0 ? 'FREE' : formatPrice(shippingData?.shipping_charge || 0)}</p>
+                      <p>COD: {pincodeData.cod_available ? 'Available' : 'Not Available'}</p>
+                    </motion.div>
+                  ) : (
+                    <div className="bg-red-900/20 border border-red-500 p-3 text-sm">
+                      <p className="font-bold text-red-500">✗ Delivery not available for this pincode</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Pincode Status for New Address */}
+              {addressMode === 'new' && pincodeData && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-green-900/20 border border-green-500 p-3 text-sm mt-4"
+                  data-testid="pincode-success-new"
+                >
+                  <p className="font-bold text-green-500">✓ Delivery Available</p>
+                  <p>Shipping: {shippingData?.shipping_charge === 0 ? 'FREE' : formatPrice(shippingData?.shipping_charge || 0)}</p>
+                  <p>COD: {pincodeData.cod_available ? 'Available' : 'Not Available'}</p>
+                </motion.div>
+              )}
             </div>
 
             {/* Payment Method */}
