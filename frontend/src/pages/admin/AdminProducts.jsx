@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, Edit2, Trash2, Search, Loader2, Package, 
-  AlertTriangle, X, Upload, Image as ImageIcon, CheckCircle
+  AlertTriangle, X, Upload, Image as ImageIcon, CheckCircle, FileText, ExternalLink
 } from 'lucide-react';
-import { productsAPI, categoriesAPI, uploadsAPI } from '../../services/api';
+import { productsAPI, categoriesAPI, uploadsAPI, sizesAPI } from '../../services/api';
 import { toast } from 'sonner';
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -19,10 +19,9 @@ const INITIAL_PRODUCT = {
   sizes: [],
   stock: '',
   images: [],
-  description: ''
+  description: '',
+  size_chart_pdf: ''
 };
-
-const SIZE_OPTIONS = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '28', '30', '32', '34', '36', '38'];
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
