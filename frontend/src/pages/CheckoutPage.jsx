@@ -451,7 +451,7 @@ const CheckoutPage = () => {
                     data-testid="pincode-success"
                   >
                     <p className="font-bold text-green-500">✓ Delivery Available</p>
-                    <p>Shipping: {pincodeData.shipping_charge === 0 || subtotal > 999 ? 'FREE' : formatPrice(pincodeData.shipping_charge)}</p>
+                    <p>Shipping: {shippingData?.shipping_charge === 0 ? 'FREE' : formatPrice(shippingData?.shipping_charge || 0)}</p>
                     <p>COD: {pincodeData.cod_available ? 'Available' : 'Not Available'}</p>
                   </motion.div>
                 )}
