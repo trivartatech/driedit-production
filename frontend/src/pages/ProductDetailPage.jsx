@@ -2,24 +2,158 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingCart, Star, ChevronLeft, ChevronRight, Truck, RefreshCcw, Shield } from 'lucide-react';
-import { products, reviews, calculateDiscount, formatPrice, addToWishlist, removeFromWishlist, getWishlist, addToCart } from '../mockData';
 import ProductCard from '../components/ProductCard';
 import { toast } from '../hooks/use-toast';
+import { productsAPI, reviewsAPI, wishlistAPI } from '../services/api';
+import { useAuth } from '../context/AuthContext';
+import { addToCart } from '../mockData';
+
+const formatPrice = (price) => {
+  return `₹${price.toLocaleString('en-IN')}`;
+};
+
+const calculateDiscount = (regular, discounted) => {
+  return Math.round(((regular - discounted) / regular) * 100);
+};
 
 const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const product = products.find(p => p.id === parseInt(id));
+  const { isAuthenticated, user } = useAuth();
   
+  const [product, setProduct] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [reviewText, setReviewText] = useState('');
+  const [rating, setRating] = useState(5);
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   useEffect(() => {
-    const wishlist = getWishlist();
-    setIsWishlisted(wishlist.includes(product?.id));
-  }, [product?.id]);
+    fetchProduct();
+    fetchReviews();
+  }, [id]);
+
+  useEffect(() => {
+    if (isAuthenticated && product) {
+      checkWishlistStatus();
+    }
+  }, [isAuthenticated, product]);
+
+  const fetchProduct = async () => {
+    try {
+      const response = await productsAPI.getById(id);
+      setProduct(response.data);
+      fetchRelatedProducts(response.data.category_id);
+    } catch (error) {
+      console.error('Error fetching product:', error);
+      toast({ title: 'Product not found', variant: 'destructive' });
+      navigate('/products');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchReviews = async () => {
+    try {
+      const response = await reviewsAPI.getByProduct(id);
+      setReviews(response.data);
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+    }
+  };
+
+  const fetchRelatedProducts = async (categoryId) => {
+    try {
+      const response = await productsAPI.getAll({ category: categoryId, limit: 4 });
+      setRelatedProducts(response.data.filter(p => p.product_id !== id));
+    } catch (error) {
+      console.error('Error fetching related products:', error);
+    }
+  };
+
+  const checkWishlistStatus = async () => {
+    try {
+      const response = await wishlistAPI.get();
+      setIsWishlisted(response.data.includes(id));
+    } catch (error) {
+      console.error('Error checking wishlist:', error);
+    }
+  };
+
+  const handleWishlistToggle = async () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      if (isWishlisted) {
+        await wishlistAPI.remove(id);
+        setIsWishlisted(false);
+        toast({ title: 'Removed from wishlist' });
+      } else {
+        await wishlistAPI.add(id);
+        setIsWishlisted(true);
+        toast({ title: 'Added to wishlist' });
+      }
+      window.dispatchEvent(new Event('wishlistUpdated'));
+    } catch (error) {
+      console.error('Error toggling wishlist:', error);
+      toast({ title: 'Error updating wishlist', variant: 'destructive' });
+    }
+  };
+
+  const handleAddToCart = () => {
+    if (!selectedSize) {
+      toast({ title: 'Please select a size', variant: 'destructive' });
+      return;
+    }
+    
+    if (product.stock < quantity) {
+      toast({ title: 'Insufficient stock', variant: 'destructive' });
+      return;
+    }
+
+    // Using localStorage cart for now (will be backend in checkout)
+    addToCart(id, selectedSize, quantity);
+    toast({ title: 'Added to cart!' });
+    window.dispatchEvent(new Event('cartUpdated'));
+  };
+
+  const handleSubmitReview = async () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    if (!reviewText.trim()) {
+      toast({ title: 'Please write a review', variant: 'destructive' });
+      return;
+    }
+
+    setSubmittingReview(true);
+    try {
+      await reviewsAPI.create({
+        product_id: id,
+        rating,
+        review_text: reviewText
+      });
+      toast({ title: 'Review submitted!' });
+      setReviewText('');
+      setRating(5);
+      fetchReviews();
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      toast({ title: error.response?.data?.detail || 'Error submitting review', variant: 'destructive' });
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
 
   if (!product) {
     return (
