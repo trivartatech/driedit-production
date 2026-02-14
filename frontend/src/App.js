@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -22,6 +22,17 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/context/AuthContext";
 
+// Scroll to top on route change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  
+  return null;
+}
+
 // Router component to handle route logic
 function AppRouter() {
   const location = useLocation();
@@ -31,6 +42,7 @@ function AppRouter() {
   
   return (
     <>
+      <ScrollToTop />
       {!isAdmin && <Header />}
       <Routes>
         <Route path="/" element={<HomePage />} />
