@@ -36,6 +36,16 @@ export const wishlistAPI = {
   remove: (productId) => axiosInstance.delete(`/wishlist/remove/${productId}`)
 };
 
+// Cart API
+export const cartAPI = {
+  get: () => axiosInstance.get('/cart'),
+  add: (data) => axiosInstance.post('/cart/add', data),
+  update: (productId, size, quantity) => axiosInstance.put(`/cart/update/${productId}/${size}`, { quantity }),
+  remove: (productId, size) => axiosInstance.delete(`/cart/remove/${productId}/${size}`),
+  clear: () => axiosInstance.delete('/cart/clear'),
+  getCount: () => axiosInstance.get('/cart/count')
+};
+
 // Orders API
 export const ordersAPI = {
   create: (data) => axiosInstance.post('/orders', data),
