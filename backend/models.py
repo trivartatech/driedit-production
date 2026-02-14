@@ -74,18 +74,60 @@ class CouponUsage(BaseModel):
     applied_type: str = "manual"  # "manual" or "auto"
     used_at: datetime = Field(default_factory=datetime.utcnow)
 
+# Address Models
+class Address(BaseModel):
+    address_id: str
+    label: str = "Home"  # "Home", "Work", "Other"
+    name: str
+    phone: str
+    address_line1: str
+    address_line2: Optional[str] = None
+    city: str
+    state: str
+    pincode: str
+    is_default: bool = False
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class AddressCreate(BaseModel):
+    label: str = "Home"
+    name: str
+    phone: str = Field(min_length=10, max_length=10)
+    address_line1: str
+    address_line2: Optional[str] = None
+    city: str
+    state: str
+    pincode: str = Field(min_length=6, max_length=6)
+    is_default: bool = False
+
+class AddressUpdate(BaseModel):
+    label: Optional[str] = None
+    name: Optional[str] = None
+    phone: Optional[str] = None
+    address_line1: Optional[str] = None
+    address_line2: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    pincode: Optional[str] = None
+    is_default: Optional[bool] = None
+
 # User Models
 class User(BaseModel):
     user_id: str
     email: EmailStr
     name: str
+    phone: Optional[str] = None
     password: Optional[str] = None  # Hashed password (null for Google users)
     picture: Optional[str] = None
     auth_provider: str = "email"  # "email" or "google"
     role: UserRole = UserRole.USER
     is_verified: bool = False
     wishlist: List[str] = []
+    addresses: List[Address] = []
     created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class UserProfileUpdate(BaseModel):
+    name: Optional[str] = None
+    phone: Optional[str] = None
 
 class UserSession(BaseModel):
     user_id: str
