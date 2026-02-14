@@ -122,6 +122,7 @@ export const authAPI = {
 
 // Uploads API
 export const uploadsAPI = {
+  // Product images
   uploadProductImage: (file) => {
     const formData = new FormData();
     formData.append('file', file);
@@ -137,7 +138,51 @@ export const uploadsAPI = {
     });
   },
   deleteImage: (filename) => axiosInstance.delete(`/uploads/images/${filename}`),
-  getImageUrl: (filename) => `${API}/api/uploads/images/${filename}`
+  getImageUrl: (filename) => `${API}/api/uploads/images/${filename}`,
+  
+  // Banner images
+  uploadBannerImage: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return axiosInstance.post('/uploads/banner-image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  deleteBannerImage: (filename) => axiosInstance.delete(`/uploads/banner-image/${filename}`),
+  getBannerImageUrl: (filename) => `${API}/api/uploads/banners/${filename}`,
+  
+  // Popup images
+  uploadPopupImage: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return axiosInstance.post('/uploads/popup-image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  deletePopupImage: (filename) => axiosInstance.delete(`/uploads/popup-image/${filename}`),
+  getPopupImageUrl: (filename) => `${API}/api/uploads/popups/${filename}`,
+  
+  // Size chart PDFs
+  uploadSizeChart: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return axiosInstance.post('/uploads/size-chart', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  deleteSizeChart: (filename) => axiosInstance.delete(`/uploads/size-chart/${filename}`),
+  getSizeChartUrl: (filename) => `${API}/api/uploads/size-charts/${filename}`
+};
+
+// Sizes API (Admin)
+export const sizesAPI = {
+  getAll: (includeInactive = false) => axiosInstance.get(`/admin/sizes?include_inactive=${includeInactive}`),
+  getActive: () => axiosInstance.get('/admin/sizes/active'),
+  create: (data) => axiosInstance.post('/admin/sizes', data),
+  update: (sizeId, data) => axiosInstance.put(`/admin/sizes/${sizeId}`, data),
+  delete: (sizeId) => axiosInstance.delete(`/admin/sizes/${sizeId}`),
+  toggle: (sizeId) => axiosInstance.put(`/admin/sizes/${sizeId}/toggle`),
+  seed: () => axiosInstance.post('/admin/sizes/seed')
 };
 
 // Coupons API
