@@ -26,19 +26,22 @@ const Header = () => {
   }, [isAuthenticated]);
 
   const updateCounts = async () => {
-    // Cart is still localStorage for now
-    const cart = getCart();
-    setCartCount(cart.reduce((acc, item) => acc + item.quantity, 0));
-    
-    // Wishlist from backend if authenticated
     if (isAuthenticated) {
       try {
-        const response = await wishlistAPI.get();
-        setWishlistCount(response.data.length);
+        // Fetch cart count from backend
+        const cartResponse = await cartAPI.getCount();
+        setCartCount(cartResponse.data.count || 0);
+        
+        // Fetch wishlist from backend
+        const wishlistResponse = await wishlistAPI.get();
+        setWishlistCount(wishlistResponse.data.length || 0);
       } catch (error) {
-        console.error('Error fetching wishlist:', error);
+        console.error('Error fetching counts:', error);
+        setCartCount(0);
+        setWishlistCount(0);
       }
     } else {
+      setCartCount(0);
       setWishlistCount(0);
     }
   };
