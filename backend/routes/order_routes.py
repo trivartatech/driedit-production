@@ -11,14 +11,19 @@ from pydantic import BaseModel
 router = APIRouter(prefix="/api/orders", tags=["orders"])
 
 # Initialize Razorpay client (will use env vars in production)
-try:
-    razorpay_client = razorpay.Client(auth=(
-        os.getenv('RAZORPAY_KEY_ID', 'mock_key_id'),
-        os.getenv('RAZORPAY_KEY_SECRET', 'mock_key_secret')
-    ))
-except Exception as e:
-    print(f"Razorpay client initialization warning: {e}")
+razorpay_key_id = os.getenv('RAZORPAY_KEY_ID', '')
+razorpay_key_secret = os.getenv('RAZORPAY_KEY_SECRET', '')
+
+# Only initialize Razorpay client if real keys are provided
+if razorpay_key_id and razorpay_key_secret and not razorpay_key_id.startswith('mock'):
+    try:
+        razorpay_client = razorpay.Client(auth=(razorpay_key_id, razorpay_key_secret))
+    except Exception as e:
+        print(f"Razorpay client initialization warning: {e}")
+        razorpay_client = None
+else:
     razorpay_client = None
+    print("Razorpay client not initialized - using mock mode")
 
 class RazorpayOrderCreate(BaseModel):
     amount: int  # in paise
