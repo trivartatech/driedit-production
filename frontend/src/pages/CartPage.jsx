@@ -37,7 +37,7 @@ const CartPage = () => {
 
   const fetchGST = async () => {
     try {
-      const response = await adminAPI.getGST();
+      const response = await publicAPI.getGST();
       setGstPercentage(response.data.gst_percentage);
     } catch (error) {
       console.error('Error fetching GST:', error);
