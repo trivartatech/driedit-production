@@ -165,4 +165,14 @@ export const shippingAPI = {
   toggle: (tierId) => axiosInstance.put(`/shipping-tiers/admin/${tierId}/toggle`)
 };
 
+// Analytics API (Admin)
+export const analyticsAPI = {
+  getOverview: () => axiosInstance.get('/admin/analytics/overview'),
+  getRevenueChart: (days = 30) => axiosInstance.get(`/admin/analytics/revenue-chart?days=${days}`),
+  getTopProducts: (limit = 5) => axiosInstance.get(`/admin/analytics/products?limit=${limit}`),
+  getCouponAnalytics: () => axiosInstance.get('/admin/analytics/coupons'),
+  getConversion: () => axiosInstance.get('/admin/analytics/conversion'),
+  getCustomerMetrics: () => axiosInstance.get('/admin/analytics/customers')
+};
+
 export default axiosInstance;
