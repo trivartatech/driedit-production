@@ -218,12 +218,21 @@ class PopupCreate(BaseModel):
     display_type: str = "once_per_session"
 
 # Return Request Models
+class ReturnItemDetail(BaseModel):
+    product_id: str
+    product_title: str
+    product_image: str
+    size: str
+    quantity: int
+
 class ReturnRequest(BaseModel):
     request_id: str
     order_id: str
     user_id: str
+    items: List[ReturnItemDetail] = []
     reason: str
-    image: Optional[str] = None
+    comments: Optional[str] = None
+    images: List[str] = []
     status: ReturnStatus = ReturnStatus.REQUESTED
     admin_notes: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -231,8 +240,10 @@ class ReturnRequest(BaseModel):
 
 class ReturnRequestCreate(BaseModel):
     order_id: str
+    items: List[ReturnItemDetail]
     reason: str
-    image: Optional[str] = None
+    comments: Optional[str] = None
+    images: List[str] = []
 
 # Cart Models
 class CartItem(BaseModel):
