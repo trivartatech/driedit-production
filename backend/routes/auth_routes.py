@@ -2,6 +2,8 @@ from fastapi import APIRouter, HTTPException, Request, Response
 from auth import exchange_session_id, get_current_user, db
 from models import UserRegister, UserLogin
 from pydantic import BaseModel
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 import logging
 import bcrypt
 import uuid
@@ -9,6 +11,9 @@ from datetime import datetime, timezone, timedelta
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/auth", tags=["auth"])
+
+# Rate limiter
+limiter = Limiter(key_func=get_remote_address)
 
 class SessionExchange(BaseModel):
     session_id: str
