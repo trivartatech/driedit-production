@@ -1,193 +1,160 @@
 # DRIEDIT.IN - Gen-Z Fashion E-commerce Platform
 
-## Product Requirements Document
+## Product Overview
+A complete, production-ready, minimalistic Gen-Z fashion e-commerce platform for a streetwear brand.
 
-### Original Problem Statement
-Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-commerce platform for a streetwear brand called **DRIEDIT.IN**.
+## Design System
+- **Style**: Minimal, bold typography, Black & white UI with Red accent (#E10600)
+- **Approach**: Mobile-first, Gen-Z focused
 
-### Tech Stack
-- **Frontend**: React, Tailwind CSS, Framer Motion, Axios
-- **Backend**: FastAPI, Pydantic
-- **Database**: MongoDB (Motor async driver)
-- **Authentication**: JWT (httpOnly cookies), bcrypt, Google OAuth 2.0
-
-### Design Style
-- Minimal, bold typography
-- Black & white UI with Red accent (#E10600)
-- Mobile-first responsive design
-
----
-
-## What's Been Implemented ✅
-
-### Core E-commerce (Completed)
-- Full authentication (Email/Password + Google OAuth)
-- Product catalog with categories and filters
-- Wishlist and cart systems
-- Checkout flow with Razorpay (test mode) and COD
-- Order management and tracking
-- Admin dashboard with full CRUD operations
-- Customer return request flow
-- Product image upload
-- User reviews system
-
-### Email Notifications (Completed - PENDING API KEY)
-- Resend integration for transactional emails
-- **STATUS**: Code complete, awaiting RESEND_API_KEY + domain verification
-
-### Tier-Based Shipping System (Completed - Feb 14, 2026)
-- Replaced pincode-based shipping with tier-based system
-- Shipping calculated on discounted subtotal
-- Admin CRUD for shipping tiers
-- **Default Tiers**: ₹0-499 = ₹80, ₹500-999 = ₹50, ₹1000+ = FREE
-
-### Hybrid Coupon Engine (Completed - Feb 14, 2026)
-**Enterprise-Level Pricing System:**
-
-#### Auto-Apply Engine
-- Fetch eligible auto-apply coupons
-- Validate eligibility (min order, expiry, usage limits)
-- Pick highest discount automatically
-- Apply at checkout load
-
-#### Manual Coupon Override
-- User can enter private/influencer codes
-- Manual always overrides auto
-- Invalid manual reverts to auto
-
-#### Priority Rules
-| Scenario | Result |
-|----------|--------|
-| Auto coupon exists | Applied automatically |
-| User enters manual | Manual overrides auto |
-| Manual gives lower discount | Still override (user choice) |
-| Manual invalid | Revert to auto coupon |
-
-#### Final Pricing Order (Industry Standard)
-```
-1. Calculate base subtotal
-2. Apply coupon discount
-3. Calculate GST on discounted base
-4. Calculate shipping (tier-based on discounted base)
-5. Final total
-```
-
-**Note:** Shipping never discounted. No stacking allowed.
-
-#### Admin Features
-- Create coupon with auto_apply toggle
-- AUTO badge with lightning icon on auto coupons
-- Usage breakdown: auto/manual count
-- Revenue generated per coupon
-
-**Test Results:** 22/22 backend tests passed, 100% frontend verified
+## Tech Stack
+- **Frontend**: React, Tailwind CSS, Shadcn UI, Framer Motion
+- **Backend**: FastAPI, Motor (async MongoDB driver)
+- **Database**: MongoDB
+- **Payments**: Razorpay (test mode)
+- **Email**: Resend (verified domain: driedit.in)
+- **Auth**: JWT + Google OAuth via Emergent
 
 ---
 
-## Pending Tasks 📋
+## Implemented Features ✅
 
-### P1 - High Priority
-- [ ] Activate email notifications (add RESEND_API_KEY + verify domain)
+### Authentication & Authorization
+- [x] Email/Password registration with bcrypt hashing
+- [x] JWT-based session management (httpOnly cookies)
+- [x] Google OAuth 2.0 via Emergent
+- [x] Role-based access control (user, admin)
+- [x] Forgot Password flow with secure token generation
+- [x] Password Reset functionality
 
-### P2 - Nice to Have
-- [ ] Email verification for new registrations
-- [ ] Search with autocomplete
-- [ ] Analytics dashboard
+### Customer Features
+- [x] Product browsing with categories
+- [x] Product detail pages with size selection
+- [x] Wishlist system (database backed)
+- [x] Shopping cart management
+- [x] Complete checkout flow
+- [x] Order history ("My Orders" page)
+- [x] Order tracking
+- [x] Replace & Return system
+- [x] User Reviews (verified buyers only)
 
-### P3 - Future
-- [ ] SMS Notifications
-- [ ] Production deployment checklist
+### Pricing Engine
+- [x] Dual pricing (regular + discounted)
+- [x] GST calculation (18%)
+- [x] Tier-based shipping system (admin configurable)
+- [x] Hybrid coupon engine (manual + auto-apply best discount)
+- [x] Pricing order: Subtotal → Discount → GST → Shipping → Total
+
+### Payment & Logistics
+- [x] Razorpay integration (test mode)
+- [x] Cash on Delivery (COD)
+- [x] Tier-based shipping fees
+
+### Admin Panel
+- [x] Dashboard overview
+- [x] Product CRUD with image uploads
+- [x] Category management
+- [x] Order management
+- [x] Return management
+- [x] Coupon management (with auto-apply toggle)
+- [x] Shipping tier management
+- [x] User management
+
+### Email Notifications (Resend)
+- [x] Password reset emails ✅ TESTED 2026-02-14
+- [x] Order confirmation template ready
+- [x] Shipping notification template ready
+- [x] Delivery notification template ready
+- [x] Return status templates ready
+
+---
+
+## Upcoming Tasks (P1-P2)
+
+### P1 - Analytics Dashboard
+- Revenue metrics (daily/weekly/monthly)
+- Average Order Value (AOV)
+- Conversion rates
+- Top selling products
+- Customer acquisition trends
+
+### P2 - Production Deployment
+- Environment variable audit
+- Security hardening
+- Performance optimization
+- SSL/domain configuration
+- Razorpay production keys
+
+---
+
+## Future Backlog (P2-P3)
+
+- Email verification on signup
+- SMS notifications (Twilio/MSG91)
+- Inventory alerts
+- Advanced analytics
+- Marketing campaign integration
 
 ---
 
 ## Test Credentials
-- **Admin**: admin@driedit.in / adminpassword
-- **User**: test@example.com / password123
-- **Test Pincode**: 110001
-- **Auto Coupon**: FESTIVE10 (10% off, min ₹500, max ₹200)
 
----
+**Admin User:**
+- Email: admin@driedit.in
+- Password: adminpassword
 
-## Integration Status
-
-| Integration | Status | Notes |
-|-------------|--------|-------|
-| Razorpay | ✅ TEST MODE | Working with test keys |
-| Resend Email | ⚠️ PENDING | Code complete, needs API key + domain |
-| Google OAuth | ✅ ACTIVE | Via Emergent Auth |
+**Regular User:**
+- Email: test@example.com
+- Password: password123
 
 ---
 
 ## Key API Endpoints
 
-### Coupons (Enhanced)
-- `GET /api/coupons/auto-apply?subtotal={amount}` - Get best auto-apply coupon
-- `POST /api/coupons/validate` - Validate manual coupon
-- `POST /api/coupons/admin/create` - Create coupon with auto_apply flag
-- `GET /api/coupons/admin/all` - List with auto/manual usage stats
-- `GET /api/coupons/admin/{id}` - Details with revenue breakdown
+### Auth
+- POST `/api/auth/register`
+- POST `/api/auth/login`
+- POST `/api/auth/forgot-password`
+- POST `/api/auth/reset-password`
 
-### Shipping Tiers
-- `GET /api/shipping-tiers/calculate?subtotal={amount}` - Calculate shipping
-- `GET /api/shipping-tiers/admin/all` - Admin management
+### Products & Cart
+- GET `/api/products`
+- GET `/api/products/{id}`
+- POST `/api/cart/add`
+- GET `/api/cart`
 
 ### Orders
-- `POST /api/orders` - Create order (uses correct pricing order)
+- POST `/api/orders`
+- GET `/api/orders/my-orders`
+- GET `/api/orders/{id}`
+
+### Admin
+- All admin routes prefixed with `/api/admin/`
+- Shipping tiers: `/api/shipping-tiers/`
+- Coupons: `/api/coupons/`
 
 ---
 
-## File Structure
+## Architecture
+
 ```
 /app
 ├── backend/
-│   ├── routes/
-│   │   ├── coupon_routes.py  # Enhanced with auto-apply
-│   │   ├── shipping_tier_routes.py
-│   │   ├── order_routes.py  # Updated pricing order
-│   │   └── ...
-│   ├── models.py  # Coupon with auto_apply field
-│   └── server.py
-├── frontend/
-│   ├── src/
-│   │   ├── pages/
-│   │   │   ├── CheckoutPage.jsx  # Auto-apply + pricing display
-│   │   │   ├── admin/
-│   │   │   │   ├── AdminCoupons.jsx  # Auto toggle + stats
-│   │   │   │   └── AdminShippingTiers.jsx
-│   │   │   └── ...
-│   │   └── services/api.js  # getAutoCoupon endpoint
-│   └── .env
-└── memory/PRD.md
+│   ├── server.py (FastAPI app)
+│   ├── models.py (Pydantic models)
+│   ├── auth.py (JWT utilities)
+│   ├── routes/ (API routes)
+│   └── services/
+│       └── email_service.py (Resend integration)
+└── frontend/
+    └── src/
+        ├── components/ (UI components)
+        ├── pages/ (Route pages)
+        ├── context/ (React context)
+        └── services/api.js (API client)
 ```
 
 ---
 
-## Checkout Display Example
-
-```
-Subtotal:                  ₹2,000
-Auto Coupon (FESTIVE10):   -₹200
-GST (18%) (on discounted):  ₹324
-Shipping:                   FREE
-─────────────────────────────────
-Total:                    ₹2,124
-```
-
-If user enters manual code:
-```
-Manual Coupon (INFLUENCER50): -₹50
-```
-Auto coupon disappears.
-
----
-
-## Testing Results (Feb 14, 2026)
-- **Hybrid Coupon System**: 22/22 backend tests passed, 100% frontend
-- **Shipping Tiers**: 22/23 passed
-- **Previous Tests**: All passed
-
----
-
-## Last Updated
-**Date**: February 14, 2026
-**Session**: Implemented hybrid coupon engine with auto-apply functionality
+*Last Updated: 2026-02-14*
+*Email System: Verified Working*
