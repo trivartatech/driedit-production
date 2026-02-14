@@ -1,12 +1,13 @@
-from fastapi import HTTPException, Request, Depends
+"""
+Authentication utilities for DRIEDIT
+Handles session management and role-based access control.
+"""
+from fastapi import HTTPException, Request
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 from dotenv import load_dotenv
 from pathlib import Path
-import requests
-from datetime import datetime, timezone, timedelta
-import uuid
-from typing import Optional
+from datetime import datetime, timezone
 import logging
 
 # Load environment variables
@@ -22,7 +23,7 @@ def get_db():
 
 db = get_db()
 
-# Auth helper to get current user from session_token
+
 async def get_current_user(request: Request) -> dict:
     """
     Get current user from session_token in cookies or Authorization header.
@@ -72,7 +73,7 @@ async def get_current_user(request: Request) -> dict:
     
     return user_doc
 
-# Admin-only decorator
+
 async def require_admin(request: Request) -> dict:
     """
     Require admin role. Returns user dict or raises 403.
@@ -83,88 +84,3 @@ async def require_admin(request: Request) -> dict:
         raise HTTPException(status_code=403, detail="Admin access required")
     
     return user
-
-# Exchange session_id for user data
-async def exchange_session_id(session_id: str) -> dict:
-    """
-    Exchange session_id from Emergent Auth for user data.
-    Creates/updates user in database and returns session_token.
-    """
-    try:
-        # Call Emergent Auth API
-        response = requests.get(
-            'https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data',
-            headers={'X-Session-ID': session_id},
-            timeout=10
-        )
-        
-        if response.status_code != 200:
-            raise HTTPException(status_code=400, detail="Invalid session_id")
-        
-        auth_data = response.json()
-        
-        # Check if user exists
-        existing_user = await db.users.find_one(
-            {"email": auth_data['email']},
-            {"_id": 0}
-        )
-        
-        if existing_user:
-            user_id = existing_user['user_id']
-            # Update user data
-            await db.users.update_one(
-                {"user_id": user_id},
-                {"$set": {
-                    "name": auth_data.get('name', ''),
-                    "picture": auth_data.get('picture', ''),
-                    "auth_provider": "google"
-                }}
-            )
-        else:
-            # Create new user
-            user_id = f"user_{uuid.uuid4().hex[:12]}"
-            await db.users.insert_one({
-                "user_id": user_id,
-                "email": auth_data['email'],
-                "name": auth_data.get('name', ''),
-                "picture": auth_data.get('picture', ''),
-                "password": None,
-                "auth_provider": "google",
-                "role": "user",
-                "is_verified": True,
-                "wishlist": [],
-                "created_at": datetime.now(timezone.utc)
-            })
-        
-        # Create session
-        session_token = auth_data['session_token']
-        expires_at = datetime.now(timezone.utc) + timedelta(days=7)
-        
-        # Delete old sessions for this user
-        await db.user_sessions.delete_many({"user_id": user_id})
-        
-        # Insert new session
-        await db.user_sessions.insert_one({
-            "user_id": user_id,
-            "session_token": session_token,
-            "expires_at": expires_at,
-            "created_at": datetime.now(timezone.utc)
-        })
-        
-        # Get user data to return
-        user_doc = await db.users.find_one(
-            {"user_id": user_id},
-            {"_id": 0}
-        )
-        
-        return {
-            "user": user_doc,
-            "session_token": session_token
-        }
-        
-    except requests.RequestException as e:
-        logger.error(f"Error calling Emergent Auth API: {e}")
-        raise HTTPException(status_code=500, detail="Auth service error")
-    except Exception as e:
-        logger.error(f"Error in exchange_session_id: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
