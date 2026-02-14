@@ -69,6 +69,7 @@ app.include_router(admin_routes.router)
 app.include_router(public_routes.router)
 app.include_router(cart_routes.router)
 app.include_router(upload_routes.router)
+app.include_router(coupon_routes.router)
 
 # Health check endpoint
 @app.get("/api/")
