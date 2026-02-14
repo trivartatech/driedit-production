@@ -177,11 +177,48 @@ const Header = () => {
               >
                 COLLECTIONS
               </Link>
-              <div className="border-t border-white/10 pt-4">
-                <button className="flex items-center space-x-2 text-sm font-semibold hover:text-[#E10600] transition-colors">
-                  <User size={18} />
-                  <span>ACCOUNT</span>
-                </button>
+              <div className="border-t border-white/10 pt-4 space-y-4">
+                {isAuthenticated ? (
+                  <>
+                    <Link 
+                      to="/my-orders"
+                      className="flex items-center space-x-2 text-sm font-semibold hover:text-[#E10600] transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Package size={18} />
+                      <span>MY ORDERS</span>
+                    </Link>
+                    {user?.role === 'admin' && (
+                      <Link 
+                        to="/admin"
+                        className="flex items-center space-x-2 text-sm font-semibold hover:text-[#E10600] transition-colors"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <User size={18} />
+                        <span>ADMIN</span>
+                      </Link>
+                    )}
+                    <button 
+                      onClick={() => {
+                        handleLogout();
+                        setMobileMenuOpen(false);
+                      }}
+                      className="flex items-center space-x-2 text-sm font-semibold hover:text-[#E10600] transition-colors"
+                    >
+                      <LogOut size={18} />
+                      <span>LOGOUT</span>
+                    </button>
+                  </>
+                ) : (
+                  <Link 
+                    to="/login"
+                    className="flex items-center space-x-2 text-sm font-semibold hover:text-[#E10600] transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <User size={18} />
+                    <span>LOGIN</span>
+                  </Link>
+                )}
               </div>
             </nav>
           </motion.div>
