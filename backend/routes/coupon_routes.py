@@ -286,25 +286,33 @@ async def get_all_coupons(request: Request, include_inactive: bool = True):
     query = {} if include_inactive else {"is_active": True}
     coupons = await db.coupons.find(query, {"_id": 0}).sort("created_at", -1).to_list(100)
     
-    # Add usage stats for each coupon
     for coupon in coupons:
-        # Get total discount given
+        # Get usage stats with revenue
         pipeline = [
             {"$match": {"coupon_id": coupon["coupon_id"]}},
             {"$group": {
                 "_id": None,
                 "total_discount": {"$sum": "$discount_amount"},
-                "total_uses": {"$sum": 1}
+                "total_revenue": {"$sum": "$order_subtotal"},
+                "total_uses": {"$sum": 1},
+                "auto_uses": {"$sum": {"$cond": [{"$eq": ["$applied_type", "auto"]}, 1, 0]}},
+                "manual_uses": {"$sum": {"$cond": [{"$eq": ["$applied_type", "manual"]}, 1, 0]}}
             }}
         ]
         stats = await db.coupon_usage.aggregate(pipeline).to_list(1)
         
         if stats:
             coupon["total_discount_given"] = stats[0].get("total_discount", 0)
+            coupon["total_revenue"] = stats[0].get("total_revenue", 0)
             coupon["redemption_count"] = stats[0].get("total_uses", 0)
+            coupon["auto_uses"] = stats[0].get("auto_uses", 0)
+            coupon["manual_uses"] = stats[0].get("manual_uses", 0)
         else:
             coupon["total_discount_given"] = 0
+            coupon["total_revenue"] = 0
             coupon["redemption_count"] = 0
+            coupon["auto_uses"] = 0
+            coupon["manual_uses"] = 0
         
         # Check if expired
         if coupon.get("expires_at"):
@@ -345,10 +353,16 @@ async def get_coupon_details(coupon_id: str, request: Request):
     
     # Calculate stats
     total_discount = sum(u.get("discount_amount", 0) for u in usage_history)
+    total_revenue = sum(u.get("order_subtotal", 0) for u in usage_history)
+    auto_uses = len([u for u in usage_history if u.get("applied_type") == "auto"])
+    manual_uses = len([u for u in usage_history if u.get("applied_type") == "manual"])
     
     return {
         **coupon,
         "total_discount_given": total_discount,
+        "total_revenue": total_revenue,
+        "auto_uses": auto_uses,
+        "manual_uses": manual_uses,
         "usage_history": usage_history
     }
 
@@ -366,7 +380,6 @@ async def update_coupon(coupon_id: str, data: CouponUpdateRequest, request: Requ
     
     if data.code is not None:
         code = data.code.strip().upper()
-        # Check if new code conflicts with existing
         existing = await db.coupons.find_one({"code": code, "coupon_id": {"$ne": coupon_id}})
         if existing:
             raise HTTPException(status_code=400, detail="Coupon code already exists")
@@ -391,6 +404,9 @@ async def update_coupon(coupon_id: str, data: CouponUpdateRequest, request: Requ
     
     if data.one_time_per_user is not None:
         update_data["one_time_per_user"] = data.one_time_per_user
+    
+    if data.auto_apply is not None:
+        update_data["auto_apply"] = data.auto_apply
     
     if data.is_active is not None:
         update_data["is_active"] = data.is_active
