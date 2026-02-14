@@ -66,6 +66,11 @@ function AppRouter() {
             <WishlistPage />
           </ProtectedRoute>
         } />
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        } />
         
         {/* Admin Routes */}
         <Route path="/admin/*" element={
