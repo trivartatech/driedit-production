@@ -46,7 +46,7 @@ FRONTEND_URL=https://driedit.in
 
 ### Redirect URIs to Configure in Google Cloud Console
 - Production: `https://driedit.in/api/auth/google/callback`
-- Preview: `https://driedit-preview.preview.emergentagent.com/api/auth/google/callback`
+- Preview: `https://checkout-dev.preview.emergentagent.com/api/auth/google/callback`
 - Local: `http://localhost:8000/api/auth/google/callback`
 
 ---
