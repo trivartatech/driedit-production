@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { analyticsAPI } from '../../services/api';
-import AdminLayout from '../../components/admin/AdminLayout';
 import { 
   TrendingUp, 
   ShoppingBag, 
