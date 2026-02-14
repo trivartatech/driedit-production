@@ -1,12 +1,64 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingCart, Star, ChevronLeft, ChevronRight, Truck, RefreshCcw, Shield, Loader2, FileText, ExternalLink, Share2, Copy, Check } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { toast } from 'sonner';
 import { productsAPI, reviewsAPI, wishlistAPI, cartAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+
+// Custom hook to update meta tags for SEO & social sharing
+const useMetaTags = (product, discount) => {
+  useEffect(() => {
+    if (!product) return;
+    
+    const productUrl = window.location.href;
+    const productImage = product.images?.[0] || '';
+    const productTagline = `₹${product.discounted_price.toLocaleString('en-IN')} | ${discount > 0 ? `${discount}% OFF` : 'Best Price'} | DRIEDIT Streetwear`;
+    const pageTitle = `${product.title} | DRIEDIT`;
+    
+    // Update page title
+    document.title = pageTitle;
+    
+    // Helper to set or create meta tag
+    const setMetaTag = (property, content, isName = false) => {
+      const attr = isName ? 'name' : 'property';
+      let meta = document.querySelector(`meta[${attr}="${property}"]`);
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.setAttribute(attr, property);
+        document.head.appendChild(meta);
+      }
+      meta.setAttribute('content', content);
+    };
+    
+    // Open Graph tags
+    setMetaTag('og:type', 'product');
+    setMetaTag('og:url', productUrl);
+    setMetaTag('og:title', pageTitle);
+    setMetaTag('og:description', productTagline);
+    setMetaTag('og:image', productImage);
+    setMetaTag('og:site_name', 'DRIEDIT - Stay Raw Stay Real');
+    
+    // Product specific
+    setMetaTag('product:price:amount', String(product.discounted_price));
+    setMetaTag('product:price:currency', 'INR');
+    
+    // Twitter Card
+    setMetaTag('twitter:card', 'summary_large_image', true);
+    setMetaTag('twitter:title', pageTitle, true);
+    setMetaTag('twitter:description', productTagline, true);
+    setMetaTag('twitter:image', productImage, true);
+    
+    // Description
+    setMetaTag('description', product.description || '', true);
+    
+    // Cleanup on unmount
+    return () => {
+      document.title = 'DRIEDIT - Gen-Z Streetwear';
+    };
+  }, [product, discount]);
+};
 
 const formatPrice = (price) => {
   return `₹${price.toLocaleString('en-IN')}`;
