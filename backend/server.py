@@ -20,7 +20,8 @@ from routes import (
     admin_routes,
     public_routes,
     cart_routes,
-    upload_routes
+    upload_routes,
+    coupon_routes
 )
 
 ROOT_DIR = Path(__file__).parent
