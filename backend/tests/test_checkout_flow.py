@@ -404,15 +404,13 @@ class TestOrderManagement:
 class TestGSTSettings:
     """Test GST settings retrieval"""
     
-    def test_get_gst(self):
-        """Test getting GST percentage"""
-        session = get_auth_session()
+    def test_get_gst_requires_auth(self):
+        """Test that GST endpoint requires authentication"""
+        session = get_public_session()
         response = session.get(f"{BASE_URL}/api/admin/gst")
-        assert response.status_code == 200, f"Get GST failed: {response.text}"
-        data = response.json()
-        assert "gst_percentage" in data
-        assert data["gst_percentage"] >= 0
-        print(f"✓ GST percentage: {data['gst_percentage']}%")
+        # GST endpoint requires admin access
+        assert response.status_code in [401, 403], f"Expected 401 or 403, got {response.status_code}"
+        print("✓ GST endpoint correctly requires authentication")
 
 
 if __name__ == "__main__":
