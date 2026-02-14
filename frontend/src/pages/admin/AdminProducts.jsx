@@ -621,6 +621,66 @@ const AdminProducts = () => {
                   />
                 </div>
 
+                {/* Size Chart PDF Upload */}
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">
+                    Size Chart (PDF)
+                    <span className="text-xs text-gray-500 ml-1">- Optional</span>
+                  </label>
+                  
+                  {formData.size_chart_pdf ? (
+                    <div className="flex items-center space-x-3 bg-white/5 border border-white/10 p-3">
+                      <FileText size={24} className="text-[#E10600]" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold truncate">Size Chart Uploaded</p>
+                        <a 
+                          href={formData.size_chart_pdf} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-xs text-[#E10600] hover:underline flex items-center space-x-1"
+                        >
+                          <span>View PDF</span>
+                          <ExternalLink size={12} />
+                        </a>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={removeSizeChart}
+                        className="text-gray-400 hover:text-red-500 p-1"
+                        title="Remove"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <input
+                        type="file"
+                        ref={pdfInputRef}
+                        onChange={handlePdfUpload}
+                        accept="application/pdf"
+                        className="hidden"
+                        data-testid="size-chart-upload-input"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => pdfInputRef.current?.click()}
+                        disabled={uploadingPdf}
+                        className="flex items-center space-x-2 bg-white/5 border border-white/10 px-4 py-2 text-sm font-bold hover:bg-white/10 transition-colors disabled:opacity-50"
+                        data-testid="upload-size-chart-btn"
+                      >
+                        {uploadingPdf ? (
+                          <Loader2 size={16} className="animate-spin" />
+                        ) : (
+                          <FileText size={16} />
+                        )}
+                        <span>{uploadingPdf ? 'Uploading...' : 'Upload Size Chart PDF'}</span>
+                      </button>
+                      <p className="text-xs text-gray-500 mt-1">Max 5MB, PDF only</p>
+                    </div>
+                  )}
+                </div>
+
                 <div className="flex space-x-3 pt-4">
                   <button
                     type="button"
