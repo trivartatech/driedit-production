@@ -1,10 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { LogIn } from 'lucide-react';
+import { LogIn, Mail, Lock } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { authAPI } from '../services/api';
+import { useAuth } from '../context/AuthContext';
+import { toast } from '../hooks/use-toast';
 
 const LoginPage = () => {
-  const handleLogin = () => {
-    // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
+  const navigate = useNavigate();
+  const { setUser, setIsAuthenticated } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleEmailLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const response = await authAPI.login({ email, password });
+      setUser(response.data.user);
+      setIsAuthenticated(true);
+      toast({ title: 'Login successful!' });
+      navigate('/');
+    } catch (error) {
+      console.error('Login error:', error);
+      toast({ 
+        title: error.response?.data?.detail || 'Login failed', 
+        variant: 'destructive' 
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = () => {
     const redirectUrl = window.location.origin + '/auth/callback';
     window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
