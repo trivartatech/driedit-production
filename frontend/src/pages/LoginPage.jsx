@@ -67,6 +67,7 @@ const LoginPage = () => {
   };
 
   const handleGoogleLogin = () => {
+    setGoogleLoading(true);
     // Redirect to backend Google OAuth endpoint
     const backendUrl = process.env.REACT_APP_BACKEND_URL || '';
     window.location.href = `${backendUrl}/api/auth/google/login`;
