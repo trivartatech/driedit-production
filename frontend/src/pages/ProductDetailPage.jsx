@@ -208,29 +208,30 @@ const ProductDetailPage = () => {
   const productUrl = window.location.href;
   const productImage = product.images?.[0] || '';
   const productTagline = `₹${product.discounted_price.toLocaleString('en-IN')} | ${discount > 0 ? `${discount}% OFF` : 'Best Price'} | DRIEDIT Streetwear`;
+  const pageTitle = `${product.title} | DRIEDIT`;
 
   return (
     <div className="min-h-screen bg-black text-white">
       {/* SEO & Social Share Meta Tags */}
       <Helmet>
-        <title>{product.title} | DRIEDIT</title>
-        <meta name="description" content={product.description} />
+        <title>{pageTitle}</title>
+        <meta name="description" content={product.description || ''} />
         
         {/* Open Graph / Facebook / WhatsApp */}
         <meta property="og:type" content="product" />
         <meta property="og:url" content={productUrl} />
-        <meta property="og:title" content={`${product.title} | DRIEDIT`} />
+        <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={productTagline} />
         <meta property="og:image" content={productImage} />
         <meta property="og:site_name" content="DRIEDIT - Stay Raw Stay Real" />
         
         {/* Product specific */}
-        <meta property="product:price:amount" content={product.discounted_price} />
+        <meta property="product:price:amount" content={String(product.discounted_price)} />
         <meta property="product:price:currency" content="INR" />
         
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${product.title} | DRIEDIT`} />
+        <meta name="twitter:title" content={pageTitle} />
         <meta name="twitter:description" content={productTagline} />
         <meta name="twitter:image" content={productImage} />
       </Helmet>
