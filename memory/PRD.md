@@ -115,13 +115,21 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 - [x] "Return request pending review" status display
 - [x] Mobile-first Return Request Modal
 
+### Phase 9: Product Image Upload (Completed - Feb 14, 2026)
+- [x] Server-side image storage in `/uploads/products/`
+- [x] Image upload API with validation (JPG, PNG, WebP, GIF)
+- [x] Max 5MB per image, max 5 images per product
+- [x] Unique filename generation (UUID-based)
+- [x] Image preview grid in admin panel
+- [x] Support for both file upload and URL input
+- [x] Image deletion API
+- [x] Static file serving with caching headers
+
 ---
 
 ## Pending Tasks 📋
 
 ### P1 - Important
-- [ ] Integrate real Razorpay keys (currently mocked)
-- [ ] Product image upload (currently URL-based)
 - [ ] Order status email notifications
 
 ### P2 - Nice to Have
