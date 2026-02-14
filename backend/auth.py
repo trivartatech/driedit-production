@@ -116,7 +116,8 @@ async def exchange_session_id(session_id: str) -> dict:
                 {"user_id": user_id},
                 {"$set": {
                     "name": auth_data.get('name', ''),
-                    "picture": auth_data.get('picture', '')
+                    "picture": auth_data.get('picture', ''),
+                    "auth_provider": "google"
                 }}
             )
         else:
@@ -127,7 +128,10 @@ async def exchange_session_id(session_id: str) -> dict:
                 "email": auth_data['email'],
                 "name": auth_data.get('name', ''),
                 "picture": auth_data.get('picture', ''),
+                "password": None,
+                "auth_provider": "google",
                 "role": "user",
+                "is_verified": True,
                 "wishlist": [],
                 "created_at": datetime.now(timezone.utc)
             })
