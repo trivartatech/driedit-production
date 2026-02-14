@@ -149,7 +149,7 @@ const ProductDetailPage = () => {
     }
 
     if (!reviewText.trim()) {
-      toast({ title: 'Please write a review', variant: 'destructive' });
+      toast.error('Please write a review');
       return;
     }
 
@@ -160,13 +160,13 @@ const ProductDetailPage = () => {
         rating,
         review_text: reviewText
       });
-      toast({ title: 'Review submitted!' });
+      toast.success('Review submitted!');
       setReviewText('');
       setRating(5);
       fetchReviews();
     } catch (error) {
       console.error('Error submitting review:', error);
-      toast({ title: error.response?.data?.detail || 'Error submitting review', variant: 'destructive' });
+      toast.error(error.response?.data?.detail || 'Error submitting review');
     } finally {
       setSubmittingReview(false);
     }
