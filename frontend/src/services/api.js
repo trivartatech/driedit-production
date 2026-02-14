@@ -175,4 +175,18 @@ export const analyticsAPI = {
   getCustomerMetrics: () => axiosInstance.get('/admin/analytics/customers')
 };
 
+// User Profile & Addresses API
+export const profileAPI = {
+  // Profile
+  get: () => axiosInstance.get('/user/profile'),
+  update: (data) => axiosInstance.put('/user/profile', data),
+  
+  // Addresses
+  getAddresses: () => axiosInstance.get('/user/addresses'),
+  addAddress: (data) => axiosInstance.post('/user/addresses', data),
+  updateAddress: (addressId, data) => axiosInstance.put(`/user/addresses/${addressId}`, data),
+  deleteAddress: (addressId) => axiosInstance.delete(`/user/addresses/${addressId}`),
+  setDefaultAddress: (addressId) => axiosInstance.put(`/user/addresses/${addressId}/set-default`)
+};
+
 export default axiosInstance;
