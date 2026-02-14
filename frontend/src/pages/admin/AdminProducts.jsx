@@ -222,7 +222,8 @@ const AdminProducts = () => {
         ...formData,
         regular_price: parseFloat(formData.regular_price),
         discounted_price: parseFloat(formData.discounted_price),
-        stock: parseInt(formData.stock) || 0
+        stock: parseInt(formData.stock) || 0,
+        size_chart_pdf: formData.size_chart_pdf || null
       };
 
       if (editingProduct) {
