@@ -115,7 +115,8 @@ const CheckoutPage = () => {
       acc + ((item.product?.discounted_price || 0) * item.quantity), 0
     );
     const gstAmount = Math.round(subtotal * (gstPercentage / 100));
-    const shipping = pincodeData ? (subtotal > 999 ? 0 : pincodeData.shipping_charge) : 0;
+    // Use tier-based shipping (calculated on subtotal before GST)
+    const shipping = shippingData?.shipping_charge || 0;
     const subtotalWithGst = subtotal + gstAmount + shipping;
     const discount = couponApplied ? couponApplied.discount_amount : 0;
     const total = subtotalWithGst - discount;
