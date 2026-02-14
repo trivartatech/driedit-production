@@ -1,0 +1,102 @@
+{
+  "summary": "Hybrid Coupon System with Auto-Apply Testing Complete. Backend 22/22 passed. Frontend checkout flow verified with auto-coupon, manual override, invalid revert. Pricing order (Discount→GST→Shipping) verified correct.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {
+        "endpoint": "/api/coupons/admin/all",
+        "issue": "Older coupons created before auto_apply feature don't have auto_apply field (defaults to false/undefined)",
+        "priority": "LOW"
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Admin Coupons Table",
+        "issues": ["Usage column shows '0 auto / 0 manual' text but may be hard to read at small sizes"]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_coupon_auto_apply.py",
+    "/app/test_reports/pytest/coupon_auto_apply_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Auto-apply coupon logic correctly selects best eligible coupon by discount amount",
+    "Manual coupon successfully overrides auto-coupon with toast notification",
+    "Invalid manual coupon correctly reverts to auto-coupon",
+    "Pricing order is industry-standard: Subtotal → Discount → GST (on discounted) → Shipping → Total",
+    "GST label shows '(on discounted)' when coupon applied - good UX",
+    "Admin create/edit form includes auto-apply checkbox with '(Best discount wins)' explanation",
+    "AUTO badge with lightning icon displayed next to auto-apply coupons in admin list"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_coupon_auto_apply.py"
+  ],
+  "success_rate": {
+    "backend": "100% (22/22 passed)",
+    "frontend": "100% (all coupon features working)"
+  },
+  "test_credentials": {
+    "admin_email": "admin@driedit.in",
+    "admin_password": "adminpassword",
+    "test_user_email": "test@example.com",
+    "test_user_password": "password123",
+    "test_pincode": "110001"
+  },
+  "seed_data_creation": "FESTIVE10 auto-apply coupon (10% off, min ₹500, max ₹200) exists in DB",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Hybrid coupon system fully tested. Auto-apply endpoint /api/coupons/auto-apply works. Checkout auto-applies best coupon on load. Manual code entry overrides. Invalid codes revert to auto. Pricing order verified: Discount→GST→Shipping.",
+  "features_tested": {
+    "backend_apis": {
+      "auto_apply_endpoint_200": "PASS - Returns best eligible auto-coupon",
+      "auto_apply_low_subtotal": "PASS - Returns null when below min_order",
+      "auto_apply_zero_subtotal": "PASS - Handles gracefully",
+      "auto_apply_negative_subtotal": "PASS - Handles gracefully",
+      "auto_apply_requires_auth": "PASS - Returns 401 without auth",
+      "validate_manual_coupon": "PASS - Both manual and auto coupons validate",
+      "validate_invalid_code": "PASS - Returns 404",
+      "validate_below_minimum": "PASS - Returns 400 with message",
+      "admin_create_auto_coupon": "PASS - Creates coupon with auto_apply=true",
+      "admin_create_manual_coupon": "PASS - Creates coupon with auto_apply=false",
+      "admin_list_shows_auto_flag": "PASS - auto_uses/manual_uses in response",
+      "admin_update_auto_flag": "PASS - Can toggle auto_apply",
+      "admin_details_breakdown": "PASS - Shows auto/manual usage stats",
+      "festive10_exists": "PASS - FESTIVE10 is auto_apply=true",
+      "festive10_discount_calc": "PASS - 10% of 1000 = 100",
+      "festive10_max_cap": "PASS - 10% of 3000 capped at 200",
+      "error_validate_no_auth": "PASS - 401",
+      "error_admin_no_auth": "PASS - 401",
+      "error_user_admin_access": "PASS - 403"
+    },
+    "frontend_ui": {
+      "checkout_auto_apply_on_load": "PASS - FESTIVE10 auto-applied with AUTO badge",
+      "checkout_manual_override": "PASS - SAVE10 overrides FESTIVE10",
+      "checkout_invalid_reverts": "PASS - Invalid code shows error, reverts to FESTIVE10",
+      "checkout_pricing_order": "PASS - Subtotal→Coupon→GST(discounted)→Shipping→Total",
+      "checkout_gst_on_discounted_label": "PASS - Shows 'GST (18%) (on discounted)'",
+      "admin_coupons_auto_badge": "PASS - AUTO badge with lightning icon",
+      "admin_create_auto_checkbox": "PASS - 'Auto-apply at checkout' option"
+    },
+    "pricing_verification": {
+      "example_999_subtotal": {
+        "subtotal": 999,
+        "festive10_discount": 99.9,
+        "discounted_subtotal": 899.1,
+        "gst_18_percent": 162,
+        "shipping_500_999_tier": 50,
+        "total": 1111.1,
+        "verified": true
+      }
+    }
+  },
+  "mocked_apis": {
+    "has_mocked_apis": false,
+    "mocked_apis_list": []
+  }
+}
