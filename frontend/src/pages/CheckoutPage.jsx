@@ -68,6 +68,19 @@ const CheckoutPage = () => {
       
       setCartItems(items);
       setGstPercentage(gstResponse.data.gst_percentage || 18);
+      
+      // Calculate shipping based on subtotal
+      const subtotal = items.reduce((acc, item) => 
+        acc + ((item.product?.discounted_price || 0) * item.quantity), 0
+      );
+      
+      try {
+        const shippingResponse = await shippingAPI.calculate(subtotal);
+        setShippingData(shippingResponse.data);
+      } catch (error) {
+        console.log('Shipping tiers not configured, using free shipping');
+        setShippingData({ shipping_charge: 0, tier_matched: false });
+      }
     } catch (error) {
       console.error('Error loading data:', error);
       toast.error('Failed to load checkout data');
