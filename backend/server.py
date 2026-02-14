@@ -27,7 +27,8 @@ from routes import (
     coupon_routes,
     password_reset_routes,
     shipping_tier_routes,
-    analytics_routes
+    analytics_routes,
+    google_oauth_routes
 )
 
 ROOT_DIR = Path(__file__).parent
