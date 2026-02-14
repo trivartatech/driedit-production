@@ -35,8 +35,9 @@ const LoginPage = () => {
   };
 
   const handleGoogleLogin = () => {
-    const redirectUrl = window.location.origin + '/auth/callback';
-    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
+    // Redirect to backend Google OAuth endpoint
+    const backendUrl = process.env.REACT_APP_BACKEND_URL || '';
+    window.location.href = `${backendUrl}/api/auth/google/login`;
   };
 
   return (
