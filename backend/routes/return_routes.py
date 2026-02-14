@@ -3,15 +3,100 @@ from auth import get_current_user, require_admin, db
 from models import ReturnRequest, ReturnRequestCreate, ReturnStatus
 from typing import List
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pydantic import BaseModel
 
 router = APIRouter(prefix="/api/returns", tags=["returns"])
 
-@router.post("", response_model=ReturnRequest)
+# Return window in days
+RETURN_WINDOW_DAYS = 7
+
+@router.get("/check-eligibility/{order_id}")
+async def check_return_eligibility(order_id: str, request: Request):
+    """
+    Check if an order is eligible for return.
+    Returns eligibility status, days remaining, and any existing return request.
+    """
+    user = await get_current_user(request)
+    
+    # Get order
+    order = await db.orders.find_one({
+        "order_id": order_id,
+        "user_id": user["user_id"]
+    }, {"_id": 0})
+    
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    # Check order status
+    if order.get("order_status") != "delivered":
+        return {
+            "eligible": False,
+            "reason": "Order not yet delivered",
+            "order_status": order.get("order_status"),
+            "return_status": order.get("return_status", "none")
+        }
+    
+    # Check for existing return request
+    existing_return = await db.return_requests.find_one({
+        "order_id": order_id,
+        "user_id": user["user_id"]
+    }, {"_id": 0})
+    
+    if existing_return and existing_return.get("status") in ["approved", "completed"]:
+        return {
+            "eligible": False,
+            "reason": "Return already processed for this order",
+            "return_status": existing_return.get("status"),
+            "return_request": existing_return
+        }
+    
+    if existing_return and existing_return.get("status") == "requested":
+        return {
+            "eligible": False,
+            "reason": "Return request already pending",
+            "return_status": "requested",
+            "return_request": existing_return
+        }
+    
+    # Check return window (7 days from delivery)
+    # Use updated_at as delivery timestamp (when status changed to delivered)
+    delivery_date = order.get("updated_at")
+    if isinstance(delivery_date, str):
+        delivery_date = datetime.fromisoformat(delivery_date.replace('Z', '+00:00'))
+    
+    now = datetime.now(timezone.utc)
+    if delivery_date.tzinfo is None:
+        delivery_date = delivery_date.replace(tzinfo=timezone.utc)
+    
+    window_end = delivery_date + timedelta(days=RETURN_WINDOW_DAYS)
+    days_remaining = (window_end - now).days
+    
+    if now > window_end:
+        return {
+            "eligible": False,
+            "reason": "Return window closed",
+            "window_days": RETURN_WINDOW_DAYS,
+            "days_since_delivery": (now - delivery_date).days,
+            "return_status": order.get("return_status", "none")
+        }
+    
+    return {
+        "eligible": True,
+        "days_remaining": max(0, days_remaining),
+        "window_end": window_end.isoformat(),
+        "return_status": order.get("return_status", "none")
+    }
+
+@router.post("")
 async def create_return_request(return_data: ReturnRequestCreate, request: Request):
     """
     Create a return/replace request for an order.
+    Validates:
+    - Order belongs to user
+    - Order is delivered
+    - Within 7-day return window
+    - No existing approved/completed return
     """
     user = await get_current_user(request)
     
@@ -24,9 +109,36 @@ async def create_return_request(return_data: ReturnRequestCreate, request: Reque
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     
-    # Check if return already requested
-    if order.get("return_status") and order["return_status"] != "none":
+    # Check order status - must be delivered
+    if order.get("order_status") != "delivered":
+        raise HTTPException(status_code=400, detail="Only delivered orders can be returned")
+    
+    # Check for existing return request (approved or completed)
+    existing_return = await db.return_requests.find_one({
+        "order_id": return_data.order_id,
+        "user_id": user["user_id"],
+        "status": {"$in": ["requested", "approved", "completed"]}
+    })
+    
+    if existing_return:
         raise HTTPException(status_code=400, detail="Return already requested for this order")
+    
+    # Check return window (7 days from delivery)
+    delivery_date = order.get("updated_at")
+    if isinstance(delivery_date, str):
+        delivery_date = datetime.fromisoformat(delivery_date.replace('Z', '+00:00'))
+    
+    now = datetime.now(timezone.utc)
+    if delivery_date.tzinfo is None:
+        delivery_date = delivery_date.replace(tzinfo=timezone.utc)
+    
+    window_end = delivery_date + timedelta(days=RETURN_WINDOW_DAYS)
+    
+    if now > window_end:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Return window has expired. Orders can only be returned within {RETURN_WINDOW_DAYS} days of delivery."
+        )
     
     request_id = f"ret_{uuid.uuid4().hex[:12]}"
     
@@ -34,8 +146,10 @@ async def create_return_request(return_data: ReturnRequestCreate, request: Reque
         "request_id": request_id,
         "order_id": return_data.order_id,
         "user_id": user["user_id"],
+        "items": [item.dict() for item in return_data.items],
         "reason": return_data.reason,
-        "image": return_data.image,
+        "comments": return_data.comments,
+        "images": return_data.images or [],
         "status": ReturnStatus.REQUESTED.value,
         "created_at": datetime.now(timezone.utc),
         "updated_at": datetime.now(timezone.utc)
@@ -48,11 +162,12 @@ async def create_return_request(return_data: ReturnRequestCreate, request: Reque
         {"order_id": return_data.order_id},
         {"$set": {
             "return_status": ReturnStatus.REQUESTED.value,
-            "return_reason": return_data.reason,
-            "return_image": return_data.image,
             "updated_at": datetime.now(timezone.utc)
         }}
     )
+    
+    # Remove _id for response
+    return_request.pop("_id", None)
     
     return return_request
 
