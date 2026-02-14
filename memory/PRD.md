@@ -186,6 +186,20 @@ A complete, production-ready, minimalistic Gen-Z fashion e-commerce platform for
 - `frontend/src/pages/admin/AdminPopups.jsx` - File upload instead of URL only
 - `frontend/src/pages/ProductDetailPage.jsx` - "View Size Chart" button
 
+### Content Pages ✅
+- [x] About Us page
+- [x] Privacy Policy page
+- [x] Terms & Conditions page
+- [x] Return & Refund Policy page
+
+### UI/UX Enhancements ✅
+- [x] Scroll-to-top on navigation
+- [x] Clickable banner images (Hero section)
+- [x] Redesigned "Shop by Category" section
+- [x] Updated wishlist icon (outline style)
+- [x] Mobile menu font size improvements
+- [x] Simplified header navigation
+
 ---
 
 ## Upcoming Tasks
