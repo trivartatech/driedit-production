@@ -10,6 +10,7 @@ import CartPage from "@/pages/CartPage";
 import WishlistPage from "@/pages/WishlistPage";
 import LoginPage from "@/pages/LoginPage";
 import AuthCallback from "@/pages/AuthCallback";
+import AdminLayout from "@/pages/admin/AdminLayout";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/context/AuthContext";
@@ -23,9 +24,12 @@ function AppRouter() {
     return <AuthCallback />;
   }
   
+  // Check if on admin route
+  const isAdmin = location.pathname.startsWith('/admin');
+  
   return (
     <>
-      <Header />
+      {!isAdmin && <Header />}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/products" element={<ProductsPage />} />
@@ -44,8 +48,15 @@ function AppRouter() {
             <WishlistPage />
           </ProtectedRoute>
         } />
+        
+        {/* Admin Routes */}
+        <Route path="/admin/*" element={
+          <ProtectedRoute>
+            <AdminLayout />
+          </ProtectedRoute>
+        } />
       </Routes>
-      <Footer />
+      {!isAdmin && <Footer />}
       <Toaster />
     </>
   );
