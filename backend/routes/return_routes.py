@@ -186,7 +186,7 @@ async def get_my_return_requests(request: Request):
     return requests
 
 # Admin endpoints
-@router.get("/admin/all", response_model=List[ReturnRequest])
+@router.get("/admin/all")
 async def get_all_return_requests(
     request: Request,
     status: str = None,
@@ -205,6 +205,15 @@ async def get_all_return_requests(
         query,
         {"_id": 0}
     ).sort("created_at", -1).limit(limit).to_list(limit)
+    
+    # Enrich with order details
+    for req in requests:
+        order = await db.orders.find_one(
+            {"order_id": req["order_id"]},
+            {"_id": 0, "delivery_address": 1, "total": 1}
+        )
+        if order:
+            req["order_details"] = order
     
     return requests
 
