@@ -68,6 +68,7 @@ const AdminCoupons = () => {
         max_discount: coupon.max_discount || '',
         usage_limit: coupon.usage_limit || '',
         one_time_per_user: coupon.one_time_per_user,
+        auto_apply: coupon.auto_apply || false,
         is_active: coupon.is_active,
         expires_at: coupon.expires_at ? new Date(coupon.expires_at).toISOString().split('T')[0] : ''
       });
