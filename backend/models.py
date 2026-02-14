@@ -205,17 +205,38 @@ class ReviewCreate(BaseModel):
     rating: int = Field(ge=1, le=5)
     review_text: str
 
-# Pincode Models
+# Pincode Models (Legacy - still used for COD availability check)
 class Pincode(BaseModel):
     pincode: str
-    shipping_charge: float
+    shipping_charge: float  # Deprecated - use shipping_tiers instead
     cod_available: bool
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class PincodeCreate(BaseModel):
     pincode: str
-    shipping_charge: float
+    shipping_charge: float = 0  # Deprecated
     cod_available: bool
+
+# Shipping Tier Models (New tier-based shipping)
+class ShippingTier(BaseModel):
+    tier_id: str
+    min_amount: float  # Minimum subtotal (inclusive)
+    max_amount: Optional[float] = None  # Maximum subtotal (inclusive), None = unlimited
+    shipping_charge: float
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class ShippingTierCreate(BaseModel):
+    min_amount: float
+    max_amount: Optional[float] = None
+    shipping_charge: float
+    is_active: bool = True
+
+class ShippingTierUpdate(BaseModel):
+    min_amount: Optional[float] = None
+    max_amount: Optional[float] = None
+    shipping_charge: Optional[float] = None
+    is_active: Optional[bool] = None
 
 # GST Settings
 class GSTSettings(BaseModel):
