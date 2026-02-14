@@ -151,6 +151,7 @@ app.include_router(shipping_tier_routes.router)
 app.include_router(analytics_routes.router)
 app.include_router(google_oauth_routes.router)
 app.include_router(user_profile_routes.router)
+app.include_router(sizes_routes.router)
 
 # Health check endpoint
 @app.get("/api/")
