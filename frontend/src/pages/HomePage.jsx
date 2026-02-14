@@ -47,23 +47,31 @@ const HomePage = () => {
           SHOP BY <span className="text-[#E10600]">CATEGORY</span>
         </motion.h2>
         
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          {categories.map((category, index) => (
-            <motion.button
-              key={category.id}
-              onClick={() => navigate('/products')}
-              className="bg-white/5 hover:bg-[#E10600] border border-white/10 hover:border-[#E10600] p-6 transition-all duration-300 group"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <span className="text-sm font-bold">{category.name.toUpperCase()}</span>
-            </motion.button>
-          ))}
-        </div>
+        {loading ? (
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="bg-white/5 h-24 animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {categories.map((category, index) => (
+              <motion.button
+                key={category.category_id}
+                onClick={() => navigate('/products')}
+                className="bg-white/5 hover:bg-[#E10600] border border-white/10 hover:border-[#E10600] p-6 transition-all duration-300 group"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="text-sm font-bold">{category.name.toUpperCase()}</span>
+              </motion.button>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Featured Products */}
@@ -89,19 +97,27 @@ const HomePage = () => {
           </motion.button>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-          {featuredProducts.map((product, index) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <ProductCard product={product} />
-            </motion.div>
-          ))}
-        </div>
+        {loading ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-white/5 aspect-[3/4] animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+            {featuredProducts.map((product, index) => (
+              <motion.div
+                key={product.product_id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <ProductCard product={product} />
+              </motion.div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* CTA Section */}
