@@ -9,7 +9,7 @@ import uuid
 import asyncio
 from datetime import datetime, timezone, timedelta
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://driedit-checkout.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://driedit-returns.preview.emergentagent.com').rstrip('/')
 
 # Test credentials
 TEST_EMAIL = "test@example.com"
