@@ -2,28 +2,58 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { calculateDiscount, formatPrice, addToWishlist, removeFromWishlist, getWishlist } from '../mockData';
+import { wishlistAPI } from '../services/api';
+import { useAuth } from '../context/AuthContext';
+
+const calculateDiscount = (regular, discounted) => {
+  return Math.round(((regular - discounted) / regular) * 100);
+};
+
+const formatPrice = (price) => {
+  return `₹${price.toLocaleString('en-IN')}`;
+};
 
 const ProductCard = ({ product }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    const wishlist = getWishlist();
-    setIsWishlisted(wishlist.includes(product.id));
-  }, [product.id]);
-
-  const handleWishlistToggle = (e) => {
-    e.stopPropagation();
-    if (isWishlisted) {
-      removeFromWishlist(product.id);
-      setIsWishlisted(false);
-    } else {
-      addToWishlist(product.id);
-      setIsWishlisted(true);
+    if (isAuthenticated) {
+      checkWishlistStatus();
     }
-    window.dispatchEvent(new Event('wishlistUpdated'));
+  }, [product.product_id, isAuthenticated]);
+
+  const checkWishlistStatus = async () => {
+    try {
+      const response = await wishlistAPI.get();
+      setIsWishlisted(response.data.includes(product.product_id));
+    } catch (error) {
+      console.error('Error checking wishlist:', error);
+    }
+  };
+
+  const handleWishlistToggle = async (e) => {
+    e.stopPropagation();
+    
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      if (isWishlisted) {
+        await wishlistAPI.remove(product.product_id);
+        setIsWishlisted(false);
+      } else {
+        await wishlistAPI.add(product.product_id);
+        setIsWishlisted(true);
+      }
+      window.dispatchEvent(new Event('wishlistUpdated'));
+    } catch (error) {
+      console.error('Error toggling wishlist:', error);
+    }
   };
 
   const discount = calculateDiscount(product.regular_price, product.discounted_price);
