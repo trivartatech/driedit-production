@@ -233,3 +233,24 @@ class ReturnRequestCreate(BaseModel):
     order_id: str
     reason: str
     image: Optional[str] = None
+
+# Cart Models
+class CartItem(BaseModel):
+    product_id: str
+    size: str
+    quantity: int
+
+class Cart(BaseModel):
+    cart_id: str
+    user_id: str
+    items: List[CartItem] = []
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class CartItemAdd(BaseModel):
+    product_id: str
+    size: str
+    quantity: int = 1
+
+class CartItemUpdate(BaseModel):
+    quantity: int
