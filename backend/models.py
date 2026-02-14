@@ -36,8 +36,11 @@ class User(BaseModel):
     user_id: str
     email: EmailStr
     name: str
+    password: Optional[str] = None  # Hashed password (null for Google users)
     picture: Optional[str] = None
+    auth_provider: str = "email"  # "email" or "google"
     role: UserRole = UserRole.USER
+    is_verified: bool = False
     wishlist: List[str] = []
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
@@ -46,6 +49,15 @@ class UserSession(BaseModel):
     session_token: str
     expires_at: datetime
     created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class UserRegister(BaseModel):
+    email: EmailStr
+    password: str = Field(min_length=8)
+    name: str
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
 
 # Category Models
 class Category(BaseModel):
