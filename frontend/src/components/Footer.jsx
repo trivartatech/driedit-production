@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Instagram, Twitter, Facebook } from 'lucide-react';
+import { Instagram, Phone, MessageCircle, MapPin } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -12,18 +12,43 @@ const Footer = () => {
             <h3 className="text-2xl font-black tracking-tighter mb-4">
               <span className="text-[#E10600]">D</span>RIEDIT
             </h3>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-400 mb-4">
               Minimal Gen-Z streetwear for the culture.
             </p>
-            <div className="flex space-x-4 mt-6">
-              <a href="#" className="hover:text-[#E10600] transition-colors">
+            <div className="flex items-start space-x-2 text-sm text-gray-400 mb-4">
+              <MapPin size={16} className="text-[#E10600] flex-shrink-0 mt-0.5" />
+              <span>
+                Sampath Nilya, Ground Floor<br />
+                5th Cross, 2nd Main, Vidyanagar<br />
+                (Opp. Park) Chitradurga,<br />
+                Karnataka – 577502
+              </span>
+            </div>
+            <div className="flex space-x-4 mt-4">
+              <a 
+                href="https://www.instagram.com/dried.it" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:text-[#E10600] transition-colors"
+                aria-label="Instagram"
+              >
                 <Instagram size={20} />
               </a>
-              <a href="#" className="hover:text-[#E10600] transition-colors">
-                <Twitter size={20} />
+              <a 
+                href="https://wa.me/919611132391" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:text-[#E10600] transition-colors"
+                aria-label="WhatsApp"
+              >
+                <MessageCircle size={20} />
               </a>
-              <a href="#" className="hover:text-[#E10600] transition-colors">
-                <Facebook size={20} />
+              <a 
+                href="tel:+919611132391" 
+                className="hover:text-[#E10600] transition-colors"
+                aria-label="Phone"
+              >
+                <Phone size={20} />
               </a>
             </div>
           </div>
