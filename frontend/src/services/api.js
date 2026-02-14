@@ -114,7 +114,10 @@ export const authAPI = {
   register: (data) => axiosInstance.post('/auth/register', data),
   login: (data) => axiosInstance.post('/auth/login', data),
   getMe: () => axiosInstance.get('/auth/me'),
-  logout: () => axiosInstance.post('/auth/logout')
+  logout: () => axiosInstance.post('/auth/logout'),
+  forgotPassword: (email) => axiosInstance.post('/auth/forgot-password', { email }),
+  resetPassword: (token, newPassword) => axiosInstance.post('/auth/reset-password', { token, new_password: newPassword }),
+  verifyResetToken: (token) => axiosInstance.get(`/auth/verify-reset-token/${token}`)
 };
 
 // Uploads API
