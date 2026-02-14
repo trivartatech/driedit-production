@@ -118,24 +118,32 @@ const ProductsPage = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
-          Showing {sortedProducts.length} products
+          Showing {products.length} products
         </motion.p>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {sortedProducts.map((product, index) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-            >
-              <ProductCard product={product} />
-            </motion.div>
-          ))}
-        </div>
+        {loading ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="bg-white/5 aspect-[3/4] animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {products.map((product, index) => (
+              <motion.div
+                key={product.product_id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <ProductCard product={product} />
+              </motion.div>
+            ))}
+          </div>
+        )}
 
-        {sortedProducts.length === 0 && (
+        {products.length === 0 && !loading && (
           <div className="text-center py-20">
             <p className="text-xl text-gray-400">No products found in this category.</p>
           </div>
