@@ -96,26 +96,28 @@ const HomePage = () => {
         </motion.h2>
         
         {loading ? (
-          <div className="flex flex-col space-y-3">
+          <div className="flex flex-col items-center space-y-4 max-w-md mx-auto">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white/5 h-14 animate-pulse" />
+              <div key={i} className="bg-white/5 h-14 w-full animate-pulse rounded" />
             ))}
           </div>
         ) : (
-          <div className="flex flex-col space-y-3">
+          <div className="flex flex-col items-center space-y-4 max-w-md mx-auto">
             {categories.map((category, index) => (
               <motion.button
                 key={category.category_id}
                 onClick={() => navigate('/products')}
-                className="bg-white/5 hover:bg-[#E10600] border border-white/10 hover:border-[#E10600] p-4 transition-all duration-300 group text-left"
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                className="w-full bg-transparent hover:bg-[#E10600] border-2 border-white/20 hover:border-[#E10600] py-4 px-8 transition-all duration-300 group text-center"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                whileHover={{ x: 10 }}
+                whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <span className="text-base font-bold">{category.name.toUpperCase()}</span>
+                <span className="text-lg font-black tracking-wider group-hover:text-white transition-colors">
+                  {category.name.toUpperCase()}
+                </span>
               </motion.button>
             ))}
           </div>
