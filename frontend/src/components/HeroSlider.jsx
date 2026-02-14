@@ -44,14 +44,14 @@ const HeroSlider = () => {
   };
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % activeSliders.length);
+    setCurrentSlide((prev) => (prev + 1) % banners.length);
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + activeSliders.length) % activeSliders.length);
+    setCurrentSlide((prev) => (prev - 1 + banners.length) % banners.length);
   };
 
-  if (activeSliders.length === 0) return null;
+  if (banners.length === 0) return null;
 
   return (
     <div className="relative w-full h-[60vh] md:h-[70vh] bg-black overflow-hidden">
