@@ -13,6 +13,8 @@ import MyOrdersPage from "@/pages/MyOrdersPage";
 import WishlistPage from "@/pages/WishlistPage";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
+import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
+import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import AuthCallback from "@/pages/AuthCallback";
 import AdminLayout from "@/pages/admin/AdminLayout";
 import ProtectedRoute from "@/components/ProtectedRoute";
