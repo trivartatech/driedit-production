@@ -152,4 +152,16 @@ export const couponsAPI = {
   toggle: (couponId) => axiosInstance.put(`/coupons/admin/${couponId}/toggle`)
 };
 
+// Shipping Tiers API
+export const shippingAPI = {
+  calculate: (subtotal) => axiosInstance.get(`/shipping-tiers/calculate?subtotal=${subtotal}`),
+  getActiveTiers: () => axiosInstance.get('/shipping-tiers/all-active'),
+  // Admin
+  getAll: () => axiosInstance.get('/shipping-tiers/admin/all'),
+  create: (data) => axiosInstance.post('/shipping-tiers/admin/create', data),
+  update: (tierId, data) => axiosInstance.put(`/shipping-tiers/admin/${tierId}`, data),
+  delete: (tierId) => axiosInstance.delete(`/shipping-tiers/admin/${tierId}`),
+  toggle: (tierId) => axiosInstance.put(`/shipping-tiers/admin/${tierId}/toggle`)
+};
+
 export default axiosInstance;
