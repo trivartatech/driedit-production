@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request, Response
-from auth import exchange_session_id, get_current_user, db
+from auth import get_current_user, db
 from models import UserRegister, UserLogin
-from pydantic import BaseModel
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 import logging
@@ -21,9 +20,6 @@ IS_PRODUCTION = os.environ.get('ENVIRONMENT', 'development') == 'production'
 # SameSite=none requires Secure=true, even in development
 COOKIE_SECURE = True  # Always secure because SameSite=none requires it
 COOKIE_SAMESITE = "strict" if IS_PRODUCTION else "none"
-
-class SessionExchange(BaseModel):
-    session_id: str
 
 # Helper functions for password hashing
 def hash_password(password: str) -> str:
