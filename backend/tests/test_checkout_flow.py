@@ -5,33 +5,42 @@ Testing: Auth, Cart, Orders, Pincode validation, GST
 import pytest
 import requests
 import os
-import uuid
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
+# Get API URL from environment
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://driedit-checkout.preview.emergentagent.com').rstrip('/')
+
+# Session to maintain cookies across requests
+session = requests.Session()
+session.headers.update({"Content-Type": "application/json"})
+
+# Test credentials
+TEST_EMAIL = "test@example.com"
+TEST_PASSWORD = "password123"
+
 
 class TestHealthAndPublicEndpoints:
     """Test health and public endpoints - no auth required"""
     
-    def test_api_health(self, api_client):
+    def test_api_health(self):
         """Test API health endpoint"""
-        response = api_client.get(f"{BASE_URL}/api/health")
+        response = session.get(f"{BASE_URL}/api/health")
         assert response.status_code == 200, f"Health check failed: {response.text}"
         data = response.json()
         assert data.get("status") == "healthy"
         print("✓ API health check passed")
     
-    def test_get_products(self, api_client):
+    def test_get_products(self):
         """Test get products endpoint"""
-        response = api_client.get(f"{BASE_URL}/api/products")
+        response = session.get(f"{BASE_URL}/api/products")
         assert response.status_code == 200, f"Get products failed: {response.text}"
         products = response.json()
         assert isinstance(products, list)
         assert len(products) > 0, "No products found"
         print(f"✓ Found {len(products)} products")
         
-    def test_pincode_validation_success(self, api_client):
+    def test_pincode_validation_success(self):
         """Test pincode 110001 which should be valid"""
-        response = api_client.post(
+        response = session.post(
             f"{BASE_URL}/api/public/check-pincode",
             json={"pincode": "110001"}
         )
@@ -42,9 +51,9 @@ class TestHealthAndPublicEndpoints:
         assert "cod_available" in data
         print(f"✓ Pincode 110001 is valid: shipping={data['shipping_charge']}, COD={data['cod_available']}")
     
-    def test_pincode_validation_failure(self, api_client):
+    def test_pincode_validation_failure(self):
         """Test invalid pincode"""
-        response = api_client.post(
+        response = session.post(
             f"{BASE_URL}/api/public/check-pincode",
             json={"pincode": "999999"}
         )
@@ -55,33 +64,48 @@ class TestHealthAndPublicEndpoints:
 class TestAuthentication:
     """Test user authentication flow"""
     
-    def test_login_with_valid_credentials(self, api_client, test_user_credentials):
+    def test_login_with_valid_credentials(self):
         """Test login with test@example.com / password123"""
-        response = api_client.post(
+        response = session.post(
             f"{BASE_URL}/api/auth/login",
-            json=test_user_credentials
+            json={
+                "email": TEST_EMAIL,
+                "password": TEST_PASSWORD
+            }
         )
         assert response.status_code == 200, f"Login failed: {response.text}"
         data = response.json()
         assert "user" in data
-        assert data["user"]["email"] == test_user_credentials["email"]
+        assert data["user"]["email"] == TEST_EMAIL
         print(f"✓ Login successful for {data['user']['email']}")
     
-    def test_login_with_invalid_credentials(self, api_client):
+    def test_login_with_invalid_credentials(self):
         """Test login with wrong password"""
-        response = api_client.post(
+        temp_session = requests.Session()
+        temp_session.headers.update({"Content-Type": "application/json"})
+        response = temp_session.post(
             f"{BASE_URL}/api/auth/login",
             json={
-                "email": "test@example.com",
+                "email": TEST_EMAIL,
                 "password": "wrongpassword"
             }
         )
         assert response.status_code == 401, f"Expected 401 for invalid credentials, got {response.status_code}"
         print("✓ Invalid credentials correctly rejected")
     
-    def test_get_current_user(self, auth_session):
+    def test_get_current_user(self):
         """Test getting current user after login"""
-        response = auth_session.get(f"{BASE_URL}/api/auth/me")
+        # First ensure we are logged in
+        login_response = session.post(
+            f"{BASE_URL}/api/auth/login",
+            json={
+                "email": TEST_EMAIL,
+                "password": TEST_PASSWORD
+            }
+        )
+        assert login_response.status_code == 200, f"Login failed: {login_response.text}"
+        
+        response = session.get(f"{BASE_URL}/api/auth/me")
         assert response.status_code == 200, f"Get me failed: {response.text}"
         data = response.json()
         assert "user_id" in data
@@ -92,20 +116,40 @@ class TestAuthentication:
 class TestCartOperations:
     """Test cart CRUD operations"""
     
-    def test_get_cart(self, auth_session):
+    @pytest.fixture(autouse=True)
+    def ensure_logged_in(self):
+        """Ensure user is logged in before each test"""
+        session.post(
+            f"{BASE_URL}/api/auth/login",
+            json={
+                "email": TEST_EMAIL,
+                "password": TEST_PASSWORD
+            }
+        )
+    
+    def get_first_product(self):
+        """Helper to get first product"""
+        response = session.get(f"{BASE_URL}/api/products")
+        if response.status_code == 200 and len(response.json()) > 0:
+            return response.json()[0]
+        return None
+    
+    def test_get_cart(self):
         """Test getting cart"""
-        response = auth_session.get(f"{BASE_URL}/api/cart")
+        response = session.get(f"{BASE_URL}/api/cart")
         assert response.status_code == 200, f"Get cart failed: {response.text}"
         data = response.json()
         assert "items" in data
         print(f"✓ Cart retrieved with {len(data['items'])} items")
     
-    def test_add_to_cart(self, auth_session, first_product):
+    def test_add_to_cart(self):
         """Test adding item to cart"""
-        product = first_product
+        product = self.get_first_product()
+        assert product is not None, "No products available"
+        
         size = product["sizes"][0] if product.get("sizes") else "M"
         
-        response = auth_session.post(
+        response = session.post(
             f"{BASE_URL}/api/cart/add",
             json={
                 "product_id": product["product_id"],
@@ -116,7 +160,7 @@ class TestCartOperations:
         assert response.status_code == 200, f"Add to cart failed: {response.text}"
         
         # Verify item was added by getting cart
-        cart_response = auth_session.get(f"{BASE_URL}/api/cart")
+        cart_response = session.get(f"{BASE_URL}/api/cart")
         assert cart_response.status_code == 200
         cart = cart_response.json()
         
@@ -125,13 +169,15 @@ class TestCartOperations:
         assert product["product_id"] in product_ids_in_cart, "Product not found in cart after add"
         print(f"✓ Added {product['title']} to cart")
     
-    def test_update_cart_quantity(self, auth_session, first_product):
+    def test_update_cart_quantity(self):
         """Test updating cart item quantity"""
-        product = first_product
+        product = self.get_first_product()
+        assert product is not None, "No products available"
+        
         size = product["sizes"][0] if product.get("sizes") else "M"
         
         # First ensure item is in cart
-        auth_session.post(
+        session.post(
             f"{BASE_URL}/api/cart/add",
             json={
                 "product_id": product["product_id"],
@@ -141,14 +187,14 @@ class TestCartOperations:
         )
         
         # Update quantity
-        response = auth_session.put(
+        response = session.put(
             f"{BASE_URL}/api/cart/update/{product['product_id']}/{size}",
             json={"quantity": 2}
         )
         assert response.status_code == 200, f"Update cart failed: {response.text}"
         
         # Verify quantity was updated
-        cart_response = auth_session.get(f"{BASE_URL}/api/cart")
+        cart_response = session.get(f"{BASE_URL}/api/cart")
         cart = cart_response.json()
         for item in cart["items"]:
             if item["product_id"] == product["product_id"] and item["size"] == size:
@@ -156,21 +202,23 @@ class TestCartOperations:
                 break
         print(f"✓ Updated cart item quantity to 2")
     
-    def test_get_cart_count(self, auth_session):
+    def test_get_cart_count(self):
         """Test getting cart count"""
-        response = auth_session.get(f"{BASE_URL}/api/cart/count")
+        response = session.get(f"{BASE_URL}/api/cart/count")
         assert response.status_code == 200, f"Get cart count failed: {response.text}"
         data = response.json()
         assert "count" in data
         print(f"✓ Cart count: {data['count']}")
     
-    def test_remove_from_cart(self, auth_session, first_product):
+    def test_remove_from_cart(self):
         """Test removing item from cart"""
-        product = first_product
+        product = self.get_first_product()
+        assert product is not None, "No products available"
+        
         size = product["sizes"][0] if product.get("sizes") else "M"
         
         # First ensure item is in cart
-        auth_session.post(
+        session.post(
             f"{BASE_URL}/api/cart/add",
             json={
                 "product_id": product["product_id"],
@@ -180,13 +228,13 @@ class TestCartOperations:
         )
         
         # Remove item
-        response = auth_session.delete(
+        response = session.delete(
             f"{BASE_URL}/api/cart/remove/{product['product_id']}/{size}"
         )
         assert response.status_code == 200, f"Remove from cart failed: {response.text}"
         
         # Verify item was removed
-        cart_response = auth_session.get(f"{BASE_URL}/api/cart")
+        cart_response = session.get(f"{BASE_URL}/api/cart")
         cart = cart_response.json()
         for item in cart["items"]:
             if item["product_id"] == product["product_id"] and item["size"] == size:
@@ -197,17 +245,37 @@ class TestCartOperations:
 class TestCheckoutFlow:
     """Test complete checkout flow - the main test for this feature"""
     
-    def test_full_checkout_flow_with_cod(self, auth_session, first_product):
+    @pytest.fixture(autouse=True)
+    def ensure_logged_in(self):
+        """Ensure user is logged in before each test"""
+        session.post(
+            f"{BASE_URL}/api/auth/login",
+            json={
+                "email": TEST_EMAIL,
+                "password": TEST_PASSWORD
+            }
+        )
+    
+    def get_first_product(self):
+        """Helper to get first product"""
+        response = session.get(f"{BASE_URL}/api/products")
+        if response.status_code == 200 and len(response.json()) > 0:
+            return response.json()[0]
+        return None
+    
+    def test_full_checkout_flow_with_cod(self):
         """Test complete checkout: add to cart -> place order with COD"""
-        product = first_product
+        product = self.get_first_product()
+        assert product is not None, "No products available"
+        
         size = product["sizes"][0] if product.get("sizes") else "M"
         
         # Step 1: Clear cart first
-        auth_session.delete(f"{BASE_URL}/api/cart/clear")
+        session.delete(f"{BASE_URL}/api/cart/clear")
         print("Step 1: ✓ Cart cleared")
         
         # Step 2: Add product to cart
-        add_response = auth_session.post(
+        add_response = session.post(
             f"{BASE_URL}/api/cart/add",
             json={
                 "product_id": product["product_id"],
@@ -219,7 +287,7 @@ class TestCheckoutFlow:
         print(f"Step 2: ✓ Added {product['title']} to cart")
         
         # Step 3: Verify cart has the item
-        cart_response = auth_session.get(f"{BASE_URL}/api/cart")
+        cart_response = session.get(f"{BASE_URL}/api/cart")
         assert cart_response.status_code == 200
         cart = cart_response.json()
         assert len(cart["items"]) > 0, "Cart is empty"
@@ -249,7 +317,7 @@ class TestCheckoutFlow:
             "pincode": "110001"
         }
         
-        order_response = auth_session.post(
+        order_response = session.post(
             f"{BASE_URL}/api/orders",
             json=order_data
         )
@@ -261,7 +329,7 @@ class TestCheckoutFlow:
         print(f"Step 4: ✓ Order created: {order['order_id']}")
         
         # Step 5: Verify order was created by fetching it
-        get_order_response = auth_session.get(f"{BASE_URL}/api/orders/{order['order_id']}")
+        get_order_response = session.get(f"{BASE_URL}/api/orders/{order['order_id']}")
         assert get_order_response.status_code == 200, f"Get order failed: {get_order_response.text}"
         fetched_order = get_order_response.json()
         assert fetched_order["order_id"] == order["order_id"]
@@ -269,18 +337,16 @@ class TestCheckoutFlow:
         print(f"Step 5: ✓ Order verified, total: ₹{fetched_order['total']}")
         
         # Step 6: Verify order appears in my orders
-        my_orders_response = auth_session.get(f"{BASE_URL}/api/orders")
+        my_orders_response = session.get(f"{BASE_URL}/api/orders")
         assert my_orders_response.status_code == 200
         my_orders = my_orders_response.json()
         order_ids = [o["order_id"] for o in my_orders]
         assert order["order_id"] in order_ids, "Order not found in my orders"
         print(f"Step 6: ✓ Order appears in my orders list")
-        
-        return order
     
-    def test_razorpay_mock_order_creation(self, auth_session):
+    def test_razorpay_mock_order_creation(self):
         """Test Razorpay mock order creation"""
-        response = auth_session.post(
+        response = session.post(
             f"{BASE_URL}/api/orders/create-razorpay-order",
             json={"amount": 100000}  # ₹1000 in paise
         )
@@ -294,9 +360,20 @@ class TestCheckoutFlow:
 class TestOrderManagement:
     """Test order retrieval"""
     
-    def test_get_my_orders(self, auth_session):
+    @pytest.fixture(autouse=True)
+    def ensure_logged_in(self):
+        """Ensure user is logged in before each test"""
+        session.post(
+            f"{BASE_URL}/api/auth/login",
+            json={
+                "email": TEST_EMAIL,
+                "password": TEST_PASSWORD
+            }
+        )
+    
+    def test_get_my_orders(self):
         """Test getting user's orders"""
-        response = auth_session.get(f"{BASE_URL}/api/orders")
+        response = session.get(f"{BASE_URL}/api/orders")
         assert response.status_code == 200, f"Get my orders failed: {response.text}"
         orders = response.json()
         assert isinstance(orders, list)
@@ -306,27 +383,25 @@ class TestOrderManagement:
 class TestGSTSettings:
     """Test GST settings retrieval"""
     
-    def test_get_gst(self, auth_session):
+    @pytest.fixture(autouse=True)
+    def ensure_logged_in(self):
+        """Ensure user is logged in before each test"""
+        session.post(
+            f"{BASE_URL}/api/auth/login",
+            json={
+                "email": TEST_EMAIL,
+                "password": TEST_PASSWORD
+            }
+        )
+    
+    def test_get_gst(self):
         """Test getting GST percentage"""
-        response = auth_session.get(f"{BASE_URL}/api/admin/gst")
+        response = session.get(f"{BASE_URL}/api/admin/gst")
         assert response.status_code == 200, f"Get GST failed: {response.text}"
         data = response.json()
         assert "gst_percentage" in data
         assert data["gst_percentage"] >= 0
         print(f"✓ GST percentage: {data['gst_percentage']}%")
-
-
-# Cleanup fixture to clear test orders after test session
-@pytest.fixture(scope="session", autouse=True)
-def cleanup_test_data(auth_session):
-    """Clear cart after tests"""
-    yield
-    try:
-        # Clear cart at the end of tests
-        auth_session.delete(f"{BASE_URL}/api/cart/clear")
-        print("\n✓ Test cleanup: Cart cleared")
-    except:
-        pass
 
 
 if __name__ == "__main__":
