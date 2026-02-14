@@ -266,3 +266,15 @@ async def get_active_popup():
         raise HTTPException(status_code=404, detail="No active popup")
     
     return popup
+
+@router.get("/public/gst", response_model=GSTSettings)
+async def get_public_gst_settings():
+    """
+    Get GST settings. Public endpoint for checkout.
+    """
+    settings = await db.gst_settings.find_one({}, {"_id": 0})
+    if not settings:
+        # Return default
+        settings = {"gst_percentage": 18.0, "updated_at": datetime.now(timezone.utc)}
+    
+    return settings
