@@ -28,6 +28,23 @@ const WishlistPage = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <h1 className="text-4xl md:text-6xl font-black mb-8">
+            YOUR <span className="text-[#E10600]">WISHLIST</span>
+          </h1>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-white/5 aspect-[3/4] animate-pulse" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (wishlistItems.length === 0) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
