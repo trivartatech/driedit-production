@@ -111,7 +111,7 @@ def format_date(date_str: str) -> str:
             return date_str.strftime("%d %b %Y, %I:%M %p")
         dt = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
         return dt.strftime("%d %b %Y, %I:%M %p")
-    except:
+    except Exception:
         return str(date_str)
 
 # ============================================
