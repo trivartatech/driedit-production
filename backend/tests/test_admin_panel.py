@@ -17,7 +17,7 @@ ADMIN_PASSWORD = "admin123"
 REGULAR_USER_EMAIL = "test@example.com"
 REGULAR_USER_PASSWORD = "password123"
 
-# Global session tokens
+# Global session tokens - set in setup
 ADMIN_SESSION_TOKEN = None
 USER_SESSION_TOKEN = None
 
@@ -38,66 +38,58 @@ def setup_module(module):
         client = AsyncIOMotorClient(os.environ.get('MONGO_URL', 'mongodb://localhost:27017'))
         db = client[os.environ.get('DB_NAME', 'test_database')]
         
+        admin_token = None
+        user_token = None
+        
         # Setup admin session
         admin = await db.users.find_one({"email": ADMIN_EMAIL})
         if admin:
-            admin_session_token = f"test_admin_session_{uuid.uuid4().hex}"
+            admin_token = f"pytest_admin_{uuid.uuid4().hex}"
             expires_at = datetime.now(timezone.utc) + timedelta(days=7)
             
             await db.user_sessions.delete_many({"user_id": admin["user_id"]})
             await db.user_sessions.insert_one({
                 "user_id": admin["user_id"],
-                "session_token": admin_session_token,
+                "session_token": admin_token,
                 "expires_at": expires_at,
                 "created_at": datetime.now(timezone.utc)
             })
             print(f"\nAdmin session created for {admin['email']} (role={admin.get('role')})")
+            print(f"Token: {admin_token[:30]}...")
         else:
-            # Create admin user if not exists
-            admin_session_token = f"test_admin_session_{uuid.uuid4().hex}"
-            hashed_password = bcrypt.hashpw(ADMIN_PASSWORD.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-            admin_data = {
-                "user_id": "admin_001",
-                "email": ADMIN_EMAIL,
-                "name": "Admin",
-                "password": hashed_password,
-                "auth_provider": "email",
-                "role": "admin",
-                "is_verified": True,
-                "created_at": datetime.now(timezone.utc)
-            }
-            await db.users.insert_one(admin_data)
-            expires_at = datetime.now(timezone.utc) + timedelta(days=7)
-            await db.user_sessions.insert_one({
-                "user_id": "admin_001",
-                "session_token": admin_session_token,
-                "expires_at": expires_at,
-                "created_at": datetime.now(timezone.utc)
-            })
-            print(f"\nAdmin user and session created")
+            print(f"\nWARNING: Admin user {ADMIN_EMAIL} not found!")
         
         # Setup regular user session
         user = await db.users.find_one({"email": REGULAR_USER_EMAIL})
         if user:
-            user_session_token = f"test_user_session_{uuid.uuid4().hex}"
+            user_token = f"pytest_user_{uuid.uuid4().hex}"
             expires_at = datetime.now(timezone.utc) + timedelta(days=7)
             
             await db.user_sessions.delete_many({"user_id": user["user_id"]})
             await db.user_sessions.insert_one({
                 "user_id": user["user_id"],
-                "session_token": user_session_token,
+                "session_token": user_token,
                 "expires_at": expires_at,
                 "created_at": datetime.now(timezone.utc)
             })
             print(f"Regular user session created for {user['email']} (role={user.get('role')})")
         else:
-            user_session_token = None
-            print(f"Regular user {REGULAR_USER_EMAIL} not found")
+            print(f"WARNING: Regular user {REGULAR_USER_EMAIL} not found!")
         
         client.close()
-        return admin_session_token, user_session_token
+        return admin_token, user_token
     
     ADMIN_SESSION_TOKEN, USER_SESSION_TOKEN = asyncio.run(setup_sessions())
+    
+    # Verify the session works
+    if ADMIN_SESSION_TOKEN:
+        test_session = requests.Session()
+        test_session.cookies.set("session_token", ADMIN_SESSION_TOKEN)
+        resp = test_session.get(f"{BASE_URL}/api/auth/me")
+        if resp.status_code == 200:
+            print(f"Verified admin session works: {resp.json().get('email')}")
+        else:
+            print(f"WARNING: Admin session verification failed: {resp.status_code}")
 
 
 def get_admin_session():
