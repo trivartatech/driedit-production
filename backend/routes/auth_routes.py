@@ -18,7 +18,8 @@ limiter = Limiter(key_func=get_remote_address)
 
 # Environment configuration for cookies
 IS_PRODUCTION = os.environ.get('ENVIRONMENT', 'development') == 'production'
-COOKIE_SECURE = IS_PRODUCTION  # Only secure in production (requires HTTPS)
+# SameSite=none requires Secure=true, even in development
+COOKIE_SECURE = True  # Always secure because SameSite=none requires it
 COOKIE_SAMESITE = "strict" if IS_PRODUCTION else "none"
 
 class SessionExchange(BaseModel):
