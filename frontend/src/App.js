@@ -12,6 +12,7 @@ import OrderSuccessPage from "@/pages/OrderSuccessPage";
 import MyOrdersPage from "@/pages/MyOrdersPage";
 import WishlistPage from "@/pages/WishlistPage";
 import ProfilePage from "@/pages/ProfilePage";
+import AboutPage from "@/pages/AboutPage";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
