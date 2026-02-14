@@ -213,11 +213,12 @@ async def logout(request: Request, response: Response):
             # Delete session from database
             await db.user_sessions.delete_one({"session_token": session_token})
         
-        # Clear cookie
+        # Clear cookie with environment-aware settings
         response.delete_cookie(
             key="session_token",
             path="/",
-            samesite="none"
+            samesite=COOKIE_SAMESITE,
+            secure=COOKIE_SECURE
         )
         
         return {"message": "Logged out successfully"}
