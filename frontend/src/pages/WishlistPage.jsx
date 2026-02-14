@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { getWishlist, products } from '../mockData';
 import ProductCard from '../components/ProductCard';
+import { wishlistAPI } from '../services/api';
 
 const WishlistPage = () => {
   const [wishlistItems, setWishlistItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,12 +16,16 @@ const WishlistPage = () => {
     return () => window.removeEventListener('wishlistUpdated', loadWishlist);
   }, []);
 
-  const loadWishlist = () => {
-    const wishlist = getWishlist();
-    const items = wishlist
-      .map(id => products.find(p => p.id === id))
-      .filter(Boolean);
-    setWishlistItems(items);
+  const loadWishlist = async () => {
+    setLoading(true);
+    try {
+      const response = await wishlistAPI.getProducts();
+      setWishlistItems(response.data);
+    } catch (error) {
+      console.error('Error loading wishlist:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (wishlistItems.length === 0) {
