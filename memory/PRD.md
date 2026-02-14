@@ -13,19 +13,45 @@ A complete, production-ready, minimalistic Gen-Z fashion e-commerce platform for
 - **Database**: MongoDB
 - **Payments**: Razorpay (test mode)
 - **Email**: Resend (verified domain: driedit.in)
-- **Auth**: JWT + Google OAuth via Emergent
+- **Auth**: JWT + Official Google OAuth 2.0 (Backend-controlled flow)
+
+---
+
+## Authentication System ✅
+
+### Email/Password Auth
+- [x] Registration with bcrypt hashing
+- [x] Login with JWT sessions
+- [x] Forgot Password flow
+- [x] Password Reset
+
+### Google OAuth 2.0 (NEW) ✅
+- [x] Backend-controlled OAuth flow (more secure)
+- [x] `/api/auth/google/login` - Initiates OAuth flow
+- [x] `/api/auth/google/callback` - Handles callback, creates session
+- [x] `/api/auth/google/status` - Check if configured
+- [x] CSRF protection with state parameter
+- [x] Account linking by email
+- [x] Error handling with user-friendly messages
+- [x] Removed Emergent Auth dependency
+
+### Configuration Required
+```env
+# backend/.env
+GOOGLE_CLIENT_ID=your_client_id
+GOOGLE_CLIENT_SECRET=your_client_secret
+GOOGLE_REDIRECT_URI=https://driedit.in/api/auth/google/callback
+FRONTEND_URL=https://driedit.in
+```
+
+### Redirect URIs to Configure in Google Cloud Console
+- Production: `https://driedit.in/api/auth/google/callback`
+- Preview: `https://driedit-preview.preview.emergentagent.com/api/auth/google/callback`
+- Local: `http://localhost:8000/api/auth/google/callback`
 
 ---
 
 ## Implemented Features ✅
-
-### Authentication & Authorization
-- [x] Email/Password registration with bcrypt hashing
-- [x] JWT-based session management (httpOnly cookies)
-- [x] Google OAuth 2.0 via Emergent
-- [x] Role-based access control (user, admin)
-- [x] Forgot Password flow with secure token generation
-- [x] Password Reset functionality
 
 ### Customer Features
 - [x] Product browsing with categories
@@ -43,7 +69,6 @@ A complete, production-ready, minimalistic Gen-Z fashion e-commerce platform for
 - [x] GST calculation (18%)
 - [x] Tier-based shipping system (admin configurable)
 - [x] Hybrid coupon engine (manual + auto-apply best discount)
-- [x] Pricing order: Subtotal → Discount → GST → Shipping → Total
 
 ### Payment & Logistics
 - [x] Razorpay integration (test mode)
@@ -52,71 +77,28 @@ A complete, production-ready, minimalistic Gen-Z fashion e-commerce platform for
 
 ### Admin Panel
 - [x] Dashboard overview
-- [x] **Analytics Dashboard (NEW)** ✅
-  - Revenue Overview (Today, 7 Days, 30 Days, Lifetime)
-  - Average Order Value (AOV)
-  - Revenue Trend Chart (7-90 days)
-  - Top Products by Revenue/Quantity
-  - Coupon Performance metrics
-  - Conversion Funnel
-  - Customer Metrics
+- [x] Analytics Dashboard (Revenue, AOV, Top Products, Coupons, Conversion, Customers)
 - [x] Product CRUD with image uploads
 - [x] Category management
 - [x] Order management
 - [x] Return management
-- [x] Coupon management (with auto-apply toggle)
+- [x] Coupon management
 - [x] Shipping tier management
-- [x] User management
 
-### Email Notifications (Resend)
-- [x] Password reset emails ✅ TESTED 2026-02-14
-- [x] Order confirmation emails ✅ TESTED 2026-02-14
-- [x] Shipping notification emails ✅ TESTED 2026-02-14
-- [x] Delivery notification emails ✅ TESTED 2026-02-14
-- [x] Return status emails ✅ TESTED 2026-02-14
+### Email Notifications (Resend) ✅
+- [x] Password reset emails
+- [x] Order confirmation
+- [x] Shipping notifications
+- [x] Delivery notifications
+- [x] Return status updates
 
 ### Production Security ✅
-- [x] HTTPS enforcement middleware
-- [x] Secure cookies (httpOnly, secure, samesite)
-- [x] Security headers (HSTS, X-Frame-Options, etc.)
-- [x] Rate limiting on login
-- [x] API docs disabled in production
-- [x] Rotating log files (error.log, access.log)
-- [x] DB backup scripts (daily cron)
-- [x] Uploads backup scripts (daily cron)
-
----
-
-## API Endpoints
-
-### Analytics (Admin)
-- GET `/api/admin/analytics/overview` - Revenue & order overview
-- GET `/api/admin/analytics/revenue-chart?days=30` - Daily revenue data
-- GET `/api/admin/analytics/products?limit=5` - Top products
-- GET `/api/admin/analytics/coupons` - Coupon performance
-- GET `/api/admin/analytics/conversion` - Conversion funnel
-- GET `/api/admin/analytics/customers` - Customer metrics
-
----
-
-## Upcoming Tasks (P2)
-
-### P2 - Production Deployment
-- Environment variable audit
-- Security hardening
-- Performance optimization
-- SSL/domain configuration
-- Razorpay production keys
-
----
-
-## Future Backlog (P2-P3)
-
-- Email verification on signup
-- SMS notifications (Twilio/MSG91)
-- Inventory alerts
-- Advanced analytics (cohort analysis, LTV)
-- Marketing campaign integration
+- [x] HTTPS enforcement
+- [x] Secure cookies
+- [x] Security headers (HSTS, etc.)
+- [x] Rate limiting
+- [x] Log rotation
+- [x] Backup scripts
 
 ---
 
@@ -132,39 +114,24 @@ A complete, production-ready, minimalistic Gen-Z fashion e-commerce platform for
 
 ---
 
-## Architecture
+## Files Changed for Google OAuth
 
-```
-/app
-├── backend/
-│   ├── server.py (FastAPI app)
-│   ├── models.py (Pydantic models)
-│   ├── auth.py (JWT utilities)
-│   ├── routes/
-│   │   ├── analytics_routes.py (NEW)
-│   │   └── ... (other routes)
-│   ├── services/
-│   │   └── email_service.py (Resend integration)
-│   ├── scripts/
-│   │   ├── backup_db.sh
-│   │   ├── backup_uploads.sh
-│   │   └── setup_cron.sh
-│   └── logs/ (rotating logs)
-└── frontend/
-    └── src/
-        ├── components/ (UI components)
-        ├── pages/
-        │   ├── admin/
-        │   │   ├── AdminAnalytics.jsx (NEW)
-        │   │   └── ...
-        │   └── ...
-        ├── context/ (React context)
-        └── services/api.js (API client)
-```
+### New Files
+- `backend/routes/google_oauth_routes.py` - Complete OAuth flow implementation
+
+### Modified Files
+- `backend/server.py` - Added google_oauth_routes
+- `backend/auth.py` - Removed Emergent exchange_session_id function
+- `backend/routes/auth_routes.py` - Removed /session endpoint
+- `backend/.env` - Added Google OAuth variables
+- `frontend/src/pages/LoginPage.jsx` - Updated Google button to call backend
+- `frontend/src/pages/HomePage.jsx` - Added OAuth success handling
+- `frontend/src/App.js` - Removed AuthCallback
+
+### Deleted Files
+- `frontend/src/pages/AuthCallback.jsx` - No longer needed
 
 ---
 
 *Last Updated: 2026-02-14*
-*Analytics Dashboard: ✅ Implemented*
-*Email System: ✅ Verified Working*
-*Production Security: ✅ Hardened*
+*Google OAuth: ✅ Implemented (pending credentials)*
