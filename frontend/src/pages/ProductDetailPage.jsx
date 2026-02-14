@@ -95,16 +95,16 @@ const ProductDetailPage = () => {
       if (isWishlisted) {
         await wishlistAPI.remove(id);
         setIsWishlisted(false);
-        toast({ title: 'Removed from wishlist' });
+        toast.success('Removed from wishlist');
       } else {
         await wishlistAPI.add(id);
         setIsWishlisted(true);
-        toast({ title: 'Added to wishlist' });
+        toast.success('Added to wishlist');
       }
       window.dispatchEvent(new Event('wishlistUpdated'));
     } catch (error) {
       console.error('Error toggling wishlist:', error);
-      toast({ title: 'Error updating wishlist', variant: 'destructive' });
+      toast.error('Error updating wishlist');
     }
   };
 
