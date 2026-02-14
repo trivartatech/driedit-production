@@ -302,15 +302,60 @@ const AdminPopups = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm text-gray-400 mb-1">Image URL (optional)</label>
-                  <input
-                    type="url"
-                    value={formData.image}
-                    onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 p-3 focus:outline-none focus:border-[#E10600]"
-                    placeholder="https://example.com/popup.jpg"
-                    data-testid="popup-image-input"
-                  />
+                  <label className="block text-sm text-gray-400 mb-2">Image (optional)</label>
+                  
+                  {formData.image ? (
+                    <div className="relative">
+                      <img 
+                        src={formData.image} 
+                        alt="Preview" 
+                        className="w-full h-32 object-cover border border-white/10"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="absolute top-2 right-2 bg-red-500 rounded-full p-1 hover:bg-red-600"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleImageUpload}
+                        accept="image/jpeg,image/png,image/webp"
+                        className="hidden"
+                        data-testid="popup-upload-input"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploading}
+                        className="w-full flex items-center justify-center space-x-2 bg-white/5 border border-dashed border-white/20 p-4 hover:border-[#E10600] transition-colors disabled:opacity-50"
+                        data-testid="upload-popup-btn"
+                      >
+                        {uploading ? (
+                          <Loader2 size={20} className="animate-spin" />
+                        ) : (
+                          <>
+                            <Upload size={20} />
+                            <span className="font-bold text-sm">Upload Image</span>
+                          </>
+                        )}
+                      </button>
+                      <p className="text-xs text-gray-500">JPG, PNG, WebP (max 5MB) - or paste URL below</p>
+                      <input
+                        type="url"
+                        value={formData.image}
+                        onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                        className="w-full bg-white/5 border border-white/10 p-2 focus:outline-none focus:border-[#E10600] text-sm"
+                        placeholder="https://example.com/popup.jpg"
+                        data-testid="popup-image-input"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
