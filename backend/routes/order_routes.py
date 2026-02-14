@@ -7,6 +7,9 @@ from datetime import datetime, timezone
 import os
 import razorpay
 from pydantic import BaseModel
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/orders", tags=["orders"])
 
@@ -15,15 +18,20 @@ razorpay_key_id = os.getenv('RAZORPAY_KEY_ID', '')
 razorpay_key_secret = os.getenv('RAZORPAY_KEY_SECRET', '')
 
 # Only initialize Razorpay client if real keys are provided
-if razorpay_key_id and razorpay_key_secret and not razorpay_key_id.startswith('mock'):
+razorpay_client = None
+razorpay_mode = "mock"
+
+if razorpay_key_id and razorpay_key_secret:
     try:
         razorpay_client = razorpay.Client(auth=(razorpay_key_id, razorpay_key_secret))
+        razorpay_mode = "test" if razorpay_key_id.startswith('rzp_test_') else "live"
+        logger.info(f"Razorpay client initialized in {razorpay_mode} mode")
     except Exception as e:
-        print(f"Razorpay client initialization warning: {e}")
+        logger.error(f"Razorpay client initialization error: {e}")
         razorpay_client = None
+        razorpay_mode = "mock"
 else:
-    razorpay_client = None
-    print("Razorpay client not initialized - using mock mode")
+    logger.info("Razorpay client not initialized - using mock mode (no keys configured)")
 
 class RazorpayOrderCreate(BaseModel):
     amount: int  # in paise
@@ -34,16 +42,35 @@ class RazorpayVerification(BaseModel):
     razorpay_signature: str
     order_id: str
 
+@router.get("/payment-config")
+async def get_payment_config():
+    """
+    Get payment configuration status (public endpoint for frontend).
+    Only returns the key_id (safe to expose) and mode status.
+    """
+    return {
+        "razorpay_enabled": razorpay_client is not None,
+        "razorpay_mode": razorpay_mode,
+        "razorpay_key_id": razorpay_key_id if razorpay_client else None,
+        "cod_enabled": True
+    }
+
 @router.post("/create-razorpay-order")
 async def create_razorpay_order(data: RazorpayOrderCreate, request: Request):
     """
     Create Razorpay order for payment.
+    Returns mock order if Razorpay is not configured.
     """
     user = await get_current_user(request)
+    
+    # Validate amount (minimum ₹1 = 100 paise)
+    if data.amount < 100:
+        raise HTTPException(status_code=400, detail="Minimum order amount is ₹1")
     
     # Mock response if Razorpay client not configured
     if not razorpay_client:
         mock_order_id = f"order_mock_{uuid.uuid4().hex[:12]}"
+        logger.info(f"Created mock Razorpay order: {mock_order_id}")
         return {
             "id": mock_order_id,
             "amount": data.amount,
@@ -56,22 +83,45 @@ async def create_razorpay_order(data: RazorpayOrderCreate, request: Request):
         razorpay_order = razorpay_client.order.create({
             "amount": data.amount,
             "currency": "INR",
-            "payment_capture": 1
+            "payment_capture": 1,
+            "notes": {
+                "user_id": user["user_id"]
+            }
         })
+        logger.info(f"Created Razorpay order: {razorpay_order['id']} for amount: {data.amount}")
         return razorpay_order
+    except razorpay.errors.BadRequestError as e:
+        logger.error(f"Razorpay bad request: {e}")
+        raise HTTPException(status_code=400, detail=f"Invalid request: {str(e)}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Razorpay error: {str(e)}")
+        logger.error(f"Razorpay order creation error: {e}")
+        raise HTTPException(status_code=500, detail="Payment service temporarily unavailable")
 
 @router.post("/verify-payment")
 async def verify_payment(data: RazorpayVerification, request: Request):
     """
     Verify Razorpay payment signature.
+    CRITICAL: This ensures payment was actually made before marking order as paid.
     """
     user = await get_current_user(request)
     
-    # Skip verification for mock payments
+    # Verify order exists and belongs to user
+    order = await db.orders.find_one({
+        "order_id": data.order_id,
+        "user_id": user["user_id"]
+    })
+    
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    # Check if already verified (prevent replay attacks)
+    if order.get("payment_status") == PaymentStatus.SUCCESS.value:
+        logger.warning(f"Payment already verified for order: {data.order_id}")
+        return {"verified": True, "message": "Payment already verified"}
+    
+    # Handle mock payments (for development/testing without real keys)
     if data.razorpay_order_id.startswith('order_mock'):
-        # Update order payment status
+        logger.info(f"Mock payment verification for order: {data.order_id}")
         await db.orders.update_one(
             {"order_id": data.order_id, "user_id": user["user_id"]},
             {"$set": {
@@ -84,15 +134,24 @@ async def verify_payment(data: RazorpayVerification, request: Request):
         )
         return {"verified": True, "mock": True}
     
+    # REAL PAYMENT VERIFICATION
+    if not razorpay_client:
+        raise HTTPException(
+            status_code=500, 
+            detail="Payment verification unavailable - Razorpay not configured"
+        )
+    
     try:
-        # Verify signature
+        # Verify signature - this is CRITICAL for security
         razorpay_client.utility.verify_payment_signature({
             'razorpay_order_id': data.razorpay_order_id,
             'razorpay_payment_id': data.razorpay_payment_id,
             'razorpay_signature': data.razorpay_signature
         })
         
-        # Update order
+        logger.info(f"Payment verified successfully: {data.razorpay_payment_id} for order: {data.order_id}")
+        
+        # Update order with verified payment details
         await db.orders.update_one(
             {"order_id": data.order_id, "user_id": user["user_id"]},
             {"$set": {
@@ -105,12 +164,22 @@ async def verify_payment(data: RazorpayVerification, request: Request):
             }}
         )
         
-        return {"verified": True}
+        return {"verified": True, "payment_id": data.razorpay_payment_id}
         
     except razorpay.errors.SignatureVerificationError:
-        raise HTTPException(status_code=400, detail="Invalid payment signature")
+        logger.error(f"Invalid payment signature for order: {data.order_id}")
+        # Mark payment as failed
+        await db.orders.update_one(
+            {"order_id": data.order_id},
+            {"$set": {
+                "payment_status": PaymentStatus.FAILED.value,
+                "updated_at": datetime.now(timezone.utc)
+            }}
+        )
+        raise HTTPException(status_code=400, detail="Invalid payment signature - payment not verified")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Verification error: {str(e)}")
+        logger.error(f"Payment verification error: {e}")
+        raise HTTPException(status_code=500, detail="Payment verification failed")
 
 @router.post("", response_model=Order)
 async def create_order(order_data: OrderCreate, request: Request):
