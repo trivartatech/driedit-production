@@ -1,17 +1,22 @@
 from fastapi import HTTPException, Request, Depends
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
+from dotenv import load_dotenv
+from pathlib import Path
 import requests
 from datetime import datetime, timezone, timedelta
 import uuid
 from typing import Optional
 import logging
 
+# Load environment variables
+ROOT_DIR = Path(__file__).parent
+load_dotenv(ROOT_DIR / '.env')
+
 logger = logging.getLogger(__name__)
 
 # Get database
-def get_db():
-    client = AsyncIOMotorClient(os.environ['MONGO_URL'])
+def get_db():\n    client = AsyncIOMotorClient(os.environ['MONGO_URL'])
     return client[os.environ['DB_NAME']]
 
 db = get_db()
