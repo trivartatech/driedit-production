@@ -136,13 +136,13 @@ async def login(data: UserLogin, request: Request, response: Response):
             "created_at": datetime.now(timezone.utc)
         })
         
-        # Set httpOnly cookie
+        # Set httpOnly cookie with environment-aware settings
         response.set_cookie(
             key="session_token",
             value=session_token,
             httponly=True,
-            secure=True,
-            samesite="none",
+            secure=COOKIE_SECURE,
+            samesite=COOKIE_SAMESITE,
             path="/",
             max_age=7 * 24 * 60 * 60  # 7 days
         )
