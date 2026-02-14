@@ -20,6 +20,7 @@ const CheckoutPage = () => {
   const [pincodeData, setPincodeData] = useState(null);
   const [pincodeChecking, setPincodeChecking] = useState(false);
   const [gstPercentage, setGstPercentage] = useState(18);
+  const [shippingData, setShippingData] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('razorpay');
   const [address, setAddress] = useState({
     name: '',
