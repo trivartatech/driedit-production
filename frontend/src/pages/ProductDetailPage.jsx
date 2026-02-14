@@ -413,6 +413,9 @@ const ProductDetailPage = () => {
                 <span>100% authentic products</span>
               </div>
             </div>
+
+            {/* Share Product */}
+            <ShareProduct product={product} />
           </div>
         </div>
 
