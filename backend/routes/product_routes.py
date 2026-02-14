@@ -144,3 +144,60 @@ async def delete_product(product_id: str, request: Request):
         raise HTTPException(status_code=404, detail="Product not found")
     
     return {"message": "Product deleted successfully"}
+
+
+@router.get("/{product_id}/recommendations", response_model=List[Product])
+async def get_product_recommendations(product_id: str, limit: int = 4):
+    """
+    Get product recommendations based on a combination of:
+    1. Same category products
+    2. Best sellers (highest sales_count)
+    
+    Public endpoint - no auth required.
+    """
+    # Get the current product to know its category
+    current_product = await db.products.find_one(
+        {"product_id": product_id},
+        {"_id": 0, "category_id": 1, "category_name": 1}
+    )
+    
+    if not current_product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    recommendations = []
+    product_ids_added = {product_id}  # Track added product IDs to avoid duplicates
+    
+    # Strategy 1: Get same category products (sorted by sales_count)
+    same_category_products = await db.products.find(
+        {
+            "product_id": {"$ne": product_id},
+            "category_id": current_product["category_id"],
+            "stock": {"$gt": 0}  # Only in-stock products
+        },
+        {"_id": 0}
+    ).sort("sales_count", -1).limit(limit).to_list(limit)
+    
+    for product in same_category_products:
+        if product["product_id"] not in product_ids_added:
+            recommendations.append(product)
+            product_ids_added.add(product["product_id"])
+    
+    # Strategy 2: If we need more, get best sellers from other categories
+    if len(recommendations) < limit:
+        remaining_slots = limit - len(recommendations)
+        best_sellers = await db.products.find(
+            {
+                "product_id": {"$nin": list(product_ids_added)},
+                "stock": {"$gt": 0}
+            },
+            {"_id": 0}
+        ).sort("sales_count", -1).limit(remaining_slots).to_list(remaining_slots)
+        
+        for product in best_sellers:
+            if product["product_id"] not in product_ids_added:
+                recommendations.append(product)
+                product_ids_added.add(product["product_id"])
+                if len(recommendations) >= limit:
+                    break
+    
+    return recommendations
