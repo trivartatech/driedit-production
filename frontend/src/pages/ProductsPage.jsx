@@ -1,30 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import ProductCard from '../components/ProductCard';
-import { products, categories } from '../mockData';
 import { SlidersHorizontal } from 'lucide-react';
+import { productsAPI, categoriesAPI } from '../services/api';
 
 const ProductsPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('featured');
   const [showFilters, setShowFilters] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredProducts = selectedCategory === 'all' 
-    ? products 
-    : products.filter(p => p.category === selectedCategory);
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    switch(sortBy) {
-      case 'price-low':
-        return a.discounted_price - b.discounted_price;
-      case 'price-high':
-        return b.discounted_price - a.discounted_price;
-      case 'newest':
-        return b.id - a.id;
-      default:
-        return b.sales_count - a.sales_count;
+  useEffect(() => {
+    fetchProducts();
+  }, [selectedCategory, sortBy]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await categoriesAPI.getAll();
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
     }
-  });
+  };
+
+  const fetchProducts = async () => {
+    setLoading(true);
+    try {
+      const params = {
+        category: selectedCategory,
+        sort: sortBy
+      };
+      const response = await productsAPI.getAll(params);
+      setProducts(response.data);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">
