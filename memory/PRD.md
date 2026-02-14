@@ -79,6 +79,10 @@ A complete, production-ready, minimalistic Gen-Z fashion e-commerce platform for
 ### Admin Panel
 - [x] Dashboard overview
 - [x] Analytics Dashboard (Revenue, AOV, Top Products, Coupons, Conversion, Customers)
+- [x] **GST & Financial Reporting Module** (India-compliant) with CSV export
+  - GST Summary Reports (date-filtered)
+  - Sales Reports
+  - Payment Reports
 - [x] Product CRUD with image uploads
 - [x] **Dynamic Size Management** (NEW)
   - Admin CRUD for sizes
