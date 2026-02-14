@@ -78,11 +78,8 @@ const Header = () => {
               <Link to="/products" className="text-sm font-semibold hover:text-[#E10600] transition-colors">
                 SHOP
               </Link>
-              <Link to="/products" className="text-sm font-semibold hover:text-[#E10600] transition-colors">
-                NEW DROPS
-              </Link>
-              <Link to="/products" className="text-sm font-semibold hover:text-[#E10600] transition-colors">
-                COLLECTIONS
+              <Link to="/about" className="text-sm font-semibold hover:text-[#E10600] transition-colors">
+                ABOUT US
               </Link>
             </nav>
 
