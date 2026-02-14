@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { LogIn, Mail, Lock } from 'lucide-react';
+import { Mail, Lock } from 'lucide-react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { authAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -38,13 +38,6 @@ const LoginPage = () => {
     }
   }, [searchParams, setSearchParams]);
 
-const LoginPage = () => {
-  const navigate = useNavigate();
-  const { setUser, setIsAuthenticated } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-
   const handleEmailLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -78,38 +71,34 @@ const LoginPage = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center max-w-md w-full"
+        className="w-full max-w-md"
       >
         {/* Logo */}
-        <motion.h1
-          className="text-5xl font-black mb-4"
-          initial={{ scale: 0.9 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          <span className="text-[#E10600]">D</span>RIEDIT
-        </motion.h1>
-        
-        <p className="text-gray-400 mb-8">Gen-Z Streetwear Fashion</p>
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-black tracking-tighter">
+            <span className="text-[#E10600]">D</span>RIEDIT
+          </h1>
+          <p className="text-gray-400 text-sm mt-2">Gen-Z Streetwear Fashion</p>
+        </div>
 
+        {/* Login Form */}
         <motion.div
-          className="bg-white/5 p-8 rounded-lg border border-white/10"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white/5 backdrop-blur-sm border border-white/10 p-8"
         >
-          <h2 className="text-2xl font-bold mb-6">Welcome Back</h2>
-
-          {/* Email/Password Form */}
-          <form onSubmit={handleEmailLogin} className="space-y-4 mb-6">
+          <h2 className="text-xl font-bold text-center mb-6">Welcome Back</h2>
+          
+          <form onSubmit={handleEmailLogin} className="space-y-4">
             <div>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                 <input
                   type="email"
+                  placeholder="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Email"
                   required
                   data-testid="email-input"
                   className="w-full bg-white/5 border border-white/10 pl-12 pr-4 py-3 focus:outline-none focus:border-[#E10600] text-white placeholder-gray-500"
@@ -119,14 +108,13 @@ const LoginPage = () => {
             
             <div>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                 <input
                   type="password"
+                  placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password"
                   required
-                  minLength="8"
                   data-testid="password-input"
                   className="w-full bg-white/5 border border-white/10 pl-12 pr-4 py-3 focus:outline-none focus:border-[#E10600] text-white placeholder-gray-500"
                 />
