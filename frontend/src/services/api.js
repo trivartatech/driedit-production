@@ -137,4 +137,16 @@ export const uploadsAPI = {
   getImageUrl: (filename) => `${API}/api/uploads/images/${filename}`
 };
 
+// Coupons API
+export const couponsAPI = {
+  validate: (code, orderTotal) => axiosInstance.post('/coupons/validate', { code, order_total: orderTotal }),
+  // Admin
+  create: (data) => axiosInstance.post('/coupons/admin/create', data),
+  getAll: (includeInactive = true) => axiosInstance.get(`/coupons/admin/all?include_inactive=${includeInactive}`),
+  getOne: (couponId) => axiosInstance.get(`/coupons/admin/${couponId}`),
+  update: (couponId, data) => axiosInstance.put(`/coupons/admin/${couponId}`, data),
+  delete: (couponId) => axiosInstance.delete(`/coupons/admin/${couponId}`),
+  toggle: (couponId) => axiosInstance.put(`/coupons/admin/${couponId}/toggle`)
+};
+
 export default axiosInstance;
