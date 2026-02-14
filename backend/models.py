@@ -144,6 +144,24 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
+# Size Models
+class Size(BaseModel):
+    size_id: str
+    name: str
+    category_type: str = "clothing"  # "clothing", "bottomwear", "footwear", etc.
+    active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class SizeCreate(BaseModel):
+    name: str
+    category_type: str = "clothing"
+    active: bool = True
+
+class SizeUpdate(BaseModel):
+    name: Optional[str] = None
+    category_type: Optional[str] = None
+    active: Optional[bool] = None
+
 # Category Models
 class Category(BaseModel):
     category_id: str
