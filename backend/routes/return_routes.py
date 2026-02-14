@@ -229,6 +229,7 @@ class ReturnStatusUpdate(BaseModel):
 async def update_return_status(request_id: str, data: ReturnStatusUpdate, request: Request):
     """
     Update return request status (Admin only).
+    Sends email notification to user for approved/rejected status.
     """
     await require_admin(request)
     
@@ -237,9 +238,12 @@ async def update_return_status(request_id: str, data: ReturnStatusUpdate, reques
     if not return_req:
         raise HTTPException(status_code=404, detail="Return request not found")
     
+    old_status = return_req.get("status")
+    new_status = data.status.value
+    
     # Update return request
     update_data = {
-        "status": data.status.value,
+        "status": new_status,
         "updated_at": datetime.now(timezone.utc)
     }
     if data.admin_notes:
@@ -254,9 +258,28 @@ async def update_return_status(request_id: str, data: ReturnStatusUpdate, reques
     await db.orders.update_one(
         {"order_id": return_req["order_id"]},
         {"$set": {
-            "return_status": data.status.value,
+            "return_status": new_status,
             "updated_at": datetime.now(timezone.utc)
         }}
     )
+    
+    # Send email notification for status changes
+    if old_status != new_status:
+        user = await db.users.find_one({"user_id": return_req.get("user_id")}, {"_id": 0, "email": 1})
+        if user and user.get("email"):
+            order_id = return_req.get("order_id")
+            
+            if new_status == ReturnStatus.APPROVED.value:
+                asyncio.create_task(send_return_approved(
+                    order_id, 
+                    user.get("email"),
+                    data.admin_notes or ""
+                ))
+            elif new_status == ReturnStatus.REJECTED.value:
+                asyncio.create_task(send_return_rejected(
+                    order_id,
+                    user.get("email"),
+                    data.admin_notes or ""
+                ))
     
     return {"message": "Return status updated"}
