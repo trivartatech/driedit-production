@@ -171,6 +171,13 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 - `PUT /api/orders/admin/{id}/status` - Update status (Admin)
 - `PUT /api/orders/admin/{id}/tracking` - Add tracking (Admin)
 
+### Returns
+- `GET /api/returns/check-eligibility/{order_id}` - Check return eligibility
+- `POST /api/returns` - Submit return request
+- `GET /api/returns/my-requests` - User's return requests
+- `GET /api/returns/admin/all` - All returns (Admin)
+- `PUT /api/returns/admin/{id}/status` - Update return status (Admin)
+
 ### Admin
 - `GET/POST/PUT/DELETE /api/admin/pincodes`
 - `GET/PUT /api/admin/gst`
