@@ -119,17 +119,14 @@ export default function AdminAnalytics() {
 
   if (loading) {
     return (
-      <AdminLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin w-8 h-8 border-2 border-black border-t-transparent rounded-full"></div>
-        </div>
-      </AdminLayout>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin w-8 h-8 border-2 border-white border-t-transparent rounded-full"></div>
+      </div>
     );
   }
 
   return (
-    <AdminLayout>
-      <div className="space-y-8">
+    <div className="space-y-8">
         {/* Header */}
         <div>
           <h1 className="text-2xl font-black tracking-tight">Analytics Dashboard</h1>
