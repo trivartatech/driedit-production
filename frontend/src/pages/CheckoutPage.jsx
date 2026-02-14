@@ -604,18 +604,24 @@ const CheckoutPage = () => {
               <div className="border-t border-white/10 pt-4 mb-4">
                 <label className="text-sm text-gray-400 mb-2 block">Have a coupon?</label>
                 {couponApplied ? (
-                  <div className="flex items-center justify-between bg-green-500/10 border border-green-500/30 p-3">
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle size={18} className="text-green-500" />
-                      <span className="font-mono font-bold text-green-500">{couponApplied.code}</span>
+                  <div className="bg-green-500/10 border border-green-500/30 p-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <CheckCircle size={18} className="text-green-500" />
+                        <span className="font-mono font-bold text-green-500">{couponApplied.code}</span>
+                        {couponApplied.auto_apply && (
+                          <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5">AUTO</span>
+                        )}
+                      </div>
+                      <button
+                        onClick={removeCoupon}
+                        className="text-gray-400 hover:text-white p-1"
+                        data-testid="remove-coupon-btn"
+                      >
+                        <X size={16} />
+                      </button>
                     </div>
-                    <button
-                      onClick={removeCoupon}
-                      className="text-gray-400 hover:text-white p-1"
-                      data-testid="remove-coupon-btn"
-                    >
-                      <X size={16} />
-                    </button>
+                    <p className="text-xs text-green-400 mt-1">-{formatPrice(couponApplied.discount_amount)}</p>
                   </div>
                 ) : (
                   <div className="flex space-x-2">
@@ -639,28 +645,29 @@ const CheckoutPage = () => {
                 )}
               </div>
 
+              {/* Pricing Breakdown - Correct Order */}
               <div className="border-t border-white/10 pt-4 space-y-2 text-sm mb-4">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
                   <span className="font-bold">{formatPrice(subtotal)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>GST ({gstPercentage}%)</span>
-                  <span className="font-bold">{formatPrice(gstAmount)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Shipping</span>
-                  <span className="font-bold">{shipping === 0 ? 'FREE' : formatPrice(shipping)}</span>
-                </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-green-500">
                     <span className="flex items-center space-x-1">
                       <Tag size={14} />
-                      <span>Coupon Discount</span>
+                      <span>Coupon ({couponApplied?.code})</span>
                     </span>
                     <span className="font-bold">-{formatPrice(discount)}</span>
                   </div>
                 )}
+                <div className="flex justify-between text-gray-400">
+                  <span>GST ({gstPercentage}%){discount > 0 ? ' (on discounted)' : ''}</span>
+                  <span className="font-bold">{formatPrice(gstAmount)}</span>
+                </div>
+                <div className="flex justify-between text-gray-400">
+                  <span>Shipping</span>
+                  <span className="font-bold text-white">{shipping === 0 ? 'FREE' : formatPrice(shipping)}</span>
+                </div>
               </div>
 
               <div className="border-t border-white/10 pt-4 mb-6">
