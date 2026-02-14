@@ -49,7 +49,7 @@ const CheckoutPage = () => {
     try {
       const [cartResponse, gstResponse] = await Promise.all([
         cartAPI.get(),
-        adminAPI.getGST()
+        publicAPI.getGST()
       ]);
       
       const items = cartResponse.data.items || [];
