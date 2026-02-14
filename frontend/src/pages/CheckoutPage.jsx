@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CreditCard, Truck, MapPin, Loader2, ArrowLeft } from 'lucide-react';
-import { cartAPI, ordersAPI, publicAPI } from '../services/api';
+import { CreditCard, Truck, MapPin, Loader2, ArrowLeft, Tag, X, CheckCircle } from 'lucide-react';
+import { cartAPI, ordersAPI, publicAPI, couponsAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 
@@ -30,6 +30,11 @@ const CheckoutPage = () => {
     state: '',
     pincode: ''
   });
+  
+  // Coupon state
+  const [couponCode, setCouponCode] = useState('');
+  const [couponApplied, setCouponApplied] = useState(null);
+  const [couponLoading, setCouponLoading] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
