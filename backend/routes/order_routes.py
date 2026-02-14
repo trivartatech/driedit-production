@@ -204,7 +204,15 @@ async def verify_payment(data: RazorpayVerification, request: Request):
 async def create_order(order_data: OrderCreate, request: Request):
     """
     Create new order.
-    Shipping is calculated based on subtotal (before GST) using tier system.
+    
+    Pricing Order (Industry Standard):
+    1. Calculate base subtotal
+    2. Apply coupon discount
+    3. Calculate GST on discounted subtotal
+    4. Calculate shipping (tier-based on discounted subtotal)
+    5. Final total
+    
+    Note: Shipping is never discounted.
     """
     user = await get_current_user(request)
     
@@ -217,40 +225,61 @@ async def create_order(order_data: OrderCreate, request: Request):
     if not pincode_data:
         raise HTTPException(status_code=400, detail="Delivery not available for this pincode")
     
-    # Check COD availability
     if order_data.payment_method == PaymentMethod.COD and not pincode_data["cod_available"]:
         raise HTTPException(status_code=400, detail="COD not available for this pincode")
     
-    # Calculate totals
+    # 1. Calculate base subtotal
     subtotal = sum(item.subtotal for item in order_data.items)
     
-    # Get GST settings
+    # 2. Apply coupon discount (if provided)
+    coupon_code = order_data.coupon_code
+    coupon_discount = order_data.coupon_discount if order_data.coupon_discount else 0
+    applied_type = order_data.coupon_applied_type if hasattr(order_data, 'coupon_applied_type') else "manual"
+    
+    # Re-validate coupon at order creation to prevent abuse
+    if coupon_code and coupon_discount > 0:
+        coupon = await db.coupons.find_one({"code": coupon_code.upper()}, {"_id": 0})
+        if not coupon or not coupon.get("is_active"):
+            coupon_code = None
+            coupon_discount = 0
+        else:
+            # Verify discount matches
+            from routes.coupon_routes import calculate_discount, check_coupon_eligibility
+            eligible, _ = await check_coupon_eligibility(coupon, user["user_id"], subtotal)
+            if not eligible:
+                coupon_code = None
+                coupon_discount = 0
+            else:
+                # Recalculate discount
+                coupon_discount = calculate_discount(coupon, subtotal)
+    
+    # Discounted subtotal (base for GST and shipping)
+    discounted_subtotal = subtotal - coupon_discount
+    if discounted_subtotal < 0:
+        discounted_subtotal = 0
+    
+    # 3. Calculate GST on discounted subtotal
     gst_settings = await db.gst_settings.find_one({}, {"_id": 0})
     gst_percentage = gst_settings["gst_percentage"] if gst_settings else 18.0
-    gst_amount = round(subtotal * (gst_percentage / 100), 2)
+    gst_amount = round(discounted_subtotal * (gst_percentage / 100), 2)
     
-    # Calculate shipping using tier system (based on subtotal BEFORE GST)
+    # 4. Calculate shipping using tier system (based on discounted subtotal)
     shipping_tier = await db.shipping_tiers.find_one({
         "is_active": True,
-        "min_amount": {"$lte": subtotal},
+        "min_amount": {"$lte": discounted_subtotal},
         "$or": [
-            {"max_amount": {"$gte": subtotal}},
+            {"max_amount": {"$gte": discounted_subtotal}},
             {"max_amount": None}
         ]
     }, {"_id": 0})
     
     shipping_charge = shipping_tier["shipping_charge"] if shipping_tier else 0
     
-    # Apply coupon discount if provided
-    coupon_code = order_data.coupon_code
-    coupon_discount = order_data.coupon_discount if order_data.coupon_discount else 0
-    
-    total = subtotal + gst_amount + shipping_charge - coupon_discount
+    # 5. Final total
+    total = discounted_subtotal + gst_amount + shipping_charge
     
     order_id = f"order_{uuid.uuid4().hex[:12]}"
     
-    # For COD, set payment_status as pending, order_status as confirmed
-    # For Razorpay, set payment_status as pending, order_status as pending (will confirm after payment)
     payment_status = PaymentStatus.PENDING.value
     order_status = OrderStatus.CONFIRMED.value if order_data.payment_method == PaymentMethod.COD else OrderStatus.PENDING.value
     
@@ -258,12 +287,14 @@ async def create_order(order_data: OrderCreate, request: Request):
         "order_id": order_id,
         "user_id": user["user_id"],
         "items": [item.dict() for item in order_data.items],
-        "subtotal": subtotal,
+        "subtotal": subtotal,  # Original subtotal before discount
+        "discounted_subtotal": discounted_subtotal,
         "gst_amount": gst_amount,
         "gst_percentage": gst_percentage,
         "shipping_charge": shipping_charge,
         "coupon_code": coupon_code,
         "coupon_discount": coupon_discount,
+        "coupon_applied_type": applied_type,
         "total": total,
         "payment_method": order_data.payment_method.value,
         "payment_status": payment_status,
