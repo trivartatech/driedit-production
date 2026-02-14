@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { CreditCard, Truck, MapPin, Loader2, ArrowLeft, Tag, X, CheckCircle } from 'lucide-react';
-import { cartAPI, ordersAPI, publicAPI, couponsAPI, shippingAPI } from '../services/api';
+import { useNavigate, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CreditCard, Truck, MapPin, Loader2, ArrowLeft, Tag, X, CheckCircle, Plus, ChevronDown, Star, Home, Briefcase, Building, Save } from 'lucide-react';
+import { cartAPI, ordersAPI, publicAPI, couponsAPI, shippingAPI, profileAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 
 const formatPrice = (price) => {
   return `₹${price?.toLocaleString('en-IN') || 0}`;
+};
+
+const LABEL_ICONS = {
+  Home: Home,
+  Work: Briefcase,
+  Other: Building
 };
 
 const CheckoutPage = () => {
@@ -22,6 +28,15 @@ const CheckoutPage = () => {
   const [gstPercentage, setGstPercentage] = useState(18);
   const [shippingData, setShippingData] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('razorpay');
+  
+  // Saved addresses state
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [showAddressSelector, setShowAddressSelector] = useState(false);
+  const [addressMode, setAddressMode] = useState('saved'); // 'saved' or 'new'
+  const [saveNewAddress, setSaveNewAddress] = useState(false);
+  const [newAddressLabel, setNewAddressLabel] = useState('Home');
+  
   const [address, setAddress] = useState({
     name: '',
     phone: '',
@@ -48,10 +63,10 @@ const CheckoutPage = () => {
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
-    if (user?.name) {
-      setAddress(prev => ({ ...prev, name: user.name }));
+    if (user?.name && addressMode === 'new') {
+      setAddress(prev => ({ ...prev, name: prev.name || user.name }));
     }
-  }, [user]);
+  }, [user, addressMode]);
 
   // Auto-apply coupon when cart loads or changes
   useEffect(() => {
@@ -90,9 +105,10 @@ const CheckoutPage = () => {
 
   const loadData = async () => {
     try {
-      const [cartResponse, gstResponse] = await Promise.all([
+      const [cartResponse, gstResponse, addressesResponse] = await Promise.all([
         cartAPI.get(),
-        publicAPI.getGST()
+        publicAPI.getGST(),
+        profileAPI.getAddresses().catch(() => ({ data: { addresses: [] } }))
       ]);
       
       const items = cartResponse.data.items || [];
@@ -105,6 +121,25 @@ const CheckoutPage = () => {
       
       setCartItems(items);
       setGstPercentage(gstResponse.data.gst_percentage || 18);
+      
+      // Load saved addresses
+      const addresses = addressesResponse.data.addresses || [];
+      setSavedAddresses(addresses);
+      
+      // Auto-select default address if available
+      if (addresses.length > 0) {
+        const defaultAddr = addresses.find(a => a.is_default) || addresses[0];
+        setSelectedAddressId(defaultAddr.address_id);
+        setAddressMode('saved');
+        
+        // Pre-fill from saved address and check pincode
+        selectAddress(defaultAddr);
+      } else {
+        setAddressMode('new');
+        if (user?.name) {
+          setAddress(prev => ({ ...prev, name: user.name }));
+        }
+      }
       
       // Calculate shipping based on subtotal
       const subtotal = items.reduce((acc, item) => 
@@ -124,6 +159,33 @@ const CheckoutPage = () => {
       navigate('/cart');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const selectAddress = async (addr) => {
+    setSelectedAddressId(addr.address_id);
+    setAddress({
+      name: addr.name,
+      phone: addr.phone,
+      addressLine1: addr.address_line1,
+      addressLine2: addr.address_line2 || '',
+      city: addr.city,
+      state: addr.state,
+      pincode: addr.pincode
+    });
+    setPincode(addr.pincode);
+    setShowAddressSelector(false);
+    
+    // Auto-check pincode
+    setPincodeChecking(true);
+    try {
+      const response = await publicAPI.checkPincode(addr.pincode);
+      setPincodeData(response.data);
+    } catch (error) {
+      setPincodeData(null);
+      toast.error('Delivery not available for this pincode');
+    } finally {
+      setPincodeChecking(false);
     }
   };
 
