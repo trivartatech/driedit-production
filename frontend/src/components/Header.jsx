@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, ShoppingCart, Heart, User, Search, LogOut } from 'lucide-react';
+import { Menu, X, ShoppingCart, Heart, User, Search, LogOut, Package } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getCart } from '../mockData';
 import { useAuth } from '../context/AuthContext';
-import { wishlistAPI } from '../services/api';
+import { wishlistAPI, cartAPI } from '../services/api';
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
