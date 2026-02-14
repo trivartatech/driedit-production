@@ -144,6 +144,11 @@ A complete, production-ready, minimalistic Gen-Z fashion e-commerce platform for
 - `GET /api/uploads/popups/{filename}` - Serve popup image
 - `GET /api/uploads/size-charts/{filename}` - Serve size chart PDF
 
+### Product Recommendations (NEW)
+- `GET /api/products/{product_id}/recommendations` - Get 4 recommended products
+  - Strategy: Same category products (sorted by sales_count) + Best sellers from other categories
+  - Excludes current product and out-of-stock items
+
 ---
 
 ## Test Credentials
