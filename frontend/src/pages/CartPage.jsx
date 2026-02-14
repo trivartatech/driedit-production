@@ -1,50 +1,93 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
+import { Trash2, Plus, Minus, ShoppingBag, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { getCart, removeFromCart, updateCartQuantity, products, formatPrice } from '../mockData';
-import { toast } from '../hooks/use-toast';
+import { cartAPI, adminAPI } from '../services/api';
+import { toast } from 'sonner';
+
+const formatPrice = (price) => {
+  return `₹${price?.toLocaleString('en-IN') || 0}`;
+};
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(null);
+  const [gstPercentage, setGstPercentage] = useState(18);
   const navigate = useNavigate();
 
   useEffect(() => {
     loadCart();
+    fetchGST();
     window.addEventListener('cartUpdated', loadCart);
     return () => window.removeEventListener('cartUpdated', loadCart);
   }, []);
 
-  const loadCart = () => {
-    const cart = getCart();
-    const items = cart.map(item => {
-      const product = products.find(p => p.id === item.productId);
-      return { ...item, product };
-    }).filter(item => item.product);
-    setCartItems(items);
+  const loadCart = async () => {
+    try {
+      const response = await cartAPI.get();
+      setCartItems(response.data.items || []);
+    } catch (error) {
+      console.error('Error loading cart:', error);
+      toast.error('Failed to load cart');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleRemove = (productId, size) => {
-    removeFromCart(productId, size);
-    loadCart();
-    window.dispatchEvent(new Event('cartUpdated'));
-    toast({ title: 'Removed from cart' });
+  const fetchGST = async () => {
+    try {
+      const response = await adminAPI.getGST();
+      setGstPercentage(response.data.gst_percentage);
+    } catch (error) {
+      console.error('Error fetching GST:', error);
+    }
   };
 
-  const handleQuantityChange = (productId, size, newQuantity) => {
+  const handleRemove = async (productId, size) => {
+    setUpdating(`${productId}-${size}`);
+    try {
+      await cartAPI.remove(productId, size);
+      await loadCart();
+      window.dispatchEvent(new Event('cartUpdated'));
+      toast.success('Removed from cart');
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to remove item');
+    } finally {
+      setUpdating(null);
+    }
+  };
+
+  const handleQuantityChange = async (productId, size, newQuantity) => {
     if (newQuantity < 1) return;
-    updateCartQuantity(productId, size, newQuantity);
-    loadCart();
-    window.dispatchEvent(new Event('cartUpdated'));
+    
+    setUpdating(`${productId}-${size}`);
+    try {
+      await cartAPI.update(productId, size, newQuantity);
+      await loadCart();
+      window.dispatchEvent(new Event('cartUpdated'));
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to update quantity');
+    } finally {
+      setUpdating(null);
+    }
   };
 
   const subtotal = cartItems.reduce((acc, item) => 
-    acc + (item.product.discounted_price * item.quantity), 0
+    acc + ((item.product?.discounted_price || 0) * item.quantity), 0
   );
 
   const shipping = subtotal > 999 ? 0 : 99;
-  const gst = Math.round(subtotal * 0.18); // 18% GST
+  const gst = Math.round(subtotal * (gstPercentage / 100));
   const total = subtotal + shipping + gst;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#E10600]" />
+      </div>
+    );
+  }
 
   if (cartItems.length === 0) {
     return (
@@ -56,6 +99,7 @@ const CartPage = () => {
           <button
             onClick={() => navigate('/products')}
             className="bg-[#E10600] text-white px-8 py-4 font-black hover:bg-white hover:text-black transition-colors"
+            data-testid="shop-now-btn"
           >
             SHOP NOW
           </button>
@@ -77,58 +121,71 @@ const CartPage = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-2 space-y-4" data-testid="cart-items">
             {cartItems.map((item, index) => (
               <motion.div
-                key={`${item.productId}-${item.size}`}
+                key={`${item.product_id}-${item.size}`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 className="bg-white/5 p-4 flex space-x-4"
+                data-testid={`cart-item-${item.product_id}`}
               >
                 <img
-                  src={item.product.images[0]}
-                  alt={item.product.title}
+                  src={item.product?.images?.[0] || '/placeholder.jpg'}
+                  alt={item.product?.title || 'Product'}
                   className="w-24 h-32 object-cover cursor-pointer"
-                  onClick={() => navigate(`/product/${item.product.id}`)}
+                  onClick={() => navigate(`/product/${item.product_id}`)}
                 />
                 <div className="flex-1">
                   <h3 
                     className="font-bold mb-2 cursor-pointer hover:text-[#E10600] transition-colors"
-                    onClick={() => navigate(`/product/${item.product.id}`)}
+                    onClick={() => navigate(`/product/${item.product_id}`)}
                   >
-                    {item.product.title}
+                    {item.product?.title || 'Product'}
                   </h3>
                   <p className="text-sm text-gray-400 mb-2">Size: {item.size}</p>
-                  <p className="text-lg font-black mb-4">{formatPrice(item.product.discounted_price)}</p>
+                  <p className="text-lg font-black mb-4">
+                    {formatPrice(item.product?.discounted_price)}
+                  </p>
                   
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2 bg-black border border-white/10">
                       <button
-                        onClick={() => handleQuantityChange(item.productId, item.size, item.quantity - 1)}
-                        className="px-3 py-1 hover:bg-white/10 transition-colors"
+                        onClick={() => handleQuantityChange(item.product_id, item.size, item.quantity - 1)}
+                        disabled={updating === `${item.product_id}-${item.size}` || item.quantity <= 1}
+                        className="px-3 py-1 hover:bg-white/10 transition-colors disabled:opacity-50"
+                        data-testid={`decrease-qty-${item.product_id}`}
                       >
                         <Minus size={16} />
                       </button>
                       <span className="px-3 font-bold">{item.quantity}</span>
                       <button
-                        onClick={() => handleQuantityChange(item.productId, item.size, item.quantity + 1)}
-                        className="px-3 py-1 hover:bg-white/10 transition-colors"
+                        onClick={() => handleQuantityChange(item.product_id, item.size, item.quantity + 1)}
+                        disabled={updating === `${item.product_id}-${item.size}`}
+                        className="px-3 py-1 hover:bg-white/10 transition-colors disabled:opacity-50"
+                        data-testid={`increase-qty-${item.product_id}`}
                       >
                         <Plus size={16} />
                       </button>
                     </div>
                     <button
-                      onClick={() => handleRemove(item.productId, item.size)}
-                      className="text-[#E10600] hover:text-white transition-colors"
+                      onClick={() => handleRemove(item.product_id, item.size)}
+                      disabled={updating === `${item.product_id}-${item.size}`}
+                      className="text-[#E10600] hover:text-white transition-colors disabled:opacity-50"
+                      data-testid={`remove-item-${item.product_id}`}
                     >
-                      <Trash2 size={18} />
+                      {updating === `${item.product_id}-${item.size}` ? (
+                        <Loader2 size={18} className="animate-spin" />
+                      ) : (
+                        <Trash2 size={18} />
+                      )}
                     </button>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-xl font-black">
-                    {formatPrice(item.product.discounted_price * item.quantity)}
+                    {formatPrice((item.product?.discounted_price || 0) * item.quantity)}
                   </p>
                 </div>
               </motion.div>
@@ -142,7 +199,7 @@ const CartPage = () => {
             transition={{ delay: 0.3 }}
             className="lg:col-span-1"
           >
-            <div className="bg-white/5 p-6 sticky top-20">
+            <div className="bg-white/5 p-6 sticky top-20" data-testid="order-summary">
               <h2 className="text-2xl font-black mb-6">ORDER SUMMARY</h2>
               
               <div className="space-y-3 mb-6 text-sm">
@@ -157,10 +214,10 @@ const CartPage = () => {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">GST (18%)</span>
+                  <span className="text-gray-400">GST ({gstPercentage}%)</span>
                   <span className="font-bold">{formatPrice(gst)}</span>
                 </div>
-                {subtotal < 999 && (
+                {subtotal < 999 && subtotal > 0 && (
                   <p className="text-xs text-gray-400 bg-white/5 p-2">
                     Add {formatPrice(999 - subtotal)} more for FREE shipping
                   </p>
@@ -175,9 +232,11 @@ const CartPage = () => {
               </div>
 
               <motion.button
+                onClick={() => navigate('/checkout')}
                 className="w-full bg-[#E10600] text-white py-4 font-black hover:bg-white hover:text-black transition-colors mb-4"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
+                data-testid="checkout-btn"
               >
                 PROCEED TO CHECKOUT
               </motion.button>
@@ -185,6 +244,7 @@ const CartPage = () => {
               <button
                 onClick={() => navigate('/products')}
                 className="w-full border border-white/20 py-3 font-bold hover:bg-white/5 transition-colors text-sm"
+                data-testid="continue-shopping-btn"
               >
                 CONTINUE SHOPPING
               </button>
