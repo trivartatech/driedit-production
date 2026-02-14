@@ -7,6 +7,7 @@ from slowapi.util import get_remote_address
 import logging
 import bcrypt
 import uuid
+import os
 from datetime import datetime, timezone, timedelta
 
 logger = logging.getLogger(__name__)
@@ -14,6 +15,11 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 # Rate limiter
 limiter = Limiter(key_func=get_remote_address)
+
+# Environment configuration for cookies
+IS_PRODUCTION = os.environ.get('ENVIRONMENT', 'development') == 'production'
+COOKIE_SECURE = IS_PRODUCTION  # Only secure in production (requires HTTPS)
+COOKIE_SAMESITE = "strict" if IS_PRODUCTION else "none"
 
 class SessionExchange(BaseModel):
     session_id: str
