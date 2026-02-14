@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="17" skipped="0" tests="27" time="5.460" timestamp="2026-02-14T13:42:34.644313+00:00" hostname="agent-env-df13427f-0cb9-4315-a977-fd9fb34b100d"><testcase classname="tests.test_admin_panel.TestAdminAuthentication" name="test_admin_login_success" time="1.272" /><testcase classname="tests.test_admin_panel.TestAdminAuthentication" name="test_admin_login_wrong_password" time="0.387" /><testcase classname="tests.test_admin_panel.TestAdminAuthentication" name="test_get_admin_user_info" time="0.145"><failure message="AssertionError: Get me failed: {&quot;detail&quot;:&quot;Invalid session&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">tests/test_admin_panel.py:158: in test_get_admin_user_info
+    assert response.status_code == 200, f"Get me failed: {response.text}"
+E   AssertionError: Get me failed: {"detail":"Invalid session"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="tests.test_admin_panel.TestAdminAccessControl" name="test_regular_user_denied_admin_pincodes" time="0.145" /><testcase classname="tests.test_admin_panel.TestAdminAccessControl" name="test_regular_user_denied_admin_gst" time="0.185" /><testcase classname="tests.test_admin_panel.TestAdminAccessControl" name="test_regular_user_denied_admin_banners" time="0.116" /><testcase classname="tests.test_admin_panel.TestAdminAccessControl" name="test_unauthenticated_denied_admin_routes" time="0.114" /><testcase classname="tests.test_admin_panel.TestAdminOrders" name="test_get_all_orders" time="0.136"><failure message="AssertionError: Get orders failed: {&quot;detail&quot;:&quot;Invalid session&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">tests/test_admin_panel.py:203: in test_get_all_orders
+    assert response.status_code == 200, f"Get orders failed: {response.text}"
+E   AssertionError: Get orders failed: {"detail":"Invalid session"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="tests.test_admin_panel.TestAdminOrders" name="test_filter_orders_by_status" time="0.120"><failure message="AssertionError: Filter orders failed: {&quot;detail&quot;:&quot;Invalid session&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">tests/test_admin_panel.py:212: in test_filter_orders_by_status
+    assert response.status_code == 200, f"Filter orders failed: {response.text}"
+E   AssertionError: Filter orders failed: {"detail":"Invalid session"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="tests.test_admin_panel.TestAdminOrders" name="test_update_order_status" time="0.167"><failure message="assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">tests/test_admin_panel.py:225: in test_update_order_status
+    assert orders_resp.status_code == 200
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="tests.test_admin_panel.TestAdminProducts" name="test_get_all_products" time="0.141" /><testcase classname="tests.test_admin_panel.TestAdminProducts" name="test_create_product" time="0.181"><failure message="AssertionError: Create product failed: {&quot;detail&quot;:&quot;Invalid session&quot;}&#10;assert 401 in [200, 201]&#10; +  where 401 = &lt;Response [401]&gt;.status_code">tests/test_admin_panel.py:289: in test_create_product
+    assert response.status_code in [200, 201], f"Create product failed: {response.text}"
+E   AssertionError: Create product failed: {"detail":"Invalid session"}
+E   assert 401 in [200, 201]
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="tests.test_admin_panel.TestAdminProducts" name="test_update_product" time="0.279"><failure message="AssertionError: Update product failed: {&quot;detail&quot;:&quot;Invalid session&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">tests/test_admin_panel.py:327: in test_update_product
+    assert update_resp.status_code == 200, f"Update product failed: {update_resp.text}"
+E   AssertionError: Update product failed: {"detail":"Invalid session"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="tests.test_admin_panel.TestAdminCategories" name="test_get_all_categories" time="0.143" /><testcase classname="tests.test_admin_panel.TestAdminCategories" name="test_create_and_delete_category" time="0.115"><failure message="AssertionError: Create category failed: {&quot;detail&quot;:&quot;Invalid session&quot;}&#10;assert 401 in [200, 201]&#10; +  where 401 = &lt;Response [401]&gt;.status_code">tests/test_admin_panel.py:369: in test_create_and_delete_category
+    assert create_resp.status_code in [200, 201], f"Create category failed: {create_resp.text}"
+E   AssertionError: Create category failed: {"detail":"Invalid session"}
+E   assert 401 in [200, 201]
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="tests.test_admin_panel.TestAdminPincodes" name="test_get_all_pincodes" time="0.147"><failure message="AssertionError: Get pincodes failed: {&quot;detail&quot;:&quot;Invalid session&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">tests/test_admin_panel.py:393: in test_get_all_pincodes
+    assert response.status_code == 200, f"Get pincodes failed: {response.text}"
+E   AssertionError: Get pincodes failed: {"detail":"Invalid session"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="tests.test_admin_panel.TestAdminPincodes" name="test_create_and_delete_pincode" time="0.112"><failure message="Failed: Unexpected status: 401: {&quot;detail&quot;:&quot;Invalid session&quot;}">tests/test_admin_panel.py:428: in test_create_and_delete_pincode
+    pytest.fail(f"Unexpected status: {create_resp.status_code}: {create_resp.text}")
+E   Failed: Unexpected status: 401: {"detail":"Invalid session"}</failure></testcase><testcase classname="tests.test_admin_panel.TestAdminPincodes" name="test_update_pincode" time="0.135"><failure message="KeyError: 0">tests/test_admin_panel.py:441: in test_update_pincode
+    pincode = pincodes[0]
+              ^^^^^^^^^^^
+E   KeyError: 0</failure></testcase><testcase classname="tests.test_admin_panel.TestAdminGST" name="test_get_gst_settings" time="0.127"><failure message="AssertionError: Get GST failed: {&quot;detail&quot;:&quot;Invalid session&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">tests/test_admin_panel.py:475: in test_get_gst_settings
+    assert response.status_code == 200, f"Get GST failed: {response.text}"
+E   AssertionError: Get GST failed: {"detail":"Invalid session"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="tests.test_admin_panel.TestAdminGST" name="test_update_gst_settings" time="0.160"><failure message="KeyError: 'gst_percentage'">tests/test_admin_panel.py:487: in test_update_gst_settings
+    original_gst = get_resp.json()["gst_percentage"]
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'gst_percentage'</failure></testcase><testcase classname="tests.test_admin_panel.TestAdminBanners" name="test_get_all_banners" time="0.109"><failure message="AssertionError: Get banners failed: {&quot;detail&quot;:&quot;Invalid session&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">tests/test_admin_panel.py:514: in test_get_all_banners
+    assert response.status_code == 200, f"Get banners failed: {response.text}"
+E   AssertionError: Get banners failed: {"detail":"Invalid session"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="tests.test_admin_panel.TestAdminBanners" name="test_create_and_delete_banner" time="0.113"><failure message="AssertionError: Create banner failed: {&quot;detail&quot;:&quot;Invalid session&quot;}&#10;assert 401 in [200, 201]&#10; +  where 401 = &lt;Response [401]&gt;.status_code">tests/test_admin_panel.py:533: in test_create_and_delete_banner
+    assert create_resp.status_code in [200, 201], f"Create banner failed: {create_resp.text}"
+E   AssertionError: Create banner failed: {"detail":"Invalid session"}
+E   assert 401 in [200, 201]
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="tests.test_admin_panel.TestAdminPopups" name="test_get_all_popups" time="0.121"><failure message="AssertionError: Get popups failed: {&quot;detail&quot;:&quot;Invalid session&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">tests/test_admin_panel.py:557: in test_get_all_popups
+    assert response.status_code == 200, f"Get popups failed: {response.text}"
+E   AssertionError: Get popups failed: {"detail":"Invalid session"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="tests.test_admin_panel.TestAdminPopups" name="test_create_and_delete_popup" time="0.130"><failure message="AssertionError: Create popup failed: {&quot;detail&quot;:&quot;Invalid session&quot;}&#10;assert 401 in [200, 201]&#10; +  where 401 = &lt;Response [401]&gt;.status_code">tests/test_admin_panel.py:578: in test_create_and_delete_popup
+    assert create_resp.status_code in [200, 201], f"Create popup failed: {create_resp.text}"
+E   AssertionError: Create popup failed: {"detail":"Invalid session"}
+E   assert 401 in [200, 201]
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="tests.test_admin_panel.TestAdminReturns" name="test_get_all_returns" time="0.127"><failure message="AssertionError: Get returns failed: {&quot;detail&quot;:&quot;Invalid session&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">tests/test_admin_panel.py:602: in test_get_all_returns
+    assert response.status_code == 200, f"Get returns failed: {response.text}"
+E   AssertionError: Get returns failed: {"detail":"Invalid session"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="tests.test_admin_panel.TestPublicEndpoints" name="test_public_banners" time="0.119" /><testcase classname="tests.test_admin_panel.TestPublicEndpoints" name="test_public_gst" time="0.117" /></testsuite></testsuites>
