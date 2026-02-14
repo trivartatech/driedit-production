@@ -70,6 +70,7 @@ export const reviewsAPI = {
 export const returnsAPI = {
   create: (data) => axiosInstance.post('/returns', data),
   getMy: () => axiosInstance.get('/returns/my-requests'),
+  checkEligibility: (orderId) => axiosInstance.get(`/returns/check-eligibility/${orderId}`),
   // Admin
   getAll: (params) => axiosInstance.get('/returns/admin/all', { params }),
   updateStatus: (id, data) => axiosInstance.put(`/returns/admin/${id}/status`, data)
