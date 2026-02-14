@@ -172,6 +172,9 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 ### Orders
 - `POST /api/orders` - Create order
 - `GET /api/orders` - User's orders
+- `GET /api/orders/payment-config` - Get payment gateway status (public)
+- `POST /api/orders/create-razorpay-order` - Create Razorpay order
+- `POST /api/orders/verify-payment` - Verify payment signature
 - `GET /api/orders/admin/all` - All orders (Admin)
 - `PUT /api/orders/admin/{id}/status` - Update status (Admin)
 - `PUT /api/orders/admin/{id}/tracking` - Add tracking (Admin)
