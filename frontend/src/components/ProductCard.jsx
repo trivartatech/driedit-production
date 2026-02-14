@@ -63,7 +63,7 @@ const ProductCard = ({ product }) => {
       className="group cursor-pointer"
       whileHover={{ y: -5 }}
       transition={{ duration: 0.2 }}
-      onClick={() => navigate(`/product/${product.id}`)}
+      onClick={() => navigate(`/product/${product.product_id}`)}
     >
       <div className="relative bg-white/5 overflow-hidden aspect-[3/4]">
         {/* Product Image */}
