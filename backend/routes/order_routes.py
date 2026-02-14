@@ -204,10 +204,11 @@ async def verify_payment(data: RazorpayVerification, request: Request):
 async def create_order(order_data: OrderCreate, request: Request):
     """
     Create new order.
+    Shipping is calculated based on subtotal (before GST) using tier system.
     """
     user = await get_current_user(request)
     
-    # Validate pincode
+    # Validate pincode (for COD availability only)
     pincode_data = await db.pincodes.find_one(
         {"pincode": order_data.pincode},
         {"_id": 0}
@@ -228,7 +229,17 @@ async def create_order(order_data: OrderCreate, request: Request):
     gst_percentage = gst_settings["gst_percentage"] if gst_settings else 18.0
     gst_amount = round(subtotal * (gst_percentage / 100), 2)
     
-    shipping_charge = pincode_data["shipping_charge"] if subtotal < 999 else 0
+    # Calculate shipping using tier system (based on subtotal BEFORE GST)
+    shipping_tier = await db.shipping_tiers.find_one({
+        "is_active": True,
+        "min_amount": {"$lte": subtotal},
+        "$or": [
+            {"max_amount": {"$gte": subtotal}},
+            {"max_amount": None}
+        ]
+    }, {"_id": 0})
+    
+    shipping_charge = shipping_tier["shipping_charge"] if shipping_tier else 0
     
     # Apply coupon discount if provided
     coupon_code = order_data.coupon_code
