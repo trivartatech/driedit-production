@@ -67,13 +67,28 @@ const Footer = () => {
 
           {/* Help */}
           <div>
-            <h4 className="font-bold mb-4 text-sm">HELP</h4>
+            <h4 className="font-bold mb-4 text-sm">CONTACT US</h4>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li><Link to="#" className="hover:text-white transition-colors">Contact Us</Link></li>
-              <li><Link to="#" className="hover:text-white transition-colors">Track Order</Link></li>
-              <li><Link to="#" className="hover:text-white transition-colors">Returns</Link></li>
-              <li><Link to="#" className="hover:text-white transition-colors">Shipping Info</Link></li>
-              <li><Link to="#" className="hover:text-white transition-colors">Size Guide</Link></li>
+              <li>
+                <a href="tel:+919611132391" className="hover:text-white transition-colors flex items-center space-x-2">
+                  <Phone size={14} />
+                  <span>+91 96111 32391</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://wa.me/919611132391" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center space-x-2">
+                  <MessageCircle size={14} />
+                  <span>WhatsApp</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://www.instagram.com/dried.it" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center space-x-2">
+                  <Instagram size={14} />
+                  <span>@dried.it</span>
+                </a>
+              </li>
+              <li><Link to="/orders" className="hover:text-white transition-colors">Track Order</Link></li>
+              <li><Link to="/orders" className="hover:text-white transition-colors">Returns</Link></li>
             </ul>
           </div>
 
