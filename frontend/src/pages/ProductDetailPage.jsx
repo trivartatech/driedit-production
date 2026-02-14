@@ -378,12 +378,53 @@ const ProductDetailPage = () => {
         </div>
 
         {/* Reviews Section */}
-        {productReviews.length > 0 && (
-          <div className="mb-16">
-            <h2 className="text-2xl font-black mb-6">CUSTOMER REVIEWS</h2>
+        <div className="mb-16">
+          <h2 className="text-2xl font-black mb-6">CUSTOMER REVIEWS</h2>
+          
+          {/* Submit Review */}
+          {isAuthenticated && (
+            <div className="bg-white/5 p-6 mb-6">
+              <h3 className="font-bold mb-4">Write a Review</h3>
+              <div className="mb-4">
+                <label className="block text-sm font-bold mb-2">Rating</label>
+                <div className="flex items-center space-x-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      onClick={() => setRating(star)}
+                      className="hover:scale-110 transition-transform"
+                    >
+                      <Star
+                        size={24}
+                        fill={star <= rating ? '#E10600' : 'none'}
+                        className={star <= rating ? 'text-[#E10600]' : 'text-gray-400'}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <textarea
+                value={reviewText}
+                onChange={(e) => setReviewText(e.target.value)}
+                placeholder="Share your experience..."
+                className="w-full bg-white/5 border border-white/10 p-3 mb-4 focus:outline-none focus:border-[#E10600] text-white"
+                rows="4"
+              />
+              <button
+                onClick={handleSubmitReview}
+                disabled={submittingReview}
+                className="bg-[#E10600] text-white px-6 py-3 font-bold hover:bg-white hover:text-black transition-colors disabled:opacity-50"
+              >
+                {submittingReview ? 'Submitting...' : 'SUBMIT REVIEW'}
+              </button>
+            </div>
+          )}
+          
+          {/* Reviews List */}
+          {reviews.length > 0 ? (
             <div className="space-y-4">
-              {productReviews.map(review => (
-                <div key={review.id} className="bg-white/5 p-6">
+              {reviews.map(review => (
+                <div key={review.review_id} className="bg-white/5 p-6">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
                       <span className="font-bold">{review.user_name}</span>
@@ -403,11 +444,14 @@ const ProductDetailPage = () => {
                     </div>
                   </div>
                   <p className="text-gray-400 text-sm">{review.review_text}</p>
+                  <p className="text-xs text-gray-500 mt-2">{new Date(review.created_at).toLocaleDateString()}</p>
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            <p className="text-gray-400">No reviews yet. Be the first to review!</p>
+          )}
+        </div>
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (
