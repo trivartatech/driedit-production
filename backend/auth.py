@@ -16,7 +16,8 @@ load_dotenv(ROOT_DIR / '.env')
 logger = logging.getLogger(__name__)
 
 # Get database
-def get_db():\n    client = AsyncIOMotorClient(os.environ['MONGO_URL'])
+def get_db():
+    client = AsyncIOMotorClient(os.environ['MONGO_URL'])
     return client[os.environ['DB_NAME']]
 
 db = get_db()
