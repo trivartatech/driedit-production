@@ -157,20 +157,23 @@ A complete, production-ready, minimalistic Gen-Z fashion e-commerce platform for
 
 ---
 
-## Files Changed for User Profile Feature
+## Files Changed for Admin Enhancements Feature
 
 ### New Files
-- `backend/routes/user_profile_routes.py` - Profile and address CRUD endpoints
-- `frontend/src/pages/ProfilePage.jsx` - Profile page with tabbed layout
-- `backend/tests/test_user_profile.py` - Test suite for profile feature
+- `backend/routes/sizes_routes.py` - Size CRUD endpoints
+- `frontend/src/pages/admin/AdminSizes.jsx` - Size management UI
+- `backend/tests/test_admin_enhancements.py` - Test suite
 
 ### Modified Files
-- `backend/models.py` - Added Address, AddressCreate, AddressUpdate, UserProfileUpdate models
-- `backend/server.py` - Added user_profile_routes router
-- `frontend/src/App.js` - Added /profile route
-- `frontend/src/pages/CheckoutPage.jsx` - Integrated address selector
-- `frontend/src/services/api.js` - Added profileAPI
-- `frontend/src/components/Header.jsx` - Added Profile link in navigation
+- `backend/models.py` - Added Size, SizeCreate, SizeUpdate models; Added size_chart_pdf to Product
+- `backend/routes/upload_routes.py` - Added banner, popup, size-chart upload endpoints
+- `backend/server.py` - Added sizes_routes router
+- `frontend/src/services/api.js` - Added sizesAPI, banner/popup/size-chart upload methods
+- `frontend/src/pages/admin/AdminLayout.jsx` - Added Sizes menu item
+- `frontend/src/pages/admin/AdminProducts.jsx` - Dynamic sizes + size chart PDF upload
+- `frontend/src/pages/admin/AdminBanners.jsx` - File upload instead of URL only
+- `frontend/src/pages/admin/AdminPopups.jsx` - File upload instead of URL only
+- `frontend/src/pages/ProductDetailPage.jsx` - "View Size Chart" button
 
 ---
 
