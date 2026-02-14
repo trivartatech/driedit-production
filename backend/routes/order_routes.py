@@ -229,7 +229,12 @@ async def create_order(order_data: OrderCreate, request: Request):
     gst_amount = round(subtotal * (gst_percentage / 100), 2)
     
     shipping_charge = pincode_data["shipping_charge"] if subtotal < 999 else 0
-    total = subtotal + gst_amount + shipping_charge
+    
+    # Apply coupon discount if provided
+    coupon_code = order_data.coupon_code
+    coupon_discount = order_data.coupon_discount if order_data.coupon_discount else 0
+    
+    total = subtotal + gst_amount + shipping_charge - coupon_discount
     
     order_id = f"order_{uuid.uuid4().hex[:12]}"
     
@@ -244,7 +249,10 @@ async def create_order(order_data: OrderCreate, request: Request):
         "items": [item.dict() for item in order_data.items],
         "subtotal": subtotal,
         "gst_amount": gst_amount,
+        "gst_percentage": gst_percentage,
         "shipping_charge": shipping_charge,
+        "coupon_code": coupon_code,
+        "coupon_discount": coupon_discount,
         "total": total,
         "payment_method": order_data.payment_method.value,
         "payment_status": payment_status,
@@ -257,6 +265,25 @@ async def create_order(order_data: OrderCreate, request: Request):
     }
     
     await db.orders.insert_one(order)
+    
+    # Record coupon usage if applied
+    if coupon_code and coupon_discount > 0:
+        coupon = await db.coupons.find_one({"code": coupon_code.upper()})
+        if coupon:
+            usage = {
+                "usage_id": f"usage_{uuid.uuid4().hex[:12]}",
+                "coupon_id": coupon["coupon_id"],
+                "coupon_code": coupon_code.upper(),
+                "user_id": user["user_id"],
+                "order_id": order_id,
+                "discount_amount": coupon_discount,
+                "used_at": datetime.now(timezone.utc)
+            }
+            await db.coupon_usage.insert_one(usage)
+            await db.coupons.update_one(
+                {"coupon_id": coupon["coupon_id"]},
+                {"$inc": {"used_count": 1}}
+            )
     
     # Reduce stock for each item
     for item in order_data.items:
