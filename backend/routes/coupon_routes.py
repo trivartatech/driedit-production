@@ -188,25 +188,25 @@ async def validate_coupon(data: CouponApplyRequest, request: Request):
 async def apply_coupon_to_order(
     code: str,
     order_id: str,
-    order_total: float,
-    request: Request
+    order_subtotal: float,
+    applied_type: str = "manual",
+    request: Request = None
 ):
     """
     Apply coupon to an order (called internally during order creation).
     Records usage and returns discount amount.
+    applied_type: "manual" or "auto"
     """
     user = await get_current_user(request)
     code = code.strip().upper()
     
-    # Validate coupon first
-    validation_request = CouponApplyRequest(code=code, order_total=order_total)
-    # This will raise HTTPException if invalid
+    # Validate coupon
+    validation_request = CouponApplyRequest(code=code, order_total=order_subtotal)
     validation = await validate_coupon(validation_request, request)
     
-    # Get coupon details
     coupon = await db.coupons.find_one({"code": code}, {"_id": 0})
     
-    # Record usage
+    # Record usage with atomic increment
     usage = {
         "usage_id": f"usage_{uuid.uuid4().hex[:12]}",
         "coupon_id": coupon["coupon_id"],
@@ -214,17 +214,19 @@ async def apply_coupon_to_order(
         "user_id": user["user_id"],
         "order_id": order_id,
         "discount_amount": validation["discount_amount"],
+        "order_subtotal": order_subtotal,
+        "applied_type": applied_type,
         "used_at": datetime.now(timezone.utc)
     }
     await db.coupon_usage.insert_one(usage)
     
-    # Increment used_count
+    # Atomic increment to prevent race condition
     await db.coupons.update_one(
         {"coupon_id": coupon["coupon_id"]},
         {"$inc": {"used_count": 1}}
     )
     
-    logger.info(f"Coupon {code} applied to order {order_id}, discount: {validation['discount_amount']}")
+    logger.info(f"Coupon {code} ({applied_type}) applied to order {order_id}, discount: {validation['discount_amount']}")
     
     return {
         "applied": True,
@@ -244,12 +246,9 @@ async def create_coupon(data: CouponCreate, request: Request):
     
     code = data.code.strip().upper()
     
-    # Check if code already exists
-    existing = await db.coupons.find_one({"code": code})
-    if existing:
+    if await db.coupons.find_one({"code": code}):
         raise HTTPException(status_code=400, detail="Coupon code already exists")
     
-    # Validate discount value
     if data.coupon_type == CouponType.PERCENTAGE and (data.discount_value < 0 or data.discount_value > 100):
         raise HTTPException(status_code=400, detail="Percentage discount must be between 0 and 100")
     
@@ -266,6 +265,7 @@ async def create_coupon(data: CouponCreate, request: Request):
         "usage_limit": data.usage_limit,
         "used_count": 0,
         "one_time_per_user": data.one_time_per_user,
+        "auto_apply": data.auto_apply,
         "is_active": data.is_active,
         "expires_at": data.expires_at,
         "created_at": datetime.now(timezone.utc)
@@ -274,7 +274,7 @@ async def create_coupon(data: CouponCreate, request: Request):
     await db.coupons.insert_one(coupon)
     coupon.pop("_id", None)
     
-    logger.info(f"Created coupon: {code}")
+    logger.info(f"Created coupon: {code} (auto_apply={data.auto_apply})")
     return coupon
 
 
