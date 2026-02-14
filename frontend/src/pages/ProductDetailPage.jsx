@@ -258,13 +258,9 @@ const ProductDetailPage = () => {
     return null;
   }
 
-  const discount = calculateDiscount(product.regular_price, product.discounted_price);
   const averageRating = reviews.length > 0 
     ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
     : 0;
-
-  // Set meta tags for SEO & social sharing
-  useMetaTags(product, discount);
 
   return (
     <div className="min-h-screen bg-black text-white">
