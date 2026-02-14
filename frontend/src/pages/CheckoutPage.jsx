@@ -148,17 +148,26 @@ const CheckoutPage = () => {
   };
 
   const calculateTotals = () => {
+    // 1. Base subtotal
     const subtotal = cartItems.reduce((acc, item) => 
       acc + ((item.product?.discounted_price || 0) * item.quantity), 0
     );
-    const gstAmount = Math.round(subtotal * (gstPercentage / 100));
-    // Use tier-based shipping (calculated on subtotal before GST)
-    const shipping = shippingData?.shipping_charge || 0;
-    const subtotalWithGst = subtotal + gstAmount + shipping;
+    
+    // 2. Apply coupon discount
     const discount = couponApplied ? couponApplied.discount_amount : 0;
-    const total = subtotalWithGst - discount;
+    const discountedSubtotal = Math.max(0, subtotal - discount);
+    
+    // 3. Calculate GST on discounted subtotal
+    const gstAmount = Math.round(discountedSubtotal * (gstPercentage / 100));
+    
+    // 4. Calculate shipping (tier-based on discounted subtotal)
+    // Note: We should recalculate shipping based on discounted subtotal
+    const shipping = shippingData?.shipping_charge || 0;
+    
+    // 5. Final total
+    const total = discountedSubtotal + gstAmount + shipping;
 
-    return { subtotal, gstAmount, shipping, discount, total, subtotalWithGst };
+    return { subtotal, discountedSubtotal, gstAmount, shipping, discount, total };
   };
 
   // Coupon functions
