@@ -9,9 +9,11 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div className="col-span-1">
-            <h3 className="text-2xl font-black tracking-tighter mb-4">
-              <span className="text-[#E10600]">D</span>RIEDIT
-            </h3>
+            <Link to="/" className="inline-block">
+              <h3 className="text-2xl font-black tracking-tighter mb-4 hover:text-[#E10600] transition-colors">
+                <span className="text-[#E10600]">D</span>RIEDIT
+              </h3>
+            </Link>
             <p className="text-sm text-gray-400 mb-4">
               Stay raw stay real.
             </p>
