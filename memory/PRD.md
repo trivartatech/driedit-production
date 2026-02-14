@@ -20,7 +20,7 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 
 ## What's Been Implemented ✅
 
-### Phase 1-7: Core E-commerce (Completed)
+### Core E-commerce (Completed)
 - Full authentication (Email/Password + Google OAuth)
 - Product catalog with categories and filters
 - Wishlist and cart systems
@@ -28,59 +28,70 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 - Order management and tracking
 - Admin dashboard with full CRUD operations
 - Customer return request flow
+- Product image upload
+- User reviews system
 
-### Phase 8: Product Image Upload (Completed)
-- Server-side image storage
-- Admin image upload UI
-- Max 5MB per image, max 5 images per product
-
-### Phase 9: Email Notifications (Completed - PENDING API KEY)
+### Email Notifications (Completed - PENDING API KEY)
 - Resend integration for transactional emails
-- Order confirmation, shipping, delivery notifications
-- **STATUS**: Code complete, awaiting RESEND_API_KEY
+- **STATUS**: Code complete, awaiting RESEND_API_KEY + domain verification
 
-### Phase 10: Discount Coupon System (Completed)
-- Percentage and Fixed amount coupons
-- Min order value, max discount, usage limits
-- Admin management with usage statistics
-- Checkout integration
-- **Tested**: 23/23 tests passed
-
-### Phase 11: Forgot Password Flow (Completed)
-- Secure token-based reset
-- 1-hour expiry
-- Email enumeration protection
-- **Tested**: All tests passed
-
-### Phase 12: User Reviews System (Completed)
-- Star rating (1-5)
-- Verified buyer badge
-- One review per user per product
-
-### Phase 13: Tier-Based Shipping System (Completed - Feb 14, 2026)
-- **NEW**: Replaced pincode-based shipping with tier-based system
-- Shipping calculated on **subtotal BEFORE GST**
+### Tier-Based Shipping System (Completed - Feb 14, 2026)
+- Replaced pincode-based shipping with tier-based system
+- Shipping calculated on discounted subtotal
 - Admin CRUD for shipping tiers
-- Overlap validation to prevent conflicting ranges
-- **Default Tiers**:
-  - ₹0 - ₹499: ₹80 shipping
-  - ₹500 - ₹999: ₹50 shipping
-  - ₹1,000+: FREE shipping
-- **Tested**: 22/23 backend tests passed
+- **Default Tiers**: ₹0-499 = ₹80, ₹500-999 = ₹50, ₹1000+ = FREE
+
+### Hybrid Coupon Engine (Completed - Feb 14, 2026)
+**Enterprise-Level Pricing System:**
+
+#### Auto-Apply Engine
+- Fetch eligible auto-apply coupons
+- Validate eligibility (min order, expiry, usage limits)
+- Pick highest discount automatically
+- Apply at checkout load
+
+#### Manual Coupon Override
+- User can enter private/influencer codes
+- Manual always overrides auto
+- Invalid manual reverts to auto
+
+#### Priority Rules
+| Scenario | Result |
+|----------|--------|
+| Auto coupon exists | Applied automatically |
+| User enters manual | Manual overrides auto |
+| Manual gives lower discount | Still override (user choice) |
+| Manual invalid | Revert to auto coupon |
+
+#### Final Pricing Order (Industry Standard)
+```
+1. Calculate base subtotal
+2. Apply coupon discount
+3. Calculate GST on discounted base
+4. Calculate shipping (tier-based on discounted base)
+5. Final total
+```
+
+**Note:** Shipping never discounted. No stacking allowed.
+
+#### Admin Features
+- Create coupon with auto_apply toggle
+- AUTO badge with lightning icon on auto coupons
+- Usage breakdown: auto/manual count
+- Revenue generated per coupon
+
+**Test Results:** 22/22 backend tests passed, 100% frontend verified
 
 ---
 
 ## Pending Tasks 📋
 
 ### P1 - High Priority
-- [ ] Activate email notifications (add RESEND_API_KEY)
-- [ ] Verify Resend domain for production emails
+- [ ] Activate email notifications (add RESEND_API_KEY + verify domain)
 
 ### P2 - Nice to Have
 - [ ] Email verification for new registrations
 - [ ] Search with autocomplete
-- [ ] Order tracking with courier APIs
-- [ ] Product recommendations engine
 - [ ] Analytics dashboard
 
 ### P3 - Future
@@ -93,6 +104,7 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 - **Admin**: admin@driedit.in / adminpassword
 - **User**: test@example.com / password123
 - **Test Pincode**: 110001
+- **Auto Coupon**: FESTIVE10 (10% off, min ₹500, max ₹200)
 
 ---
 
@@ -101,38 +113,26 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 | Integration | Status | Notes |
 |-------------|--------|-------|
 | Razorpay | ✅ TEST MODE | Working with test keys |
-| Resend Email | ⚠️ PENDING | Code complete, needs API key |
+| Resend Email | ⚠️ PENDING | Code complete, needs API key + domain |
 | Google OAuth | ✅ ACTIVE | Via Emergent Auth |
 
 ---
 
 ## Key API Endpoints
 
-### Shipping Tiers (NEW)
+### Coupons (Enhanced)
+- `GET /api/coupons/auto-apply?subtotal={amount}` - Get best auto-apply coupon
+- `POST /api/coupons/validate` - Validate manual coupon
+- `POST /api/coupons/admin/create` - Create coupon with auto_apply flag
+- `GET /api/coupons/admin/all` - List with auto/manual usage stats
+- `GET /api/coupons/admin/{id}` - Details with revenue breakdown
+
+### Shipping Tiers
 - `GET /api/shipping-tiers/calculate?subtotal={amount}` - Calculate shipping
-- `GET /api/shipping-tiers/all-active` - Get active tiers (public)
-- `GET /api/shipping-tiers/admin/all` - Get all tiers (admin)
-- `POST /api/shipping-tiers/admin/create` - Create tier (admin)
-- `PUT /api/shipping-tiers/admin/{id}` - Update tier (admin)
-- `DELETE /api/shipping-tiers/admin/{id}` - Delete tier (admin)
-- `PUT /api/shipping-tiers/admin/{id}/toggle` - Toggle status (admin)
-
-### Auth
-- `POST /api/auth/register`, `/api/auth/login`, `/api/auth/logout`
-- `POST /api/auth/forgot-password`, `/api/auth/reset-password`
-
-### Products & Categories
-- `GET/POST/PUT/DELETE /api/products`
-- `GET/POST/PUT/DELETE /api/categories`
+- `GET /api/shipping-tiers/admin/all` - Admin management
 
 ### Orders
-- `POST /api/orders` - Create order (uses tier-based shipping)
-- `GET /api/orders` - User's orders
-- Admin order management endpoints
-
-### Coupons
-- `POST /api/coupons/validate` - Validate coupon
-- Admin coupon CRUD endpoints
+- `POST /api/orders` - Create order (uses correct pricing order)
 
 ---
 
@@ -141,57 +141,53 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 /app
 ├── backend/
 │   ├── routes/
-│   │   ├── shipping_tier_routes.py  # NEW
-│   │   ├── coupon_routes.py
-│   │   ├── password_reset_routes.py
-│   │   ├── order_routes.py  # Updated for tier shipping
-│   │   └── ... (other routes)
-│   ├── services/
-│   │   └── email_service.py
-│   ├── models.py  # Added ShippingTier models
+│   │   ├── coupon_routes.py  # Enhanced with auto-apply
+│   │   ├── shipping_tier_routes.py
+│   │   ├── order_routes.py  # Updated pricing order
+│   │   └── ...
+│   ├── models.py  # Coupon with auto_apply field
 │   └── server.py
 ├── frontend/
 │   ├── src/
 │   │   ├── pages/
+│   │   │   ├── CheckoutPage.jsx  # Auto-apply + pricing display
 │   │   │   ├── admin/
-│   │   │   │   ├── AdminShippingTiers.jsx  # NEW
-│   │   │   │   └── ...
-│   │   │   ├── CheckoutPage.jsx  # Updated for tier shipping
+│   │   │   │   ├── AdminCoupons.jsx  # Auto toggle + stats
+│   │   │   │   └── AdminShippingTiers.jsx
 │   │   │   └── ...
-│   │   └── services/api.js  # Added shippingAPI
+│   │   └── services/api.js  # getAutoCoupon endpoint
 │   └── .env
 └── memory/PRD.md
 ```
 
 ---
 
-## Testing Results (Feb 14, 2026)
-- **Shipping Tiers**: 22/23 backend tests passed (1 rate-limit issue during testing)
-- **Coupon System**: 23/23 tests passed
-- **Password Reset**: All tests passed
-- **Admin UI**: All verified working
+## Checkout Display Example
+
+```
+Subtotal:                  ₹2,000
+Auto Coupon (FESTIVE10):   -₹200
+GST (18%) (on discounted):  ₹324
+Shipping:                   FREE
+─────────────────────────────────
+Total:                    ₹2,124
+```
+
+If user enters manual code:
+```
+Manual Coupon (INFLUENCER50): -₹50
+```
+Auto coupon disappears.
 
 ---
 
-## Shipping Tier Logic
-
-```
-Order Subtotal (before GST) → Find matching tier → Apply shipping charge
-
-Example:
-- Subtotal: ₹1,000
-- GST (5%): ₹50  
-- Shipping (₹1000+ tier): ₹0 (FREE)
-- Total: ₹1,050
-```
-
-The tier lookup uses:
-```
-min_amount <= subtotal <= max_amount (or no max for unlimited)
-```
+## Testing Results (Feb 14, 2026)
+- **Hybrid Coupon System**: 22/22 backend tests passed, 100% frontend
+- **Shipping Tiers**: 22/23 passed
+- **Previous Tests**: All passed
 
 ---
 
 ## Last Updated
 **Date**: February 14, 2026
-**Session**: Implemented tier-based shipping system with Admin UI
+**Session**: Implemented hybrid coupon engine with auto-apply functionality
