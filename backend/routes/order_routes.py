@@ -42,7 +42,7 @@ async def create_razorpay_order(data: RazorpayOrderCreate, request: Request):
     user = await get_current_user(request)
     
     # Mock response if Razorpay client not configured
-    if not razorpay_client or os.getenv('RAZORPAY_KEY_ID', '').startswith('mock'):
+    if not razorpay_client:
         mock_order_id = f"order_mock_{uuid.uuid4().hex[:12]}"
         return {
             "id": mock_order_id,
