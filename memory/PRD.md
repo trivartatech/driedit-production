@@ -48,6 +48,7 @@ A complete, production-ready, minimalistic Gen-Z fashion e-commerce platform for
 - [x] Order tracking
 - [x] Replace & Return system
 - [x] User Reviews (verified buyers only)
+- [x] **Product Recommendations** (NEW) - "You May Also Like" section on product pages
 
 ### User Profile & Address Manager (NEW) ✅
 - [x] Profile page with tabbed layout (Profile Info, Saved Addresses)
