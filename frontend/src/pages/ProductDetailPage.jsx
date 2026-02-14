@@ -267,7 +267,7 @@ const ProductDetailPage = () => {
                   />
                 ))}
               </div>
-              <span className="text-sm text-gray-400">({productReviews.length} reviews)</span>
+              <span className="text-sm text-gray-400">({reviews.length} reviews)</span>
             </div>
 
             {/* Price */}
@@ -280,6 +280,19 @@ const ProductDetailPage = () => {
 
             {/* Description */}
             <p className="text-gray-400 mb-6 leading-relaxed">{product.description}</p>
+
+            {/* Stock Warning */}
+            {product.stock < 10 && product.stock > 0 && (
+              <div className="bg-[#E10600]/10 border border-[#E10600] px-4 py-2 mb-6">
+                <p className="text-sm font-bold text-[#E10600]">Only {product.stock} left in stock!</p>
+              </div>
+            )}
+
+            {product.stock === 0 && (
+              <div className="bg-white/5 border border-white/20 px-4 py-2 mb-6">
+                <p className="text-sm font-bold text-gray-400">Out of Stock</p>
+              </div>
+            )}
 
             {/* Size Selection */}
             <div className="mb-6">
