@@ -104,7 +104,8 @@ export const adminAPI = {
 export const publicAPI = {
   checkPincode: (pincode) => axiosInstance.post('/public/check-pincode', { pincode }),
   getActiveBanners: () => axiosInstance.get('/admin/public/banners'),
-  getActivePopup: () => axiosInstance.get('/admin/public/popup')
+  getActivePopup: () => axiosInstance.get('/admin/public/popup'),
+  getGST: () => axiosInstance.get('/admin/public/gst')
 };
 
 // Auth API
