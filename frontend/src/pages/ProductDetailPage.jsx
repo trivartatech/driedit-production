@@ -544,7 +544,14 @@ const ProductDetailPage = () => {
 const ShareProduct = ({ product }) => {
   const [copied, setCopied] = useState(false);
   const productUrl = window.location.href;
-  const productText = `Check out ${product.title} on DRIEDIT - ${productUrl}`;
+  
+  // Calculate discount for tagline
+  const discount = Math.round(((product.regular_price - product.discounted_price) / product.regular_price) * 100);
+  const priceTag = `₹${product.discounted_price.toLocaleString('en-IN')}`;
+  const discountTag = discount > 0 ? ` (${discount}% OFF)` : '';
+  
+  // Enhanced share text with tagline
+  const productText = `🔥 *${product.title}*\n${priceTag}${discountTag}\n\n${product.description?.slice(0, 100)}${product.description?.length > 100 ? '...' : ''}\n\n👉 Shop now: ${productUrl}\n\n_DRIEDIT - Stay Raw Stay Real_`;
 
   const copyToClipboard = (text) => {
     // Fallback method using textarea
