@@ -528,86 +528,261 @@ const CheckoutPage = () => {
           <div className="lg:col-span-2 space-y-6">
             {/* Delivery Address */}
             <div className="bg-white/5 p-6 border border-white/10" data-testid="delivery-address-section">
-              <h2 className="text-2xl font-black mb-4 flex items-center space-x-2">
-                <Truck size={24} className="text-[#E10600]" />
-                <span>DELIVERY ADDRESS</span>
+              <h2 className="text-2xl font-black mb-4 flex items-center justify-between">
+                <span className="flex items-center space-x-2">
+                  <Truck size={24} className="text-[#E10600]" />
+                  <span>DELIVERY ADDRESS</span>
+                </span>
+                <Link 
+                  to="/profile" 
+                  className="text-xs text-gray-400 hover:text-[#E10600] font-normal"
+                  data-testid="manage-addresses-link"
+                >
+                  Manage Addresses
+                </Link>
               </h2>
 
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Full Name *"
-                  value={address.name}
-                  onChange={(e) => setAddress({ ...address, name: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 p-3 focus:outline-none focus:border-[#E10600] text-white"
-                  data-testid="address-name-input"
-                />
-                <input
-                  type="tel"
-                  placeholder="Phone Number *"
-                  value={address.phone}
-                  onChange={(e) => setAddress({ ...address, phone: e.target.value })}
-                  maxLength="10"
-                  className="w-full bg-white/5 border border-white/10 p-3 focus:outline-none focus:border-[#E10600] text-white"
-                  data-testid="address-phone-input"
-                />
-                <input
-                  type="text"
-                  placeholder="Address Line 1 *"
-                  value={address.addressLine1}
-                  onChange={(e) => setAddress({ ...address, addressLine1: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 p-3 focus:outline-none focus:border-[#E10600] text-white"
-                  data-testid="address-line1-input"
-                />
-                <input
-                  type="text"
-                  placeholder="Address Line 2 (Optional)"
-                  value={address.addressLine2}
-                  onChange={(e) => setAddress({ ...address, addressLine2: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 p-3 focus:outline-none focus:border-[#E10600] text-white"
-                  data-testid="address-line2-input"
-                />
-                <div className="grid grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    placeholder="City *"
-                    value={address.city}
-                    onChange={(e) => setAddress({ ...address, city: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 p-3 focus:outline-none focus:border-[#E10600] text-white"
-                    data-testid="address-city-input"
-                  />
-                  <input
-                    type="text"
-                    placeholder="State *"
-                    value={address.state}
-                    onChange={(e) => setAddress({ ...address, state: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 p-3 focus:outline-none focus:border-[#E10600] text-white"
-                    data-testid="address-state-input"
-                  />
-                </div>
+              {/* Saved Addresses Selector */}
+              {savedAddresses.length > 0 && (
+                <div className="mb-4">
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddressSelector(!showAddressSelector)}
+                      className="w-full bg-white/5 border border-white/10 p-4 flex items-center justify-between hover:border-white/30 transition-colors"
+                      data-testid="address-selector-btn"
+                    >
+                      <div className="flex items-center space-x-3">
+                        {addressMode === 'saved' && selectedAddressId ? (
+                          <>
+                            {(() => {
+                              const selected = savedAddresses.find(a => a.address_id === selectedAddressId);
+                              const Icon = LABEL_ICONS[selected?.label] || Home;
+                              return (
+                                <>
+                                  <Icon size={18} className="text-[#E10600]" />
+                                  <div className="text-left">
+                                    <p className="font-bold text-sm">{selected?.name} - {selected?.label}</p>
+                                    <p className="text-xs text-gray-400 truncate max-w-[200px] sm:max-w-none">
+                                      {selected?.address_line1}, {selected?.city}
+                                    </p>
+                                  </div>
+                                  {selected?.is_default && (
+                                    <span className="text-xs bg-[#E10600]/20 text-[#E10600] px-2 py-0.5 ml-2">DEFAULT</span>
+                                  )}
+                                </>
+                              );
+                            })()}
+                          </>
+                        ) : (
+                          <>
+                            <Plus size={18} className="text-gray-400" />
+                            <span className="text-gray-400">Enter new address</span>
+                          </>
+                        )}
+                      </div>
+                      <ChevronDown size={18} className={`text-gray-400 transition-transform ${showAddressSelector ? 'rotate-180' : ''}`} />
+                    </button>
 
-                {/* Pincode Check */}
-                <div className="flex space-x-2">
+                    <AnimatePresence>
+                      {showAddressSelector && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="absolute z-20 w-full mt-1 bg-[#111] border border-white/10 max-h-72 overflow-y-auto"
+                          data-testid="address-dropdown"
+                        >
+                          {savedAddresses.map((addr) => {
+                            const Icon = LABEL_ICONS[addr.label] || Building;
+                            return (
+                              <button
+                                key={addr.address_id}
+                                type="button"
+                                onClick={() => {
+                                  setAddressMode('saved');
+                                  selectAddress(addr);
+                                }}
+                                className={`w-full p-4 flex items-start space-x-3 hover:bg-white/5 text-left border-b border-white/5 last:border-0 ${
+                                  selectedAddressId === addr.address_id && addressMode === 'saved' ? 'bg-white/5' : ''
+                                }`}
+                                data-testid={`select-address-${addr.address_id}`}
+                              >
+                                <Icon size={18} className="text-gray-400 mt-0.5 flex-shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center space-x-2">
+                                    <p className="font-bold text-sm">{addr.name}</p>
+                                    <span className="text-xs text-gray-500 uppercase">{addr.label}</span>
+                                    {addr.is_default && (
+                                      <Star size={12} className="text-[#E10600]" />
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-gray-400">{addr.phone}</p>
+                                  <p className="text-xs text-gray-400 truncate">{addr.address_line1}</p>
+                                  <p className="text-xs text-gray-400">{addr.city}, {addr.state} - {addr.pincode}</p>
+                                </div>
+                                {selectedAddressId === addr.address_id && addressMode === 'saved' && (
+                                  <CheckCircle size={18} className="text-[#E10600] flex-shrink-0" />
+                                )}
+                              </button>
+                            );
+                          })}
+                          
+                          {/* New Address Option */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAddressMode('new');
+                              setSelectedAddressId(null);
+                              setAddress({
+                                name: user?.name || '',
+                                phone: '',
+                                addressLine1: '',
+                                addressLine2: '',
+                                city: '',
+                                state: '',
+                                pincode: ''
+                              });
+                              setPincode('');
+                              setPincodeData(null);
+                              setShowAddressSelector(false);
+                            }}
+                            className="w-full p-4 flex items-center space-x-3 hover:bg-white/5 text-left border-t border-white/10"
+                            data-testid="new-address-option"
+                          >
+                            <Plus size={18} className="text-[#E10600]" />
+                            <span className="text-[#E10600] font-bold text-sm">Add New Address</span>
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              )}
+
+              {/* Address Form (shown for new address or when no saved addresses) */}
+              {(addressMode === 'new' || savedAddresses.length === 0) && (
+                <div className="space-y-4">
                   <input
                     type="text"
-                    placeholder="Pincode *"
-                    value={pincode}
-                    onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
-                    maxLength="6"
-                    className="flex-1 bg-white/5 border border-white/10 p-3 focus:outline-none focus:border-[#E10600] text-white"
-                    data-testid="pincode-input"
+                    placeholder="Full Name *"
+                    value={address.name}
+                    onChange={(e) => setAddress({ ...address, name: e.target.value })}
+                    className="w-full bg-white/5 border border-white/10 p-3 focus:outline-none focus:border-[#E10600] text-white"
+                    data-testid="address-name-input"
                   />
-                  <button
-                    onClick={handlePincodeCheck}
-                    disabled={pincodeChecking || pincode.length !== 6}
-                    className="bg-[#E10600] text-white px-6 py-3 font-bold hover:bg-white hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    data-testid="check-pincode-btn"
-                  >
-                    {pincodeChecking ? <Loader2 className="w-5 h-5 animate-spin" /> : 'CHECK'}
-                  </button>
-                </div>
+                  <input
+                    type="tel"
+                    placeholder="Phone Number * (10 digits)"
+                    value={address.phone}
+                    onChange={(e) => setAddress({ ...address, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                    maxLength="10"
+                    className="w-full bg-white/5 border border-white/10 p-3 focus:outline-none focus:border-[#E10600] text-white"
+                    data-testid="address-phone-input"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Address Line 1 *"
+                    value={address.addressLine1}
+                    onChange={(e) => setAddress({ ...address, addressLine1: e.target.value })}
+                    className="w-full bg-white/5 border border-white/10 p-3 focus:outline-none focus:border-[#E10600] text-white"
+                    data-testid="address-line1-input"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Address Line 2 (Optional)"
+                    value={address.addressLine2}
+                    onChange={(e) => setAddress({ ...address, addressLine2: e.target.value })}
+                    className="w-full bg-white/5 border border-white/10 p-3 focus:outline-none focus:border-[#E10600] text-white"
+                    data-testid="address-line2-input"
+                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      placeholder="City *"
+                      value={address.city}
+                      onChange={(e) => setAddress({ ...address, city: e.target.value })}
+                      className="w-full bg-white/5 border border-white/10 p-3 focus:outline-none focus:border-[#E10600] text-white"
+                      data-testid="address-city-input"
+                    />
+                    <input
+                      type="text"
+                      placeholder="State *"
+                      value={address.state}
+                      onChange={(e) => setAddress({ ...address, state: e.target.value })}
+                      className="w-full bg-white/5 border border-white/10 p-3 focus:outline-none focus:border-[#E10600] text-white"
+                      data-testid="address-state-input"
+                    />
+                  </div>
 
-                {pincodeData && (
+                  {/* Pincode Check */}
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      placeholder="Pincode *"
+                      value={pincode}
+                      onChange={(e) => setPincode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      maxLength="6"
+                      className="flex-1 bg-white/5 border border-white/10 p-3 focus:outline-none focus:border-[#E10600] text-white"
+                      data-testid="pincode-input"
+                    />
+                    <button
+                      onClick={handlePincodeCheck}
+                      disabled={pincodeChecking || pincode.length !== 6}
+                      className="bg-[#E10600] text-white px-6 py-3 font-bold hover:bg-white hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      data-testid="check-pincode-btn"
+                    >
+                      {pincodeChecking ? <Loader2 className="w-5 h-5 animate-spin" /> : 'CHECK'}
+                    </button>
+                  </div>
+
+                  {/* Save Address Option */}
+                  {savedAddresses.length < 5 && (
+                    <div className="border-t border-white/10 pt-4 mt-4">
+                      <label className="flex items-center space-x-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={saveNewAddress}
+                          onChange={(e) => setSaveNewAddress(e.target.checked)}
+                          className="w-4 h-4 accent-[#E10600]"
+                          data-testid="save-address-checkbox"
+                        />
+                        <span className="text-sm flex items-center space-x-2">
+                          <Save size={14} />
+                          <span>Save this address for future orders</span>
+                        </span>
+                      </label>
+                      
+                      {saveNewAddress && (
+                        <div className="mt-3 flex space-x-2">
+                          {['Home', 'Work', 'Other'].map((label) => {
+                            const Icon = LABEL_ICONS[label];
+                            return (
+                              <button
+                                key={label}
+                                type="button"
+                                onClick={() => setNewAddressLabel(label)}
+                                className={`flex-1 py-2 px-3 border text-xs font-bold flex items-center justify-center space-x-1 transition-colors ${
+                                  newAddressLabel === label
+                                    ? 'bg-[#E10600] border-[#E10600] text-white'
+                                    : 'bg-white/5 border-white/10 hover:border-white/30'
+                                }`}
+                                data-testid={`label-${label.toLowerCase()}`}
+                              >
+                                <Icon size={14} />
+                                <span>{label}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Pincode Status for Saved Address */}
+              {addressMode === 'saved' && selectedAddressId && (
                   <motion.div 
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
