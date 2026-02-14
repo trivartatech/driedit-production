@@ -5,6 +5,10 @@ from typing import List
 import uuid
 from datetime import datetime, timezone, timedelta
 from pydantic import BaseModel
+import asyncio
+
+# Email service import
+from services.email_service import send_return_approved, send_return_rejected
 
 router = APIRouter(prefix="/api/returns", tags=["returns"])
 
