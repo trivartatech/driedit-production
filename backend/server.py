@@ -30,7 +30,8 @@ from routes import (
     analytics_routes,
     google_oauth_routes,
     user_profile_routes,
-    sizes_routes
+    sizes_routes,
+    reports_routes
 )
 
 ROOT_DIR = Path(__file__).parent
