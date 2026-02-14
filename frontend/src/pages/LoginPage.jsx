@@ -1,10 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { LogIn, Mail, Lock } from 'lucide-react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { authAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { toast } from '../hooks/use-toast';
+
+const LoginPage = () => {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { setUser, setIsAuthenticated } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  useEffect(() => {
+    // Handle OAuth errors
+    const errorParam = searchParams.get('error');
+    if (errorParam) {
+      const errorMessages = {
+        'oauth_denied': 'Google sign-in was cancelled',
+        'no_code': 'Authentication failed - no code received',
+        'invalid_state': 'Authentication failed - please try again',
+        'token_exchange_failed': 'Authentication failed - please try again',
+        'server_error': 'Server error - please try again'
+      };
+      
+      toast({ 
+        title: errorMessages[errorParam] || 'Authentication failed',
+        variant: 'destructive'
+      });
+      
+      // Clean up URL
+      searchParams.delete('error');
+      setSearchParams(searchParams);
+    }
+  }, [searchParams, setSearchParams]);
 
 const LoginPage = () => {
   const navigate = useNavigate();
