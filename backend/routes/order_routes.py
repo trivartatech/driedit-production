@@ -8,6 +8,14 @@ import os
 import razorpay
 from pydantic import BaseModel
 import logging
+import asyncio
+
+# Email service import
+from services.email_service import (
+    send_order_confirmation,
+    send_order_shipped,
+    send_order_delivered
+)
 
 logger = logging.getLogger(__name__)
 
