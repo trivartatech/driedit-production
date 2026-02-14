@@ -78,6 +78,18 @@ A complete, production-ready, minimalistic Gen-Z fashion e-commerce platform for
 - [x] Dashboard overview
 - [x] Analytics Dashboard (Revenue, AOV, Top Products, Coupons, Conversion, Customers)
 - [x] Product CRUD with image uploads
+- [x] **Dynamic Size Management** (NEW)
+  - Admin CRUD for sizes
+  - Pre-seeded sizes: XS, S, M, L, XL, XXL, 28, 30, 32, 34, 36, 38
+  - Grouped by category type (clothing, bottomwear)
+  - Soft-delete protection if used in products
+- [x] **Size Chart PDF per Product** (NEW)
+  - PDF upload per product
+  - "View Size Chart" button on product page (opens in new tab)
+- [x] **Banner & Popup Image Upload** (NEW)
+  - Server-side file storage instead of URL only
+  - Secure MIME validation
+  - Preview thumbnails in admin
 - [x] Category management
 - [x] Order management
 - [x] Return management
