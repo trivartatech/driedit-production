@@ -184,6 +184,14 @@ const Header = () => {
                 {isAuthenticated ? (
                   <>
                     <Link 
+                      to="/profile"
+                      className="flex items-center space-x-2 text-sm font-semibold hover:text-[#E10600] transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <User size={18} />
+                      <span>MY ACCOUNT</span>
+                    </Link>
+                    <Link 
                       to="/my-orders"
                       className="flex items-center space-x-2 text-sm font-semibold hover:text-[#E10600] transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
@@ -197,8 +205,7 @@ const Header = () => {
                         className="flex items-center space-x-2 text-sm font-semibold hover:text-[#E10600] transition-colors"
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        <User size={18} />
-                        <span>ADMIN</span>
+                        <span>ADMIN PANEL</span>
                       </Link>
                     )}
                     <button 
