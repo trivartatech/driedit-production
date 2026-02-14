@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { 
   Package, ShoppingBag, Tag, MapPin, Image, Bell, 
-  LayoutDashboard, RefreshCw, ArrowLeft, Ticket, Truck
+  LayoutDashboard, RefreshCw, ArrowLeft, Ticket, Truck, BarChart3
 } from 'lucide-react';
 import AdminDashboard from './AdminDashboard';
 import AdminProducts from './AdminProducts';
@@ -14,12 +14,14 @@ import AdminPopups from './AdminPopups';
 import AdminReturns from './AdminReturns';
 import AdminCoupons from './AdminCoupons';
 import AdminShippingTiers from './AdminShippingTiers';
+import AdminAnalytics from './AdminAnalytics';
 
 const AdminLayout = () => {
   const location = useLocation();
   
   const menuItems = [
     { path: '/admin', icon: LayoutDashboard, label: 'Dashboard', exact: true },
+    { path: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
     { path: '/admin/orders', icon: ShoppingBag, label: 'Orders' },
     { path: '/admin/products', icon: Package, label: 'Products' },
     { path: '/admin/categories', icon: Tag, label: 'Categories' },
