@@ -94,8 +94,9 @@ const Footer = () => {
 
           {/* Legal */}
           <div>
-            <h4 className="font-bold mb-4 text-sm">LEGAL</h4>
+            <h4 className="font-bold mb-4 text-sm">COMPANY</h4>
             <ul className="space-y-2 text-sm text-gray-400">
+              <li><Link to="/about" className="hover:text-white transition-colors">About Us</Link></li>
               <li><Link to="#" className="hover:text-white transition-colors">Privacy Policy</Link></li>
               <li><Link to="#" className="hover:text-white transition-colors">Terms of Service</Link></li>
               <li><Link to="#" className="hover:text-white transition-colors">Refund Policy</Link></li>
