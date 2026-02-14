@@ -194,6 +194,12 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 - `GET /api/returns/admin/all` - All returns (Admin)
 - `PUT /api/returns/admin/{id}/status` - Update return status (Admin)
 
+### Uploads
+- `POST /api/uploads/product-image` - Upload single product image (Admin)
+- `POST /api/uploads/product-images` - Upload multiple images (Admin)
+- `GET /api/uploads/images/{filename}` - Serve uploaded image
+- `DELETE /api/uploads/images/{filename}` - Delete image (Admin)
+
 ### Admin
 - `GET/POST/PUT/DELETE /api/admin/pincodes`
 - `GET/PUT /api/admin/gst`
