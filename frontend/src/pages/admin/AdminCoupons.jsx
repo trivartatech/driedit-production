@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, Edit2, Trash2, Search, Loader2, Tag, 
   ToggleLeft, ToggleRight, X, Percent, DollarSign,
-  Users, TrendingUp, Calendar, AlertCircle
+  Users, TrendingUp, Calendar, AlertCircle, Zap
 } from 'lucide-react';
 import { couponsAPI } from '../../services/api';
 import { toast } from 'sonner';
@@ -24,6 +24,7 @@ const INITIAL_COUPON = {
   max_discount: '',
   usage_limit: '',
   one_time_per_user: true,
+  auto_apply: false,
   is_active: true,
   expires_at: ''
 };
