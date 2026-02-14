@@ -168,71 +168,105 @@ const CheckoutPage = () => {
 
   const handleRazorpayPayment = async (orderData, amount) => {
     try {
-      // Create Razorpay order
+      // Create Razorpay order on backend
       const razorpayOrderRes = await ordersAPI.createRazorpayOrder(amount * 100);
       const razorpayOrder = razorpayOrderRes.data;
 
-      // Create order in backend
+      // Create order in backend (pending payment)
       const orderRes = await ordersAPI.create(orderData);
       const orderId = orderRes.data.order_id;
 
-      // Check if Razorpay SDK is loaded
-      if (window.Razorpay) {
-        const options = {
-          key: process.env.REACT_APP_RAZORPAY_KEY_ID || 'mock_key',
-          amount: razorpayOrder.amount,
-          currency: 'INR',
-          name: 'DRIEDIT',
-          description: 'Order Payment',
-          order_id: razorpayOrder.id,
-          handler: async function (response) {
-            try {
-              await ordersAPI.verifyPayment({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-                order_id: orderId
-              });
+      // Get Razorpay key from environment
+      const razorpayKeyId = process.env.REACT_APP_RAZORPAY_KEY_ID;
 
-              await cartAPI.clear();
-              window.dispatchEvent(new Event('cartUpdated'));
-              navigate(`/order-success/${orderId}`);
-            } catch (error) {
-              toast.error('Payment verification failed');
-              setProcessing(false);
-            }
-          },
-          prefill: {
-            name: address.name,
-            contact: address.phone
-          },
-          theme: {
-            color: '#E10600'
-          },
-          modal: {
-            ondismiss: function () {
-              setProcessing(false);
-            }
-          }
-        };
-
-        const razorpay = new window.Razorpay(options);
-        razorpay.open();
-      } else {
-        // Mock payment for development (Razorpay SDK not loaded)
-        toast.success('Mock payment successful (development mode)');
+      // Check if this is a mock payment (no real keys configured)
+      if (razorpayOrder.mock || !razorpayKeyId) {
+        console.log('Razorpay running in mock mode');
+        toast.info('Payment simulated (test mode)');
+        
         await ordersAPI.verifyPayment({
           razorpay_order_id: razorpayOrder.id,
-          razorpay_payment_id: 'mock_payment_id',
+          razorpay_payment_id: `pay_mock_${Date.now()}`,
           razorpay_signature: 'mock_signature',
           order_id: orderId
         });
+        
         await cartAPI.clear();
         window.dispatchEvent(new Event('cartUpdated'));
         navigate(`/order-success/${orderId}`);
+        return;
       }
 
+      // Check if Razorpay SDK is loaded
+      if (!window.Razorpay) {
+        throw new Error('Razorpay SDK not loaded. Please refresh the page.');
+      }
+
+      const options = {
+        key: razorpayKeyId,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency || 'INR',
+        name: 'DRIEDIT',
+        description: `Order #${orderId}`,
+        order_id: razorpayOrder.id,
+        handler: async function (response) {
+          try {
+            // Verify payment signature on backend
+            const verifyRes = await ordersAPI.verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              order_id: orderId
+            });
+
+            if (verifyRes.data.verified) {
+              await cartAPI.clear();
+              window.dispatchEvent(new Event('cartUpdated'));
+              toast.success('Payment successful!');
+              navigate(`/order-success/${orderId}`);
+            } else {
+              throw new Error('Payment verification failed');
+            }
+          } catch (error) {
+            console.error('Payment verification error:', error);
+            toast.error('Payment verification failed. Please contact support.');
+            setProcessing(false);
+          }
+        },
+        prefill: {
+          name: address.name,
+          contact: address.phone,
+          email: user?.email || ''
+        },
+        notes: {
+          order_id: orderId,
+          customer_name: address.name
+        },
+        theme: {
+          color: '#E10600'
+        },
+        modal: {
+          ondismiss: function () {
+            toast.warning('Payment cancelled');
+            setProcessing(false);
+          },
+          escape: true,
+          confirm_close: true
+        }
+      };
+
+      const razorpay = new window.Razorpay(options);
+      
+      razorpay.on('payment.failed', function (response) {
+        console.error('Payment failed:', response.error);
+        toast.error(`Payment failed: ${response.error.description}`);
+        setProcessing(false);
+      });
+      
+      razorpay.open();
+
     } catch (error) {
+      console.error('Razorpay payment error:', error);
       throw error;
     }
   };
