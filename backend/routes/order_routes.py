@@ -140,6 +140,12 @@ async def verify_payment(data: RazorpayVerification, request: Request):
                 "updated_at": datetime.now(timezone.utc)
             }}
         )
+        
+        # Send confirmation email (non-blocking)
+        updated_order = await db.orders.find_one({"order_id": data.order_id}, {"_id": 0})
+        if updated_order:
+            asyncio.create_task(send_order_confirmation(updated_order, user.get("email", "")))
+        
         return {"verified": True, "mock": True}
     
     # REAL PAYMENT VERIFICATION
@@ -171,6 +177,11 @@ async def verify_payment(data: RazorpayVerification, request: Request):
                 "updated_at": datetime.now(timezone.utc)
             }}
         )
+        
+        # Send confirmation email (non-blocking)
+        updated_order = await db.orders.find_one({"order_id": data.order_id}, {"_id": 0})
+        if updated_order:
+            asyncio.create_task(send_order_confirmation(updated_order, user.get("email", "")))
         
         return {"verified": True, "payment_id": data.razorpay_payment_id}
         
