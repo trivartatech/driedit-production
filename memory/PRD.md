@@ -20,150 +20,53 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 
 ## What's Been Implemented ✅
 
-### Phase 1: Foundation (Completed)
-- [x] Project scaffolding (React + FastAPI + MongoDB)
-- [x] Gen-Z aesthetic UI design (black/white/red theme)
-- [x] Database models for all collections
-- [x] CORS and security middleware
+### Phase 1-7: Core E-commerce (Completed)
+- Full authentication (Email/Password + Google OAuth)
+- Product catalog with categories and filters
+- Wishlist and cart systems
+- Checkout flow with Razorpay (test mode) and COD
+- Order management and tracking
+- Admin dashboard with full CRUD operations
+- Customer return request flow
 
-### Phase 2: Authentication (Completed)
-- [x] Email/Password registration and login
-- [x] Google OAuth integration (Emergent Auth)
-- [x] JWT token management with httpOnly cookies
-- [x] Rate limiting on auth endpoints
-- [x] Role-based access control (user/admin)
-- [x] Security hardening (generic error messages)
+### Phase 8: Product Image Upload (Completed)
+- Server-side image storage
+- Admin image upload UI
+- Max 5MB per image, max 5 images per product
 
-### Phase 3: Product Management (Completed)
-- [x] Products API (CRUD operations)
-- [x] Categories API
-- [x] Product listing page with filters
-- [x] Product detail page with image gallery
-- [x] Stock management
-- [x] Sales count tracking
+### Phase 9: Email Notifications (Completed - PENDING API KEY)
+- Resend integration for transactional emails
+- Order confirmation, shipping, delivery notifications
+- **STATUS**: Code complete, awaiting RESEND_API_KEY
 
-### Phase 4: Customer Features (Completed)
-- [x] Wishlist system (backend-driven)
-- [x] Backend Cart system with full CRUD
-- [x] Cart page with real-time updates
-- [x] Header cart/wishlist count badges
+### Phase 10: Discount Coupon System (Completed)
+- Percentage and Fixed amount coupons
+- Min order value, max discount, usage limits
+- Admin management with usage statistics
+- Checkout integration
+- **Tested**: 23/23 tests passed
 
-### Phase 5: Checkout Flow (Completed)
-- [x] Checkout page with address form
-- [x] Pincode validation API
-- [x] GST calculation (public endpoint)
-- [x] Shipping charge calculation
-- [x] COD payment option
-- [x] Razorpay integration (TEST MODE - requires production keys)
-- [x] Order creation API
-- [x] Order success page
-- [x] My Orders page with order history
+### Phase 11: Forgot Password Flow (Completed)
+- Secure token-based reset
+- 1-hour expiry
+- Email enumeration protection
+- **Tested**: All tests passed
 
-### Phase 6: Reviews System (Completed)
-- [x] Review submission API
-- [x] Verified buyer badge
-- [x] Product reviews display
-- [x] Star rating system (1-5 stars)
-- [x] One review per user per product restriction
+### Phase 12: User Reviews System (Completed)
+- Star rating (1-5)
+- Verified buyer badge
+- One review per user per product
 
-### Phase 7: Admin Dashboard (Completed)
-- [x] Admin-only route protection
-- [x] Dashboard with stats overview (Revenue, Orders, Products, Low Stock)
-- [x] **Orders Management**
-  - [x] View all orders with search and filter
-  - [x] Update order status (Pending → Confirmed → Shipped → Delivered)
-  - [x] Add tracking ID and courier info
-  - [x] View order details (items, customer info, pricing)
-- [x] **Products Management**
-  - [x] View products grid with stock indicators
-  - [x] Add new products with images, sizes, pricing
-  - [x] Edit/Delete products
-  - [x] Low stock alerts
-- [x] **Categories Management**
-  - [x] View, Add, Edit, Delete categories
-- [x] **Pincode & GST Management**
-  - [x] View/Add/Edit/Delete serviceable pincodes
-  - [x] Set shipping charges per pincode
-  - [x] Toggle COD availability
-  - [x] Update global GST percentage
-- [x] **Hero Banner Management**
-  - [x] View, Add, Edit, Delete banners
-  - [x] Set image URL, button text, redirect URL
-  - [x] Enable/Disable banners
-  - [x] Set display order
-- [x] **Popup Management**
-  - [x] View, Add, Edit, Delete popups
-  - [x] Set title, description, image, button
-  - [x] Display type configuration
-  - [x] Enable/Disable popups
-- [x] **Returns Management**
-  - [x] View all return requests
-  - [x] Approve/Reject returns
-  - [x] Add admin notes
-  - [x] Filter by status
-
-### Phase 8: Customer Return Request Flow (Completed)
-- [x] Return eligibility check API (7-day window from delivery)
-- [x] Return request creation API with validation
-- [x] Per-item return selection
-- [x] Return reason selection (7 options)
-- [x] Optional comments field
-- [x] Optional image upload (recommended for damaged/defective)
-- [x] Duplicate return prevention
-- [x] Return status badges on My Orders page
-- [x] "Days remaining" indicator for return window
-- [x] "Return request pending review" status display
-- [x] Mobile-first Return Request Modal
-
-### Phase 9: Product Image Upload (Completed)
-- [x] Server-side image storage in `/uploads/products/`
-- [x] Image upload API with validation (JPG, PNG, WebP, GIF)
-- [x] Max 5MB per image, max 5 images per product
-- [x] Unique filename generation (UUID-based)
-- [x] Image preview grid in admin panel
-- [x] Support for both file upload and URL input
-- [x] Image deletion API
-- [x] Static file serving with caching headers
-
-### Phase 10: Email Notifications (Completed - PENDING API KEY)
-- [x] Email service with Resend integration
-- [x] Order confirmation email (on payment success)
-- [x] Order shipped email (with tracking ID)
-- [x] Order delivered email
-- [x] Return approved email
-- [x] Return rejected email
-- [x] Non-blocking email sending (asyncio.create_task)
-- [x] DRIEDIT branded HTML templates
-- [x] Graceful fallback when email not configured
-- **⚠️ STATUS**: Code complete, awaiting RESEND_API_KEY in backend/.env
-
-### Phase 11: Discount Coupon System (Completed - Feb 14, 2026)
-- [x] Percentage and Fixed amount coupons
-- [x] Min order value requirement
-- [x] Max discount cap for percentage coupons
-- [x] Global usage limit
-- [x] One-time per user restriction
-- [x] Expiry date support
-- [x] Active/Inactive toggle
-- [x] Admin management panel with stats
-  - Active coupons count
-  - Total redemptions
-  - Total discount given
-  - Per-coupon usage history
-- [x] Usage history tracking
-- [x] Checkout integration with discount display
-- **Tested**: 23/23 backend tests passed, 100% frontend tests passed
-
-### Phase 12: Forgot Password Flow (Completed - Feb 14, 2026)
-- [x] Forgot password page
-- [x] Secure token generation (SHA256 hashed)
-- [x] 1-hour token expiry
-- [x] Password reset email template
-- [x] Reset password page with validation
-- [x] One-time token use
-- [x] Auto-invalidate old tokens
-- [x] Email enumeration protection
-- **Tested**: All backend tests passed, frontend UI verified
+### Phase 13: Tier-Based Shipping System (Completed - Feb 14, 2026)
+- **NEW**: Replaced pincode-based shipping with tier-based system
+- Shipping calculated on **subtotal BEFORE GST**
+- Admin CRUD for shipping tiers
+- Overlap validation to prevent conflicting ranges
+- **Default Tiers**:
+  - ₹0 - ₹499: ₹80 shipping
+  - ₹500 - ₹999: ₹50 shipping
+  - ₹1,000+: FREE shipping
+- **Tested**: 22/23 backend tests passed
 
 ---
 
@@ -171,6 +74,7 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 
 ### P1 - High Priority
 - [ ] Activate email notifications (add RESEND_API_KEY)
+- [ ] Verify Resend domain for production emails
 
 ### P2 - Nice to Have
 - [ ] Email verification for new registrations
@@ -196,75 +100,39 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 
 | Integration | Status | Notes |
 |-------------|--------|-------|
-| Razorpay | ✅ TEST MODE | Working with test keys. Add production keys for live payments |
-| Resend Email | ⚠️ PENDING | Code complete. Add RESEND_API_KEY to activate |
-| Google OAuth | ✅ ACTIVE | Via Emergent Auth system |
+| Razorpay | ✅ TEST MODE | Working with test keys |
+| Resend Email | ⚠️ PENDING | Code complete, needs API key |
+| Google OAuth | ✅ ACTIVE | Via Emergent Auth |
 
 ---
 
-## API Endpoints Summary
+## Key API Endpoints
 
-### Public
-- `GET /api/admin/public/banners` - Active banners
-- `GET /api/admin/public/gst` - GST percentage
-- `POST /api/public/check-pincode` - Check delivery
+### Shipping Tiers (NEW)
+- `GET /api/shipping-tiers/calculate?subtotal={amount}` - Calculate shipping
+- `GET /api/shipping-tiers/all-active` - Get active tiers (public)
+- `GET /api/shipping-tiers/admin/all` - Get all tiers (admin)
+- `POST /api/shipping-tiers/admin/create` - Create tier (admin)
+- `PUT /api/shipping-tiers/admin/{id}` - Update tier (admin)
+- `DELETE /api/shipping-tiers/admin/{id}` - Delete tier (admin)
+- `PUT /api/shipping-tiers/admin/{id}/toggle` - Toggle status (admin)
 
 ### Auth
 - `POST /api/auth/register`, `/api/auth/login`, `/api/auth/logout`
-- `GET /api/auth/me`
-- `POST /api/auth/forgot-password`
-- `POST /api/auth/reset-password`
-- `GET /api/auth/verify-reset-token/{token}`
+- `POST /api/auth/forgot-password`, `/api/auth/reset-password`
 
 ### Products & Categories
 - `GET/POST/PUT/DELETE /api/products`
 - `GET/POST/PUT/DELETE /api/categories`
 
-### Reviews
-- `GET /api/reviews/product/{product_id}` - Get product reviews
-- `POST /api/reviews` - Create review (authenticated)
-- `DELETE /api/reviews/admin/{id}` - Delete review (admin)
-
-### Cart
-- `GET/POST/PUT/DELETE /api/cart/*`
-
 ### Orders
-- `POST /api/orders` - Create order
+- `POST /api/orders` - Create order (uses tier-based shipping)
 - `GET /api/orders` - User's orders
-- `GET /api/orders/payment-config` - Get payment gateway status
-- `POST /api/orders/create-razorpay-order` - Create Razorpay order
-- `POST /api/orders/verify-payment` - Verify payment signature
-- `GET /api/orders/admin/all` - All orders (Admin)
-- `PUT /api/orders/admin/{id}/status` - Update status (Admin)
-- `PUT /api/orders/admin/{id}/tracking` - Add tracking (Admin)
-
-### Returns
-- `GET /api/returns/check-eligibility/{order_id}` - Check return eligibility
-- `POST /api/returns` - Submit return request
-- `GET /api/returns/my-requests` - User's return requests
-- `GET /api/returns/admin/all` - All returns (Admin)
-- `PUT /api/returns/admin/{id}/status` - Update return status (Admin)
-
-### Uploads
-- `POST /api/uploads/product-image` - Upload single product image (Admin)
-- `POST /api/uploads/product-images` - Upload multiple images (Admin)
-- `GET /api/uploads/images/{filename}` - Serve uploaded image
-- `DELETE /api/uploads/images/{filename}` - Delete image (Admin)
+- Admin order management endpoints
 
 ### Coupons
-- `POST /api/coupons/validate` - Validate coupon for order
-- `POST /api/coupons/admin/create` - Create coupon (Admin)
-- `GET /api/coupons/admin/all` - Get all coupons (Admin)
-- `GET /api/coupons/admin/{id}` - Get coupon details (Admin)
-- `PUT /api/coupons/admin/{id}` - Update coupon (Admin)
-- `DELETE /api/coupons/admin/{id}` - Delete coupon (Admin)
-- `PUT /api/coupons/admin/{id}/toggle` - Toggle status (Admin)
-
-### Admin
-- `GET/POST/PUT/DELETE /api/admin/pincodes`
-- `GET/PUT /api/admin/gst`
-- `GET/POST/PUT/DELETE /api/admin/banners`
-- `GET/POST/PUT/DELETE /api/admin/popups`
+- `POST /api/coupons/validate` - Validate coupon
+- Admin coupon CRUD endpoints
 
 ---
 
@@ -273,50 +141,24 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 /app
 ├── backend/
 │   ├── routes/
-│   │   ├── auth_routes.py
-│   │   ├── product_routes.py
-│   │   ├── cart_routes.py
-│   │   ├── order_routes.py
-│   │   ├── admin_routes.py
-│   │   ├── return_routes.py
-│   │   ├── review_routes.py
+│   │   ├── shipping_tier_routes.py  # NEW
 │   │   ├── coupon_routes.py
 │   │   ├── password_reset_routes.py
-│   │   ├── upload_routes.py
-│   │   └── public_routes.py
+│   │   ├── order_routes.py  # Updated for tier shipping
+│   │   └── ... (other routes)
 │   ├── services/
 │   │   └── email_service.py
-│   ├── models.py
-│   ├── server.py
-│   ├── auth.py
-│   └── uploads/products/
+│   ├── models.py  # Added ShippingTier models
+│   └── server.py
 ├── frontend/
 │   ├── src/
 │   │   ├── pages/
-│   │   │   ├── HomePage.jsx
-│   │   │   ├── ProductsPage.jsx
-│   │   │   ├── ProductDetailPage.jsx
-│   │   │   ├── CartPage.jsx
-│   │   │   ├── CheckoutPage.jsx
-│   │   │   ├── OrderSuccessPage.jsx
-│   │   │   ├── MyOrdersPage.jsx
-│   │   │   ├── ForgotPasswordPage.jsx
-│   │   │   ├── ResetPasswordPage.jsx
-│   │   │   └── admin/
-│   │   │       ├── AdminLayout.jsx
-│   │   │       ├── AdminDashboard.jsx
-│   │   │       ├── AdminOrders.jsx
-│   │   │       ├── AdminProducts.jsx
-│   │   │       ├── AdminCategories.jsx
-│   │   │       ├── AdminPincode.jsx
-│   │   │       ├── AdminBanners.jsx
-│   │   │       ├── AdminPopups.jsx
-│   │   │       ├── AdminReturns.jsx
-│   │   │       └── AdminCoupons.jsx
-│   │   ├── components/
-│   │   │   └── ReturnRequestModal.jsx
-│   │   ├── services/api.js
-│   │   └── context/AuthContext.jsx
+│   │   │   ├── admin/
+│   │   │   │   ├── AdminShippingTiers.jsx  # NEW
+│   │   │   │   └── ...
+│   │   │   ├── CheckoutPage.jsx  # Updated for tier shipping
+│   │   │   └── ...
+│   │   └── services/api.js  # Added shippingAPI
 │   └── .env
 └── memory/PRD.md
 ```
@@ -324,13 +166,32 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 ---
 
 ## Testing Results (Feb 14, 2026)
-- **Coupon System**: 23/23 backend tests passed, 100% frontend tests passed
+- **Shipping Tiers**: 22/23 backend tests passed (1 rate-limit issue during testing)
+- **Coupon System**: 23/23 tests passed
 - **Password Reset**: All tests passed
-- **Return Flow**: 15/15 tests passed
-- **Access Control**: Working (401 for unauth, 403 for non-admin)
+- **Admin UI**: All verified working
+
+---
+
+## Shipping Tier Logic
+
+```
+Order Subtotal (before GST) → Find matching tier → Apply shipping charge
+
+Example:
+- Subtotal: ₹1,000
+- GST (5%): ₹50  
+- Shipping (₹1000+ tier): ₹0 (FREE)
+- Total: ₹1,050
+```
+
+The tier lookup uses:
+```
+min_amount <= subtotal <= max_amount (or no max for unlimited)
+```
 
 ---
 
 ## Last Updated
 **Date**: February 14, 2026
-**Session**: Testing & verification of Coupon System, Forgot Password, and User Reviews
+**Session**: Implemented tier-based shipping system with Admin UI
