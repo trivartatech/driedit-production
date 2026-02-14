@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Trash2, Plus, Minus, ShoppingBag, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { cartAPI, adminAPI } from '../services/api';
+import { cartAPI, publicAPI } from '../services/api';
 import { toast } from 'sonner';
 
 const formatPrice = (price) => {
