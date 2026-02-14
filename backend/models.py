@@ -185,6 +185,7 @@ class Product(BaseModel):
     stock: int
     images: List[str]
     description: str
+    size_chart_pdf: Optional[str] = None  # Path to size chart PDF
     sales_count: int = 0
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
@@ -197,6 +198,7 @@ class ProductCreate(BaseModel):
     stock: int
     images: List[str]
     description: str
+    size_chart_pdf: Optional[str] = None
 
 class ProductUpdate(BaseModel):
     title: Optional[str] = None
@@ -207,6 +209,7 @@ class ProductUpdate(BaseModel):
     stock: Optional[int] = None
     images: Optional[List[str]] = None
     description: Optional[str] = None
+    size_chart_pdf: Optional[str] = None
 
 # Order Models
 class OrderItem(BaseModel):
