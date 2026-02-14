@@ -64,21 +64,76 @@ const LoginPage = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <h2 className="text-2xl font-bold mb-4">Welcome Back</h2>
-          <p className="text-gray-400 mb-6">Sign in to continue shopping</p>
+          <h2 className="text-2xl font-bold mb-6">Welcome Back</h2>
 
+          {/* Email/Password Form */}
+          <form onSubmit={handleEmailLogin} className="space-y-4 mb-6">
+            <div>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email"
+                  required
+                  className="w-full bg-white/5 border border-white/10 pl-12 pr-4 py-3 focus:outline-none focus:border-[#E10600] text-white placeholder-gray-500"
+                />
+              </div>
+            </div>
+            
+            <div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                  required
+                  minLength="8"
+                  className="w-full bg-white/5 border border-white/10 pl-12 pr-4 py-3 focus:outline-none focus:border-[#E10600] text-white placeholder-gray-500"
+                />
+              </div>
+            </div>
+
+            <motion.button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#E10600] text-white py-3 font-bold hover:bg-white hover:text-black transition-all duration-300 disabled:opacity-50"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {loading ? 'SIGNING IN...' : 'SIGN IN'}
+            </motion.button>
+          </form>
+
+          {/* Divider */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/10"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white/5 text-gray-400">OR</span>
+            </div>
+          </div>
+
+          {/* Google Login */}
           <motion.button
-            onClick={handleLogin}
-            className="w-full bg-white text-black py-4 font-bold flex items-center justify-center space-x-2 hover:bg-[#E10600] hover:text-white transition-all duration-300"
+            onClick={handleGoogleLogin}
+            className="w-full bg-white text-black py-3 font-bold flex items-center justify-center space-x-2 hover:bg-gray-200 transition-all duration-300"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
             <LogIn size={20} />
-            <span>SIGN IN WITH GOOGLE</span>
+            <span>CONTINUE WITH GOOGLE</span>
           </motion.button>
 
-          <p className="text-xs text-gray-500 mt-4">
-            By signing in, you agree to our Terms of Service and Privacy Policy
+          <p className="text-xs text-gray-500 mt-6">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-[#E10600] hover:underline font-bold">
+              Register
+            </Link>
           </p>
         </motion.div>
 
