@@ -349,7 +349,7 @@ async def update_order_status(order_id: str, data: OrderStatusUpdate, request: R
     old_status = order.get("order_status")
     new_status = data.order_status.value
     
-    result = await db.orders.update_one(
+    await db.orders.update_one(
         {"order_id": order_id},
         {"$set": {
             "order_status": new_status,
