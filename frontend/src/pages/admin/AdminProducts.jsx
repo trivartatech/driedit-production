@@ -488,23 +488,27 @@ const AdminProducts = () => {
 
                 <div>
                   <label className="block text-sm text-gray-400 mb-2">Sizes *</label>
-                  <div className="flex flex-wrap gap-2">
-                    {SIZE_OPTIONS.map(size => (
-                      <button
-                        key={size}
-                        type="button"
-                        onClick={() => handleSizeToggle(size)}
-                        className={`px-3 py-1 text-sm font-bold border transition-colors ${
-                          formData.sizes.includes(size)
-                            ? 'bg-[#E10600] border-[#E10600] text-white'
-                            : 'border-white/10 hover:border-white/30'
-                        }`}
-                        data-testid={`size-option-${size}`}
-                      >
-                        {size}
-                      </button>
-                    ))}
-                  </div>
+                  {availableSizes.length === 0 ? (
+                    <p className="text-yellow-500 text-sm">No sizes available. Please add sizes in Size Management.</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {availableSizes.map(size => (
+                        <button
+                          key={size.size_id}
+                          type="button"
+                          onClick={() => handleSizeToggle(size.name)}
+                          className={`px-3 py-1 text-sm font-bold border transition-colors ${
+                            formData.sizes.includes(size.name)
+                              ? 'bg-[#E10600] border-[#E10600] text-white'
+                              : 'border-white/10 hover:border-white/30'
+                          }`}
+                          data-testid={`size-option-${size.name}`}
+                        >
+                          {size.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Image Upload Section */}
