@@ -108,9 +108,26 @@ const Header = () => {
                 )}
               </Link>
               
-              <button className="hidden md:block hover:text-[#E10600] transition-colors">
-                <User size={20} />
-              </button>
+              {isAuthenticated ? (
+                <div className="hidden md:flex items-center space-x-2">
+                  {user?.role === 'admin' && (
+                    <Link to="/admin" className="text-sm font-bold hover:text-[#E10600] transition-colors">
+                      ADMIN
+                    </Link>
+                  )}
+                  <button 
+                    onClick={handleLogout}
+                    className="hover:text-[#E10600] transition-colors"
+                    title="Logout"
+                  >
+                    <LogOut size={20} />
+                  </button>
+                </div>
+              ) : (
+                <Link to="/login" className="hidden md:block hover:text-[#E10600] transition-colors">
+                  <User size={20} />
+                </Link>
+              )}
 
               {/* Mobile Menu Button */}
               <button 
