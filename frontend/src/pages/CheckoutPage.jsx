@@ -318,7 +318,7 @@ const CheckoutPage = () => {
     navigate(`/order-success/${orderRes.data.order_id}`);
   };
 
-  const { subtotal, gstAmount, shipping, total } = calculateTotals();
+  const { subtotal, gstAmount, shipping, discount, total } = calculateTotals();
 
   if (loading) {
     return (
