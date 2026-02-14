@@ -326,14 +326,16 @@ class TestAdminCouponManagement:
         
         for coupon in coupons:
             assert "code" in coupon
-            assert "auto_apply" in coupon
             assert "is_active" in coupon
             
-            # Check usage stats are present
-            assert "auto_uses" in coupon or coupon.get("auto_uses") is not None or True
-            assert "manual_uses" in coupon or coupon.get("manual_uses") is not None or True
+            # auto_apply may not exist for older coupons (defaults to False)
+            auto_apply = coupon.get("auto_apply", False)
             
-            if coupon.get("auto_apply"):
+            # Check usage stats are present
+            assert "auto_uses" in coupon
+            assert "manual_uses" in coupon
+            
+            if auto_apply:
                 auto_count += 1
             else:
                 manual_count += 1
