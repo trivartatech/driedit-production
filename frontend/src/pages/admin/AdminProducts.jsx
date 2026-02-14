@@ -26,6 +26,7 @@ const INITIAL_PRODUCT = {
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [availableSizes, setAvailableSizes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -35,7 +36,9 @@ const AdminProducts = () => {
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
   const fileInputRef = useRef(null);
+  const pdfInputRef = useRef(null);
 
   useEffect(() => {
     fetchData();
@@ -44,12 +47,14 @@ const AdminProducts = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [productsRes, categoriesRes] = await Promise.all([
+      const [productsRes, categoriesRes, sizesRes] = await Promise.all([
         productsAPI.getAll(categoryFilter ? { category: categoryFilter } : {}),
-        categoriesAPI.getAll()
+        categoriesAPI.getAll(),
+        sizesAPI.getActive()
       ]);
       setProducts(productsRes.data || []);
       setCategories(categoriesRes.data || []);
+      setAvailableSizes(sizesRes.data.sizes || []);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('Failed to load products');
@@ -69,7 +74,8 @@ const AdminProducts = () => {
         sizes: product.sizes || [],
         stock: product.stock,
         images: product.images || [],
-        description: product.description
+        description: product.description,
+        size_chart_pdf: product.size_chart_pdf || ''
       });
     } else {
       setEditingProduct(null);
