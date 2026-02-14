@@ -13,68 +13,65 @@ The user wants to build a complete, production-ready, scalable, minimalistic Gen
     -   My Orders page.
 -   **Admin-Controlled Product Management**: CRUD for Categories and Products, dynamic size management, dual pricing, stock tracking, product recommendations, and product image uploads.
 -   **Admin-Controlled Site Management**: Hero Banner management, Popup management, Coupon management.
--   **Payment & Logistics**: Razorpay integration, Cash on Delivery (COD), GST Management, Serviceable Pincode Management.
--   **Marketing & Communication**: Order and return status email notifications.
+-   **Payment & Logistics**: Razorpay integration, Cash on Delivery (COD), Tier-based shipping, GST Management.
+-   **Marketing & Communication**: Order and return status email notifications via Resend.
 -   **User Account Management**: Forgot Password flow.
 -   **Admin Dashboard**: A comprehensive dashboard to manage all features.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The application is a nearly complete e-commerce platform. It features a full-stack architecture with a React frontend and FastAPI backend.
-
--   **Core User Flow**: Users can browse products, manage a backend-driven cart, check out using Razorpay (live test mode) or COD, view their order history, and request returns/replacements for delivered items.
--   **Admin Dashboard**: A comprehensive, role-protected admin panel allows for full management of products (including image uploads), categories, orders, logistics (pincodes/GST), site content (banners), and a full-featured discount coupon system.
--   **Key Systems**:
-    -   **Payments**: Razorpay is fully integrated with backend signature verification and is running in test mode with provided keys.
-    -   **Returns**: A customer-facing return request flow is complete, allowing users to request returns from the My Orders page.
-    -   **Image Management**: Admins can now upload product images directly to the server, replacing the old URL-based system.
-    -   **Coupons**: A complete discount coupon system is in place, with admin management and checkout integration.
-    -   **Account Recovery**: A secure Forgot Password flow using email-based tokens is implemented.
-    -   **Email Notifications**: The backend is integrated with Resend for transactional emails (order confirmation, shipping updates, etc.), but it is currently inactive, awaiting a production API key.
+A feature-complete e-commerce platform built with React, FastAPI, and MongoDB. The application includes:
+-   **Full Commerce Flow**: User registration/login, product browsing, cart management, and a complete checkout process using Razorpay (test mode) or COD.
+-   **Advanced Pricing Engine**: Implements GST, a dynamic tier-based shipping system, and a hybrid coupon engine supporting both manual and automatic (best discount) coupon application. The pricing order is correctly set: .
+-   **Admin Panel**: A comprehensive, role-protected dashboard for managing products, categories, orders, returns, shipping tiers, and coupons.
+-   **Post-Purchase**: Users can view order history and request returns for delivered items.
+-   **Key Systems**: Secure authentication (JWT & Google), product image uploads, and a Forgot Password flow are fully implemented and tested.
+-   **Email Notifications**: The Resend integration for transactional emails has been coded and the necessary API key and verified domain have just been added to the environment.
 
 **Last working item**:
--   Last item agent was working: The agent implemented two major features requested by the user: a comprehensive **Discount Coupon System** and a secure **Forgot Password Flow**. The implementation included backend models, API routes, admin UI for coupon management, and frontend integration on the checkout and login pages.
--   Status: USER VERIFICATION PENDING
--   Agent Testing Done: Y (Verified via screenshots and manual API calls)
--   Which testing method agent to use? both
+-   Last item agent was working: Activating the transactional email system by adding the  and the verified domain () to the backend environment, as per the user's instruction.
+-   Status: IN PROGRESS
+-   Agent Testing Done: N
+-   Which testing method agent to use? backend testing agent
 -   User Testing Done: N
 
 **All Pending/In progress Issue list**:
--   **Issue 1: Activate and Test Email Notification System (P0)**
-    -   **Description**: The entire email notification system using Resend has been coded and integrated for order confirmations, status updates, and return processing. However, it is not functional as it's missing the .
-    -   **Status**: BLOCKED
-    -   **Why fix this issue?**: Activating emails is a critical step for professionalizing the customer experience, improving trust and transparency.
+-   **Issue 1: Test and Verify Email Notification System (P0)**
+    -   **Description**: The Resend email system has been configured with an API key and a verified domain, but it has not been tested. The system is designed to send emails for order confirmations, status updates, and password resets. The previous limitation of using  has been addressed.
+    -   **Attempted fixes**: The agent successfully added the  and  () to .
     -   **Next debug checklist**:
-        1.  Confirm with the user that the  has been added to the  file.
-        2.  Place a test order to trigger the order confirmation email.
-        3.  Check the backend logs for Email sent successfully messages or any API errors from Resend.
-        4.  Update an order's status to Shipped in the admin panel and verify the shipping notification email is triggered.
-        5.  Ask the user to confirm they have received the test emails.
+        1.  Restart the backend service to ensure it loads the new environment variables (already done by the previous agent).
+        2.  Trigger an email-sending action. The easiest is the Forgot Password flow for the test user .
+        3.  Execute a  command to the  endpoint.
+        4.  Check the backend logs () for either a success message from  or an error response from the Resend API.
+        5.  If successful, ask the user to confirm receipt of the email. If it fails, debug based on the error message.
+    -   **Why fix this issue and what will be achieved with the fix?**: This is the final step to enable a critical feature for customer communication, enhancing the platform's professionalism and user trust.
+    -   **Status**: IN PROGRESS
+    -   **Is recurring issue?**: N
+    -   **Should Test frontend/backend/both after fix?**: backend
+    -   **Blocked on other issue**: None
 
 **In progress Task List**:
 -   None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks**:
-    -   (P1) **Admin Coupon Stats**: Enhance the  page to show usage statistics for each coupon (e.g., total redemptions, total discount amount).
-    -   (P1) **User Reviews**: Implement a system for verified buyers to leave reviews on products.
+    -   (P1) **Basic Analytics Dashboard**: Implement an admin dashboard for tracking key metrics like Revenue, Average Order Value (AOV), and conversion rates.
+    -   (P2) **Production Deployment Checklist**: Prepare and execute a checklist for moving the application to a live production environment.
 -   **Future Tasks**:
     -   (P2) **Email Verification**: Add an email verification step on user signup.
-    -   (P2) **Basic Analytics**: Implement basic analytics tracking for sales and user behavior.
-    -   (P3) **SMS Notifications**: Integrate an SMS provider for order updates as a Phase 2 scaling feature.
-    -   (P3) **Production Deployment Checklist**: Prepare and execute a checklist for moving the application to a live production environment.
+    -   (P3) **SMS Notifications**: Integrate an SMS provider for order updates.
 
 **Completed work in this session**
--   **Customer Return Request Flow**: Fully implemented, allowing users to request returns for eligible orders.
--   **Razorpay Live Integration**: Successfully integrated Razorpay with test keys, backend signature verification, and completed a successful test transaction.
--   **Product Image File Upload**: Replaced the URL-based image system with a file upload system, storing images on the server and updating the admin product management UI.
--   **Order Email Notification System**: Coded and integrated  for transactional emails. The system is ready for activation once the API key is provided.
--   **Discount Coupon System**: Built a complete coupon management system with admin CRUD, flexible rules (min value, expiry, etc.), and checkout integration.
--   **Forgot Password Flow**: Implemented a secure, token-based password reset mechanism via email.
+-   **Tier-Based Shipping System**: Implemented a dynamic, admin-manageable shipping fee system based on order subtotal, replacing the old pincode-based logic.
+-   **Hybrid Coupon Engine**: Upgraded the coupon system to support both manual codes and auto-applied promotional coupons, with logic to apply the best available discount. The pricing calculation order () was also corrected.
+-   **Full System Verification**: Conducted comprehensive testing using the  on the Coupon System, Forgot Password Flow, Tier-Based Shipping, and Hybrid Coupon features, ensuring their stability and correctness.
+-   **Feature Discovery**: Investigated and confirmed that the User Reviews and Admin Coupon Statistics features were already fully implemented, preventing redundant work.
+-   **Email System Activation**: Began the process of activating the Resend email service by adding the user-provided API key and verified domain.
 
 **Earlier issues found/mentioned but not fixed**
--   None. All debugging issues related to admin login and database mismatches were resolved during the session.
+-   None.
 
 **Known issue recurrence from previous fork**
 -   None.
@@ -92,65 +89,75 @@ The application is a nearly complete e-commerce platform. It features a full-sta
 
 **key DB schema**
 -   **users**: , , , , , , 
--   **orders**: , , , , , , , , 
--   **products**: , , , , , , ,  (now stores paths)
--   **coupons**: , , , , , , , , , , 
+-   **orders**: , , , , , , , , , , , , 
+-   **products**: , , , , , , , 
+-   **coupons**: , , , , , , , , , , , , 
 -   **returns**: , , , , 
+-   **shipping_tiers**: , , , 
 
 **changes in tech stack**
--   Added **Resend** for transactional emails.
+-   Resend for transactional emails was activated (pending testing).
 
 **All files of reference**
--   **New Backend Files**: , 
--   **New Frontend Files**: , , 
--   **Heavily Modified Files**: , , , , , , , 
+-   **New Backend Files**: 
+-   **New Frontend Files**: 
+-   **Heavily Modified Files**:
+    -    (added ShippingTier, updated Coupon/Order)
+    -    (added shipping router)
+    -    (updated pricing and shipping logic)
+    -    (added auto-apply logic)
+    -    (updated pricing display and logic)
+    -    (added auto-apply toggle)
+    -    (added shipping/coupon endpoints)
+    -    (added link to new shipping page)
 
 **Areas that need refactoring**:
 -   None.
 
 **key api endpoints**
--   
--    (Full CRUD for coupons)
--   
--   
--   
+-    (CRUD for shipping tiers)
+-    (GET endpoint to find the best auto-applicable coupon)
+-    (POST endpoint for manual coupon application)
+-    (POST endpoint to trigger password reset email)
 
 **Critical Info for New Agent**
--   Your immediate next task is to **activate the email notification system**. This is currently blocked pending the user adding the  to the  file. You should start by confirming if the key is present and then proceed to test the various email triggers (order confirmation, shipping, etc.).
--   The user has confirmed they will add the API key securely themselves. Do not ask for the key in the chat.
--   The Coupon System and Forgot Password flow are functionally complete but have only been visually verified. A full testing cycle using the testing agent is recommended to ensure their stability and check for regressions.
+-   Your immediate task is to **test the Resend email notification system**. The configuration is done, but functionality is unverified. Use the Forgot Password feature as a quick test case. Check logs for success or failure.
+-   Once email is confirmed to be working, propose the next steps to the user, with the **Analytics Dashboard** being the highest priority upcoming task.
+-   The codebase is in a very healthy state. Two major features (Tiered Shipping, Hybrid Coupons) were just added and successfully passed full-stack testing via the testing agent.
 
 **documents and test reports created in this job**
--    (Updated)
--    (Customer Return Request Flow)
+-    (Updated with new features)
+-    (Coupon & Forgot Password Flow Verification)
+-    (Tier-Based Shipping Feature Test)
+-    (Hybrid Coupon System Feature Test)
 
 **Last 10 User Messages and any pending HUMAN messages**
--   User confirmed successful Razorpay test payment.
--   User instructed the agent to proceed with Product Image Upload, storing images on the server.
--   Agent completed Product Image Upload and confirmed with screenshots.
--   User approved the implementation and instructed the agent to implement Order Email Notifications using Resend.
--   Agent implemented the Resend email service (pending API key).
--   User provided a new list of priorities: Discount Coupon System, Forgot Password Flow, and activating the Resend emails.
--   User instructed the agent to build a comprehensive Coupon system with specific rules and admin features.
--   Agent implemented both the Coupon System and Forgot Password flow.
--   Agent provided screenshots verifying the new UI for Admin Coupons, Forgot Password page, and the coupon field on the Checkout Page. The user has not yet responded to this last update.
+-   User skipped initial email testing to prioritize feature development.
+-   User provided a detailed spec for a tier-based shipping system.
+-   Agent implemented and tested the tier-based shipping system.
+-   User approved the implementation.
+-   User provided a detailed spec for a hybrid (auto/manual) coupon system with a specific pricing calculation order.
+-   Agent implemented and tested the hybrid coupon system.
+-   User approved the implementation.
+-   User instructed the agent to activate the Resend email system with the verified domain .
+-   Agent acknowledged and started adding the Resend API key and domain configuration.
 
 **Project Health Check:**
 -   **Broken**: None.
--   **Mocked**: The Resend email integration is inactive pending an API key. It's not mocked, but it's not live.
+-   **Mocked**: None. (Resend is now configured and pending final testing).
 
 **3rd Party Integrations**
 -   **Google OAuth**: Implemented via Emergent's built-in authentication system.
 -   **Razorpay**: Live in test mode. Requires User API Key for production.
 -   **bcrypt**: For password hashing.
 -   **Framer Motion**: For frontend animations.
--   **Resend**: For transactional emails. Integrated but inactive; requires User API Key.
+-   **Resend**: For transactional emails. Integrated and configured; requires User API Key and is pending final testing.
 
 **Testing status**
--   Testing agent used after significant changes: YES, for the Customer Return Flow.
+-   Testing agent used after significant changes: YES (used three times this session for major features).
 -   Troubleshoot agent used after agent stuck in loop: NO
 -   Test files created: None.
--   Known regressions: None identified.
+-   Known regressions: None. A temporary issue with the product page rendering was noted by the testing agent but was not reproducible manually, suggesting an intermittent test environment problem.
 
 **Credentials to test flow:**
 -   **Admin User**:
@@ -161,4 +168,4 @@ The application is a nearly complete e-commerce platform. It features a full-sta
     -   **Password**: 
 
 **What agent forgot to execute**
--   The agent successfully implemented all high-priority items requested by the user. The admin UI for coupon statistics was mentioned as a requirement but hasn't been implemented yet; it can be treated as the next enhancement for the coupon feature.</analysis>
+-   The agent correctly followed all user directives and did not miss any requested tasks.</analysis>
