@@ -18,7 +18,8 @@ from routes import (
     review_routes,
     return_routes,
     admin_routes,
-    public_routes
+    public_routes,
+    cart_routes
 )
 
 ROOT_DIR = Path(__file__).parent
