@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, ShoppingCart, Star, ChevronLeft, ChevronRight, Truck, RefreshCcw, Shield } from 'lucide-react';
+import { Heart, ShoppingCart, Star, ChevronLeft, ChevronRight, Truck, RefreshCcw, Shield, Loader2 } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
-import { toast } from '../hooks/use-toast';
-import { productsAPI, reviewsAPI, wishlistAPI } from '../services/api';
+import { toast } from 'sonner';
+import { productsAPI, reviewsAPI, wishlistAPI, cartAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { addToCart } from '../mockData';
 
 const formatPrice = (price) => {
   return `₹${price.toLocaleString('en-IN')}`;
