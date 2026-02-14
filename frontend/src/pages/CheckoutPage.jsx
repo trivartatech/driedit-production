@@ -189,7 +189,9 @@ const CheckoutPage = () => {
         items: orderItems,
         payment_method: paymentMethod,
         delivery_address: address,
-        pincode: pincode
+        pincode: pincode,
+        coupon_code: couponApplied?.code || null,
+        coupon_discount: couponApplied?.discount_amount || 0
       };
 
       if (paymentMethod === 'razorpay') {
