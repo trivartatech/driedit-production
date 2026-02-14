@@ -51,7 +51,7 @@ const ProductDetailPage = () => {
       fetchRelatedProducts(response.data.category_id);
     } catch (error) {
       console.error('Error fetching product:', error);
-      toast({ title: 'Product not found', variant: 'destructive' });
+      toast.error('Product not found');
       navigate('/products');
     } finally {
       setLoading(false);
