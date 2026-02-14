@@ -179,27 +179,55 @@ const CheckoutPage = () => {
 
     setCouponLoading(true);
     try {
-      const { subtotalWithGst } = calculateTotals();
-      const response = await couponsAPI.validate(couponCode, subtotalWithGst);
+      const { subtotal } = calculateTotals();
+      const response = await couponsAPI.validate(couponCode, subtotal);
       
+      // Manual coupon overrides auto coupon
       setCouponApplied({
         code: response.data.coupon_code,
         discount_amount: response.data.discount_amount,
-        message: response.data.message
+        message: response.data.message,
+        auto_apply: false
       });
+      setCouponAppliedType('manual');
       toast.success(response.data.message);
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Invalid coupon code');
-      setCouponApplied(null);
+      // On invalid manual coupon, revert to auto if available
+      if (autoCoupon) {
+        setCouponApplied({
+          code: autoCoupon.code,
+          discount_amount: autoCoupon.discount_amount,
+          message: `Auto-applied: ${autoCoupon.code}`,
+          auto_apply: true
+        });
+        setCouponAppliedType('auto');
+      } else {
+        setCouponApplied(null);
+      }
     } finally {
       setCouponLoading(false);
     }
   };
 
   const removeCoupon = () => {
-    setCouponApplied(null);
     setCouponCode('');
-    toast.info('Coupon removed');
+    
+    // If we have an auto coupon, revert to it
+    if (autoCoupon && couponAppliedType === 'manual') {
+      setCouponApplied({
+        code: autoCoupon.code,
+        discount_amount: autoCoupon.discount_amount,
+        message: `Auto-applied: ${autoCoupon.code}`,
+        auto_apply: true
+      });
+      setCouponAppliedType('auto');
+      toast.info('Reverted to auto-applied coupon');
+    } else {
+      setCouponApplied(null);
+      setCouponAppliedType('manual');
+      toast.info('Coupon removed');
+    }
   };
 
   const validateForm = () => {
