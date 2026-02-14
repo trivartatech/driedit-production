@@ -29,7 +29,8 @@ from routes import (
     shipping_tier_routes,
     analytics_routes,
     google_oauth_routes,
-    user_profile_routes
+    user_profile_routes,
+    sizes_routes
 )
 
 ROOT_DIR = Path(__file__).parent
