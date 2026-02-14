@@ -107,7 +107,7 @@ const HeroSlider = () => {
 
       {/* Dots Indicator */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
-        {activeSliders.map((_, index) => (
+        {banners.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
