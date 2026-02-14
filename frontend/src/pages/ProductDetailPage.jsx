@@ -257,37 +257,11 @@ const ProductDetailPage = () => {
     ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
     : 0;
 
-  const productUrl = window.location.href;
-  const productImage = product.images?.[0] || '';
-  const productTagline = `₹${product.discounted_price.toLocaleString('en-IN')} | ${discount > 0 ? `${discount}% OFF` : 'Best Price'} | DRIEDIT Streetwear`;
-  const pageTitle = `${product.title} | DRIEDIT`;
+  // Set meta tags for SEO & social sharing
+  useMetaTags(product, discount);
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* SEO & Social Share Meta Tags */}
-      <Helmet>
-        <title>{pageTitle}</title>
-        <meta name="description" content={product.description || ''} />
-        
-        {/* Open Graph / Facebook / WhatsApp */}
-        <meta property="og:type" content="product" />
-        <meta property="og:url" content={productUrl} />
-        <meta property="og:title" content={pageTitle} />
-        <meta property="og:description" content={productTagline} />
-        <meta property="og:image" content={productImage} />
-        <meta property="og:site_name" content="DRIEDIT - Stay Raw Stay Real" />
-        
-        {/* Product specific */}
-        <meta property="product:price:amount" content={String(product.discounted_price)} />
-        <meta property="product:price:currency" content="INR" />
-        
-        {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={pageTitle} />
-        <meta name="twitter:description" content={productTagline} />
-        <meta name="twitter:image" content={productImage} />
-      </Helmet>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <div className="text-sm text-gray-400 mb-6">
