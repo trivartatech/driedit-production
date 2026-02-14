@@ -67,7 +67,7 @@ const HeroSlider = () => {
           <div 
             className="w-full h-full bg-cover bg-center"
             style={{ 
-              backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${activeSliders[currentSlide].image})` 
+              backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${banners[currentSlide].image})` 
             }}
           >
             <div className="flex items-center justify-center h-full">
@@ -78,12 +78,12 @@ const HeroSlider = () => {
                 className="text-center px-4"
               >
                 <motion.button
-                  onClick={() => navigate(activeSliders[currentSlide].redirectUrl)}
+                  onClick={() => navigate(banners[currentSlide].redirect_url)}
                   className="bg-[#E10600] text-white px-8 py-4 font-black text-sm md:text-base tracking-wider hover:bg-white hover:text-black transition-all duration-300"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  {activeSliders[currentSlide].buttonText}
+                  {banners[currentSlide].button_text}
                 </motion.button>
               </motion.div>
             </div>
