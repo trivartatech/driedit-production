@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, Edit2, Trash2, Loader2, Bell, 
-  X, Eye, EyeOff
+  X, Eye, EyeOff, Upload
 } from 'lucide-react';
-import { adminAPI } from '../../services/api';
+import { adminAPI, uploadsAPI } from '../../services/api';
 import { toast } from 'sonner';
+
+const API = process.env.REACT_APP_BACKEND_URL;
 
 const INITIAL_POPUP = {
   title: '',
@@ -31,6 +33,8 @@ const AdminPopups = () => {
   const [formData, setFormData] = useState(INITIAL_POPUP);
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     fetchPopups();
