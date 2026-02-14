@@ -81,12 +81,44 @@ limiter = Limiter(key_func=get_remote_address)
 app = FastAPI(
     title="DRIEDIT API",
     description="Gen-Z Streetwear E-commerce Platform",
-    version="1.0.0"
+    version="1.0.0",
+    docs_url="/api/docs" if not IS_PRODUCTION else None,  # Disable docs in production
+    redoc_url="/api/redoc" if not IS_PRODUCTION else None
 )
 
 # Add rate limiter state
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# HTTPS enforcement middleware for production
+@app.middleware("http")
+async def enforce_https(request: Request, call_next):
+    # Check X-Forwarded-Proto header (set by reverse proxy/load balancer)
+    if IS_PRODUCTION:
+        forwarded_proto = request.headers.get("x-forwarded-proto", "http")
+        if forwarded_proto != "https":
+            url = request.url.replace(scheme="https")
+            return RedirectResponse(url=str(url), status_code=301)
+    return await call_next(request)
+
+# Security headers middleware
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    if IS_PRODUCTION:
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
+
+# CORS configuration - restrict in production
+cors_origins = os.environ.get('CORS_ORIGINS', '*')
+if cors_origins == '*' and IS_PRODUCTION:
+    cors_origins = ["https://driedit.in", "https://www.driedit.in"]
+else:
+    cors_origins = cors_origins.split(',') if cors_origins != '*' else ["*"]
 
 # Add CORS middleware
 app.add_middleware(
