@@ -136,12 +136,36 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 - [x] DRIEDIT branded HTML templates
 - [x] Graceful fallback when email not configured
 
+### Phase 11: Discount Coupon System (Completed - Feb 14, 2026)
+- [x] Percentage and Fixed amount coupons
+- [x] Min order value requirement
+- [x] Max discount cap for percentage coupons
+- [x] Global usage limit
+- [x] One-time per user restriction
+- [x] Expiry date support
+- [x] Active/Inactive toggle
+- [x] Admin management panel with stats
+- [x] Usage history tracking
+- [x] Checkout integration with discount display
+
+### Phase 12: Forgot Password Flow (Completed - Feb 14, 2026)
+- [x] Forgot password page
+- [x] Secure token generation (SHA256 hashed)
+- [x] 1-hour token expiry
+- [x] Password reset email template
+- [x] Reset password page with validation
+- [x] One-time token use
+- [x] Auto-invalidate old tokens
+- [x] Email enumeration protection
+
 ---
 
 ## Pending Tasks 📋
 
 ### P2 - Nice to Have
-- [ ] Forgot Password feature
+- [ ] Email verification for new registrations
+- [ ] Search with autocomplete
+- [ ] Order tracking with courier APIs
 - [ ] Email verification for new registrations
 - [ ] Search functionality with autocomplete
 - [ ] Order tracking integration with courier APIs
