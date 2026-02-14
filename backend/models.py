@@ -46,6 +46,7 @@ class Coupon(BaseModel):
     usage_limit: Optional[int] = None  # Total times coupon can be used
     used_count: int = 0  # Current usage count
     one_time_per_user: bool = True  # Each user can use only once
+    auto_apply: bool = False  # If True, automatically applied at checkout
     is_active: bool = True
     expires_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -58,6 +59,7 @@ class CouponCreate(BaseModel):
     max_discount: Optional[float] = None
     usage_limit: Optional[int] = None
     one_time_per_user: bool = True
+    auto_apply: bool = False
     is_active: bool = True
     expires_at: Optional[datetime] = None
 
@@ -68,6 +70,8 @@ class CouponUsage(BaseModel):
     user_id: str
     order_id: str
     discount_amount: float
+    order_subtotal: float = 0  # Order subtotal before discount
+    applied_type: str = "manual"  # "manual" or "auto"
     used_at: datetime = Field(default_factory=datetime.utcnow)
 
 # User Models
