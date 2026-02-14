@@ -319,6 +319,8 @@ async def create_order(order_data: OrderCreate, request: Request):
                 "user_id": user["user_id"],
                 "order_id": order_id,
                 "discount_amount": coupon_discount,
+                "order_subtotal": subtotal,
+                "applied_type": applied_type,
                 "used_at": datetime.now(timezone.utc)
             }
             await db.coupon_usage.insert_one(usage)
