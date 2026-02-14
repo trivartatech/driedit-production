@@ -303,8 +303,10 @@ const CheckoutPage = () => {
       return false;
     }
 
-    if (address.phone.length < 10) {
-      toast.error('Please enter a valid phone number');
+    // Validate phone (10-digit Indian format)
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phoneRegex.test(address.phone)) {
+      toast.error('Please enter a valid 10-digit Indian mobile number');
       return false;
     }
 
@@ -314,6 +316,26 @@ const CheckoutPage = () => {
     }
 
     return true;
+  };
+
+  const saveAddressToProfile = async () => {
+    try {
+      await profileAPI.addAddress({
+        label: newAddressLabel,
+        name: address.name,
+        phone: address.phone,
+        address_line1: address.addressLine1,
+        address_line2: address.addressLine2 || null,
+        city: address.city,
+        state: address.state,
+        pincode: address.pincode,
+        is_default: savedAddresses.length === 0
+      });
+      toast.success('Address saved to your profile');
+    } catch (error) {
+      console.error('Failed to save address:', error);
+      // Don't block the order, just log the error
+    }
   };
 
   const handlePlaceOrder = async () => {
