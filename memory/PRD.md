@@ -142,7 +142,12 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 ---
 
 ## Mocked Integrations
-- **Razorpay**: Payment gateway is mocked. Creates mock order IDs (order_mock_*) and skips actual payment verification. Ready for real keys.
+- **Razorpay**: Payment gateway is in mock mode until real keys are configured.
+  - To enable: Add `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` to `/app/backend/.env`
+  - Add `REACT_APP_RAZORPAY_KEY_ID` to `/app/frontend/.env` (same key_id, safe for frontend)
+  - Restart backend after adding keys
+  - Check status: `GET /api/orders/payment-config`
+  - Supports both Test (`rzp_test_*`) and Live (`rzp_live_*`) keys
 
 ---
 
