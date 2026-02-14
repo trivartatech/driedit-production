@@ -517,13 +517,34 @@ const ShareProduct = ({ product }) => {
   const productUrl = window.location.href;
   const productText = `Check out ${product.title} on DRIEDIT - ${productUrl}`;
 
-  const handleCopyUrl = async () => {
+  const copyToClipboard = (text) => {
+    // Fallback method using textarea
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
     try {
-      await navigator.clipboard.writeText(productUrl);
+      document.execCommand('copy');
+      return true;
+    } catch (err) {
+      return false;
+    } finally {
+      textArea.remove();
+    }
+  };
+
+  const handleCopyUrl = () => {
+    const success = copyToClipboard(productUrl);
+    if (success) {
       setCopied(true);
       toast.success('Link copied to clipboard!');
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
+    } else {
       toast.error('Failed to copy link');
     }
   };
@@ -540,8 +561,12 @@ const ShareProduct = ({ product }) => {
 
   const shareOnInstagram = () => {
     // Instagram doesn't have a direct share URL, so we copy the link and show instructions
-    navigator.clipboard.writeText(productUrl);
-    toast.success('Link copied! Share it on Instagram');
+    const success = copyToClipboard(productUrl);
+    if (success) {
+      toast.success('Link copied! Share it on Instagram');
+    } else {
+      toast.info('Copy the URL from browser to share on Instagram');
+    }
   };
 
   return (
