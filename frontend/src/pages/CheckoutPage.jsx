@@ -344,6 +344,11 @@ const CheckoutPage = () => {
     setProcessing(true);
 
     try {
+      // Save address if user opted to
+      if (addressMode === 'new' && saveNewAddress && savedAddresses.length < 5) {
+        await saveAddressToProfile();
+      }
+
       const { total } = calculateTotals();
 
       // Prepare order items
