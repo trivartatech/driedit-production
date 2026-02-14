@@ -21,7 +21,8 @@ from routes import (
     public_routes,
     cart_routes,
     upload_routes,
-    coupon_routes
+    coupon_routes,
+    password_reset_routes
 )
 
 ROOT_DIR = Path(__file__).parent
