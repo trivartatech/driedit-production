@@ -203,19 +203,19 @@ const Header = () => {
                         handleLogout();
                         setMobileMenuOpen(false);
                       }}
-                      className="flex items-center space-x-2 text-sm font-semibold hover:text-[#E10600] transition-colors"
+                      className="flex items-center space-x-2 text-base font-semibold hover:text-[#E10600] transition-colors"
                     >
-                      <LogOut size={18} />
+                      <LogOut size={20} />
                       <span>LOGOUT</span>
                     </button>
                   </>
                 ) : (
                   <Link 
                     to="/login"
-                    className="flex items-center space-x-2 text-sm font-semibold hover:text-[#E10600] transition-colors"
+                    className="flex items-center space-x-2 text-base font-semibold hover:text-[#E10600] transition-colors"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    <User size={18} />
+                    <User size={20} />
                     <span>LOGIN</span>
                   </Link>
                 )}
