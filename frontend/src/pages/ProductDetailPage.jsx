@@ -155,62 +155,37 @@ const ProductDetailPage = () => {
     }
   };
 
-  if (!product) {
+  const nextImage = () => {
+    if (product) {
+      setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
+    }
+  };
+
+  const prevImage = () => {
+    if (product) {
+      setCurrentImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
+    }
+  };
+
+  if (loading) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Product Not Found</h2>
-          <button 
-            onClick={() => navigate('/products')}
-            className="bg-[#E10600] text-white px-6 py-3 font-bold hover:bg-white hover:text-black transition-colors"
-          >
-            BACK TO SHOP
-          </button>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#E10600] mx-auto mb-4"></div>
+          <p className="text-lg">Loading...</p>
         </div>
       </div>
     );
   }
 
+  if (!product) {
+    return null;
+  }
+
   const discount = calculateDiscount(product.regular_price, product.discounted_price);
-  const productReviews = reviews.filter(r => r.product_id === product.id);
-  const averageRating = productReviews.length > 0 
-    ? (productReviews.reduce((acc, r) => acc + r.rating, 0) / productReviews.length).toFixed(1)
+  const averageRating = reviews.length > 0 
+    ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
     : 0;
-
-  const relatedProducts = products
-    .filter(p => p.category === product.category && p.id !== product.id)
-    .slice(0, 4);
-
-  const handleWishlistToggle = () => {
-    if (isWishlisted) {
-      removeFromWishlist(product.id);
-      setIsWishlisted(false);
-      toast({ title: 'Removed from wishlist' });
-    } else {
-      addToWishlist(product.id);
-      setIsWishlisted(true);
-      toast({ title: 'Added to wishlist' });
-    }
-    window.dispatchEvent(new Event('wishlistUpdated'));
-  };
-
-  const handleAddToCart = () => {
-    if (!selectedSize) {
-      toast({ title: 'Please select a size', variant: 'destructive' });
-      return;
-    }
-    addToCart(product.id, selectedSize, quantity);
-    toast({ title: 'Added to cart!' });
-    window.dispatchEvent(new Event('cartUpdated'));
-  };
-
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
-  };
-
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
-  };
 
   return (
     <div className="min-h-screen bg-black text-white">
