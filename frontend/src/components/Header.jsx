@@ -164,18 +164,11 @@ const Header = () => {
                 SHOP
               </Link>
               <Link 
-                to="/products" 
+                to="/about" 
                 className="block text-sm font-semibold hover:text-[#E10600] transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                NEW DROPS
-              </Link>
-              <Link 
-                to="/products" 
-                className="block text-sm font-semibold hover:text-[#E10600] transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                COLLECTIONS
+                ABOUT US
               </Link>
               <div className="border-t border-white/10 pt-4 space-y-4">
                 {isAuthenticated ? (
