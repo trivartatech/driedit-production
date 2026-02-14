@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { 
   Package, ShoppingBag, Tag, MapPin, Image, Bell, 
-  LayoutDashboard, RefreshCw, ArrowLeft
+  LayoutDashboard, RefreshCw, ArrowLeft, Ticket
 } from 'lucide-react';
 import AdminDashboard from './AdminDashboard';
 import AdminProducts from './AdminProducts';
@@ -12,6 +12,7 @@ import AdminPincode from './AdminPincode';
 import AdminBanners from './AdminBanners';
 import AdminPopups from './AdminPopups';
 import AdminReturns from './AdminReturns';
+import AdminCoupons from './AdminCoupons';
 
 const AdminLayout = () => {
   const location = useLocation();
@@ -21,6 +22,7 @@ const AdminLayout = () => {
     { path: '/admin/orders', icon: ShoppingBag, label: 'Orders' },
     { path: '/admin/products', icon: Package, label: 'Products' },
     { path: '/admin/categories', icon: Tag, label: 'Categories' },
+    { path: '/admin/coupons', icon: Ticket, label: 'Coupons' },
     { path: '/admin/returns', icon: RefreshCw, label: 'Returns' },
     { path: '/admin/pincode', icon: MapPin, label: 'Pincode & GST' },
     { path: '/admin/banners', icon: Image, label: 'Banners' },
