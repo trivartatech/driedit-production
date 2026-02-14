@@ -117,4 +117,24 @@ export const authAPI = {
   logout: () => axiosInstance.post('/auth/logout')
 };
 
+// Uploads API
+export const uploadsAPI = {
+  uploadProductImage: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return axiosInstance.post('/uploads/product-image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  uploadMultipleImages: (files) => {
+    const formData = new FormData();
+    files.forEach(file => formData.append('files', file));
+    return axiosInstance.post('/uploads/product-images', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  deleteImage: (filename) => axiosInstance.delete(`/uploads/images/${filename}`),
+  getImageUrl: (filename) => `${API}/api/uploads/images/${filename}`
+};
+
 export default axiosInstance;
