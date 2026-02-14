@@ -102,12 +102,27 @@ Build a complete, production-ready, scalable, minimalistic Gen-Z fashion e-comme
 
 ---
 
+### Phase 8: Customer Return Request Flow (Completed - Feb 14, 2026)
+- [x] Return eligibility check API (7-day window from delivery)
+- [x] Return request creation API with validation
+- [x] Per-item return selection
+- [x] Return reason selection (7 options)
+- [x] Optional comments field
+- [x] Optional image upload (recommended for damaged/defective)
+- [x] Duplicate return prevention
+- [x] Return status badges on My Orders page
+- [x] "Days remaining" indicator for return window
+- [x] "Return request pending review" status display
+- [x] Mobile-first Return Request Modal
+
+---
+
 ## Pending Tasks 📋
 
 ### P1 - Important
-- [ ] Return/Replacement customer request flow (frontend form)
-- [ ] Order status email notifications
+- [ ] Integrate real Razorpay keys (currently mocked)
 - [ ] Product image upload (currently URL-based)
+- [ ] Order status email notifications
 
 ### P2 - Nice to Have
 - [ ] Forgot Password feature
