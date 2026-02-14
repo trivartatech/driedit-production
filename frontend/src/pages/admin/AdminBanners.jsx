@@ -118,6 +118,32 @@ const AdminBanners = () => {
     }
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const response = await uploadsAPI.uploadBannerImage(file);
+      if (response.data.success) {
+        const fullUrl = `${API}${response.data.url}`;
+        setFormData(prev => ({ ...prev, image: fullUrl }));
+        toast.success('Banner image uploaded');
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to upload image');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const removeImage = () => {
+    setFormData(prev => ({ ...prev, image: '' }));
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
