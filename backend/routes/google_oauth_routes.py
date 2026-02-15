@@ -30,8 +30,8 @@ IS_PRODUCTION = os.environ.get('ENVIRONMENT', 'development') == 'production'
 COOKIE_SECURE = True
 COOKIE_SAMESITE = "strict" if IS_PRODUCTION else "lax"
 
-# Frontend URL for redirects
-FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://driedit-preview-1.preview.emergentagent.com')
+# Frontend URL for redirects (required for OAuth callbacks)
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://driedit.in')
 
 
 def is_google_oauth_configured() -> bool:
