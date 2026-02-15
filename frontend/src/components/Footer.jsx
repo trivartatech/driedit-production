@@ -37,6 +37,15 @@ const Footer = () => {
                 <Instagram size={20} />
               </a>
               <a 
+                href="https://www.facebook.com/share/1HXRuocXPt/?mibextid=wwXIfr" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:text-[#E10600] transition-colors"
+                aria-label="Facebook"
+              >
+                <Facebook size={20} />
+              </a>
+              <a 
                 href="https://wa.me/919611132391" 
                 target="_blank" 
                 rel="noopener noreferrer"
