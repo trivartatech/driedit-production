@@ -62,14 +62,16 @@ const Header = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2">
+            <Link to="/" className="flex items-center">
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <span className="text-2xl font-black tracking-tighter">
-                  <span className="text-[#E10600]">D</span>RIEDIT
-                </span>
+                <img 
+                  src="/driedit-logo.png" 
+                  alt="DRIEDIT" 
+                  className="h-8 w-auto"
+                />
               </motion.div>
             </Link>
 
