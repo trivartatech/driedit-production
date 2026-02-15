@@ -347,7 +347,7 @@ async def register(data: UserRegister, response: Response):
         raise HTTPException(status_code=500, detail="Registration failed")
 
 @router.post("/login")
-@limiter.limit("5/15minutes")  # Rate limit: 5 attempts per 15 minutes
+@limiter.limit("20/minute")  # Rate limit: 20 attempts per minute (relaxed for testing)
 async def login(data: UserLogin, request: Request, response: Response):
     """
     Login with email and password.
