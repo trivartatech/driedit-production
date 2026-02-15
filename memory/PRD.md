@@ -156,10 +156,18 @@ A complete, production-ready, minimalistic Gen-Z fashion e-commerce platform for
 - `GET /api/uploads/popups/{filename}` - Serve popup image
 - `GET /api/uploads/size-charts/{filename}` - Serve size chart PDF
 
-### Product Recommendations (NEW)
+### Product Recommendations
 - `GET /api/products/{product_id}/recommendations` - Get 4 recommended products
   - Strategy: Same category products (sorted by sales_count) + Best sellers from other categories
   - Excludes current product and out-of-stock items
+
+### Customer Management (Admin) ✅ NEW
+- `GET /api/admin/customers` - Paginated customer list with search & filters
+  - Query params: page, per_page, search, from_date, to_date, status
+- `GET /api/admin/customers/{id}` - Customer detail (profile, orders, returns, financial summary)
+- `PUT /api/admin/customers/{id}/status` - Activate/deactivate customer
+- `GET /api/admin/customers/export/csv` - Export customers to CSV
+- `GET /api/admin/customers/export/excel` - Export customers to Excel
 
 ---
 
