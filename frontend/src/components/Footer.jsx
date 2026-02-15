@@ -86,6 +86,12 @@ const Footer = () => {
                   <span>@dried.it</span>
                 </a>
               </li>
+              <li>
+                <a href="https://www.facebook.com/share/1HXRuocXPt/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center space-x-2">
+                  <Facebook size={14} />
+                  <span>Facebook</span>
+                </a>
+              </li>
               <li><Link to="/my-orders" className="hover:text-white transition-colors">Track Order</Link></li>
               <li><Link to="/my-orders" className="hover:text-white transition-colors">Returns</Link></li>
             </ul>
