@@ -190,17 +190,21 @@ const HomePage = () => {
           >
             Get exclusive access to new drops and special offers
           </motion.p>
-          <motion.button
-            className="bg-white text-[#E10600] px-8 py-4 font-black text-sm hover:bg-black hover:text-white transition-colors"
+          <motion.a
+            href="https://wa.me/919611132391?text=Hey%20DRIEDIT!%20I%20want%20to%20join%20the%20culture%20and%20get%20exclusive%20updates!"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block bg-white text-[#E10600] px-8 py-4 font-black text-sm hover:bg-black hover:text-white transition-colors"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            data-testid="join-culture-whatsapp-btn"
           >
             SIGN UP NOW
-          </motion.button>
+          </motion.a>
         </div>
       </section>
     </div>
