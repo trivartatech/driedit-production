@@ -113,6 +113,9 @@ export const publicAPI = {
 // Auth API
 export const authAPI = {
   register: (data) => axiosInstance.post('/auth/register', data),
+  initiateRegister: (data) => axiosInstance.post('/auth/register/initiate', data),
+  verifyRegister: (data) => axiosInstance.post('/auth/register/verify', data),
+  resendOtp: (data) => axiosInstance.post('/auth/register/resend-otp', data),
   login: (data) => axiosInstance.post('/auth/login', data),
   getMe: () => axiosInstance.get('/auth/me'),
   logout: () => axiosInstance.post('/auth/logout'),
