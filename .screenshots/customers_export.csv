@@ -1,0 +1,5 @@
+Customer ID,Name,Email,Phone,Auth Provider,Status,Total Orders,Total Spend (₹),Last Order Date,Registered On
+user_ee800fa800ff,Test User Updated,test@example.com,9876543210,email,Active,6,8419.74,2026-02-14 20:37,2026-02-14 12:00
+user_31bf28056c72,prawjal,prajwalpraju080@gmail.com,,email,Active,0,0,Never,2026-02-14 11:49
+user_be6cbb017582,Test User,test@driedit.com,,email,Active,0,0,Never,2026-02-14 11:37
+user_7e3acdad0940,Prajwal Manjunath,prajwalpraju090@gmail.com,,google,Active,1,1178.82,2026-02-14 14:50,2026-02-14 11:28
