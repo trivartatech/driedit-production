@@ -286,7 +286,6 @@ async def resend_otp(request: Request):
 # Keep the old register endpoint for backward compatibility but redirect to new flow
 @router.post("/register")
 async def register(data: UserRegister, response: Response):
-async def register(data: UserRegister, response: Response):
     """
     Register new user with email and password.
     """
