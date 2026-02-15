@@ -31,7 +31,8 @@ from routes import (
     google_oauth_routes,
     user_profile_routes,
     sizes_routes,
-    reports_routes
+    reports_routes,
+    customers_routes
 )
 
 ROOT_DIR = Path(__file__).parent
