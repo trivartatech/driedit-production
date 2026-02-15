@@ -75,6 +75,12 @@ A complete, production-ready, minimalistic Gen-Z fashion e-commerce platform for
 - [x] Razorpay integration (test mode)
 - [x] Cash on Delivery (COD)
 - [x] Tier-based shipping fees
+- [x] **Universal Pincode Serviceability** ✅ NEW
+  - All pincodes serviceable by default
+  - Free shipping by default
+  - COD available by default
+  - Database entries act as OVERRIDES only (to charge shipping or disable COD for specific areas)
+  - Reduces checkout friction and increases conversion
 
 ### Admin Panel
 - [x] Dashboard overview
