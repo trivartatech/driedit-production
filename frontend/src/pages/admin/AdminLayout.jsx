@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { 
   Package, ShoppingBag, Tag, MapPin, Image, Bell, 
-  LayoutDashboard, RefreshCw, ArrowLeft, Ticket, Truck, BarChart3, Ruler, FileText
+  LayoutDashboard, RefreshCw, ArrowLeft, Ticket, Truck, BarChart3, Ruler, FileText, Users
 } from 'lucide-react';
 import AdminDashboard from './AdminDashboard';
 import AdminProducts from './AdminProducts';
@@ -17,6 +17,8 @@ import AdminShippingTiers from './AdminShippingTiers';
 import AdminAnalytics from './AdminAnalytics';
 import AdminSizes from './AdminSizes';
 import AdminReports from './AdminReports';
+import AdminCustomers from './AdminCustomers';
+import AdminCustomerDetail from './AdminCustomerDetail';
 
 const AdminLayout = () => {
   const location = useLocation();
