@@ -31,7 +31,7 @@ COOKIE_SECURE = True
 COOKIE_SAMESITE = "strict" if IS_PRODUCTION else "lax"
 
 # Frontend URL for redirects
-FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://gen-z-fashion-shop.preview.emergentagent.com')
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://driedit-preview-1.preview.emergentagent.com')
 
 
 def is_google_oauth_configured() -> bool:

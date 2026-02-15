@@ -19,6 +19,10 @@ The user wants to build a complete, production-ready, scalable, minimalistic Gen
     -   Product recommendation section on the product detail page.
     -   GST and Financial reporting module for admin.
     -   Product sharing functionality (WhatsApp, Facebook, Instagram, Copy URL).
+    -   Admin-level customer management system.
+    -   Email verification on signup using OTP.
+    -   Open Graph meta tags for rich link previews.
+    -   Pincode logic update: all pincodes serviceable by default.
 
 **User's preferred language**: English
 
@@ -26,57 +30,49 @@ The user wants to build a complete, production-ready, scalable, minimalistic Gen
 A feature-rich e-commerce platform with a React frontend, FastAPI backend, and MongoDB database. It includes a full commerce flow, an advanced pricing engine, transactional emails, and an extensive admin panel.
 
 Key systems include:
--   **Full Commerce Flow**: User registration/login (Email/Password & Google OAuth), product browsing, cart, and a complete checkout process using Razorpay (test mode) or COD.
--   **Admin Panel**: Role-protected dashboard for managing products, categories, orders, analytics, and site content.
+-   **Full Commerce Flow**: User registration/login (Email/Password with OTP verification & Google OAuth), product browsing, cart, and a complete checkout process using Razorpay (test mode) or COD.
+-   **Admin Panel**: Role-protected dashboard for managing products, categories, orders, analytics, site content, and customers.
 -   **GST & Financial Reporting**: A dedicated admin section with date-filterable reports for GST, Sales, and Payments, including CSV export functionality.
--   **User-Facing Features**: About Us page, legal pages (Privacy, T&C, Returns), product recommendations, product sharing, and a scroll-to-top navigation enhancement.
--   **UI/UX**: The UI has been refined with a simplified header/footer, updated wishlist icon, clickable banner images, and a redesigned category section.
+-   **Customer Management Module**: A full CRUD system for managing users, viewing their order history, financial summaries, and managing their status. Includes CSV/Excel export.
+-   **User-Facing Features**: About Us page, legal pages (Privacy, T&C, Returns), product recommendations, product sharing, and a scroll-to-top navigation enhancement. Rich link previews are enabled via Open Graph tags.
+-   **UI/UX**: The UI uses the official brand logo, has a simplified header/footer, updated wishlist icon, and a clickable Join The Culture button that redirects to WhatsApp.
 
 **Last working item**:
--   Last item agent was working: The user reported a runtime error after the implementation of the Share Product feature. The agent was in the process of debugging this error.
--   Status: BLOCKED
+-   Last item agent was working: The user requested to update the pincode validation logic to make all pincodes serviceable by default, with free shipping and COD available unless a specific override rule exists in the database. The agent had just started investigating the files.
+-   Status: NOT STARTED
 -   Agent Testing Done: N
--   Which testing method agent to use? The next agent should manually test the fix in the browser. Since this is a browser security policy issue, automated testing agents may not be able to replicate or verify the fix correctly. The agent should check the browser console for errors.
+-   Which testing method agent to use? backend testing agent. The agent should use  to test the  endpoint. Test cases: 1) a random, non-existent pincode (should return serviceable: true, shipping: 0, cod: true). 2) a pincode with a pre-configured override rule in the DB (should return the custom values).
 -   User Testing Done: N
 
 **All Pending/In progress Issue list**:
--   Issue 1: (P0) Clipboard API is blocked due to a permissions policy.
-
-  Issues Detail:
-  - Issue 1:
-     - **Description**: The Copy URL and Share on Instagram buttons on the product detail page are failing with the error:  This prevents users from copying the product URL.
-     - **Attempted fixes**: None yet. The agent was about to start debugging when the session ended.
-     - **Next debug checklist**:
-       1.  **Investigate the Error**: The error  points to a  issue. The Clipboard API requires a secure context (HTTPS) and must be triggered by a direct user action. The preview environment might be imposing a strict policy.
-       2.  **Examine Code**: Review the  component in .
-       3.  **Find Fallback**: If the policy cannot be changed, the agent must implement a fallback. Instead of directly writing to the clipboard, show a toast message like URL copied! but also consider a more robust solution like displaying a modal with the URL in a text field for the user to copy manually. This provides a better UX than a silently failing button.
-     - **Why fix this issue and what will be achieved with the fix?**: Fixing this will make the product sharing feature functional, improving user engagement and the potential for organic marketing.
-     - **Status**: IN PROGRESS
-     - **Is recurring issue?**: N
-     - **Should Test frontend/backend/both after fix?**: Frontend
-     - **Blocked on other issue**: None
+-   There are no pending issues.
 
 **In progress Task List**:
--   None.
+-   Task 1: (P0) Implement the updated pincode serviceability logic.
+
+ Task Detail:
+  - Task 1:
+     - **Where to resume**: The agent needs to modify the pincode validation logic in the backend. The primary file to edit is likely  where the  endpoint is defined.
+     - **What will be achieved with this?**: This change will remove delivery restrictions for users in unlisted pincodes, reducing checkout friction and potentially increasing conversion rates. The system will default to allowing orders with free shipping and COD, using database entries only for exceptions (e.g., to charge shipping or disable COD for specific areas).
+     - **Status**: NOT STARTED
+     - **Should Test frontend/backend/both after fix?**: Backend
+     - **Blocked on something**: None
 
 **Upcoming and Future Tasks**
--   **Future Tasks**:
+-   **Upcoming Tasks**:
     -   (P1) **Production Deployment Checklist Execution**: Review and execute the steps in .
-    -   (P2) **Email Verification**: Add an email verification step on user signup.
-    -   (P3) **SMS Notifications**: Integrate an SMS provider for order updates.
+-   **Future Tasks**:
+    -   (P2) **SMS Notifications**: Integrate an SMS provider for order updates.
 
 **Completed work in this session**
--   **Product Recommendation Section**: Implemented and tested a You May Also Like section on the product detail page () powered by a new backend endpoint ().
--   **GST & Financial Reporting Module**: Built a comprehensive, India-compliant reporting system in the admin panel () with backend endpoints () for GST, Sales, and Payment data, including CSV export.
--   **New Content Pages**: Created and routed an About Us page and essential legal pages: Privacy Policy, Terms & Conditions, and Return & Refund Policy.
--   **Footer & Header Redesign**: Updated the  with full contact details, a credits link, and links to the new legal pages. Simplified the  navigation menu.
--   **UI/UX Enhancements**:
-    -   Implemented a scroll to top feature on navigation ().
-    -   Made the main banner image a clickable link ().
-    -   Redesigned the wishlist icon for a cleaner look ().
-    -   Re-styled the Shop by Category section on the homepage ().
-    -   Increased mobile menu font size for better readability ().
--   **Share Product Feature**: Added share buttons to the product page. (Currently has a bug).
+-   **Clipboard API Bug Fix**: Resolved the Share Product bug by confirming the existing fallback  was working correctly.
+-   **Share Feature Refinement**: Modified the share component on the product page to remove Facebook and Instagram buttons, leaving only WhatsApp and Copy Link functionality.
+-   **Open Graph Meta Tags**: Implemented dynamic OG tags on product detail pages for rich link previews on social media and messaging apps. This was done using a custom React hook ().
+-   **Customer Management Module**: Built a complete admin module to list, view, search, filter, and export customer data. Includes a detailed customer view with profile info, financial summaries, order/return history, and address management. Tested with the testing agent.
+-   **Join the Culture CTA Update**: Changed the SIGN UP NOW button to redirect to WhatsApp with a pre-filled message.
+-   **Footer Update**: Added the company's Facebook profile link to the footer's social media icons.
+-   **Logo Integration**: Replaced the text-based logo in the header and footer with the official brand logo image.
+-   **Email Verification on Signup**: Implemented a mandatory OTP-based email verification flow for new user registrations.
 
 **Earlier issues found/mentioned but not fixed**
 -   None.
@@ -88,17 +84,20 @@ Key systems include:
 
 
 **Key Technical Concepts**
--   **Frontend**: React, React Router, Tailwind CSS, Shadcn UI, , 
--   **Backend**: FastAPI, Pydantic, Motor, MongoDB Aggregation Pipelines
--   **Database**: MongoDB
--   **Authentication**: JWTs (httpOnly cookies), bcrypt, Google OAuth
--   **Browser APIs**: Clipboard API (currently facing a permissions issue).
+-   **Frontend**: React, React Router, Tailwind CSS, Shadcn UI, , Custom React Hooks.
+-   **Backend**: FastAPI, Pydantic, Motor, MongoDB Aggregation Pipelines,  for Excel exports.
+-   **Database**: MongoDB. A new  collection was added for the OTP flow.
+-   **Authentication**: JWTs (httpOnly cookies), bcrypt, Google OAuth, OTP email verification for signup.
+-   **SEO/Sharing**: Dynamic Open Graph meta tag injection for rich link previews.
 
 **key DB schema**
--   No schema changes were made. The reporting module relies on existing financial fields within the  collection (, , , , etc.).
+-   **pending_users**:  (New collection for OTP verification)
 
 **changes in tech stack**
--   **Added**:  for icons and  for social sharing functionality.
+-   **Added**:
+    -    (backend) for generating  Excel files.
+-   **Removed**:
+    -   The attempt to use  was removed in favor of a custom hook.
 
 **All files of reference**
 -   **New/Created**:
@@ -108,67 +107,70 @@ Key systems include:
     -   
     -   
     -   
-    -   
 -   **Heavily Modified**:
-    -    (Added recommendations and share buttons)
-    -    (Added contact info, legal links, credits)
-    -    (Simplified menu, adjusted mobile styles)
-    -    (Added routes for all new pages)
-    -    (Added recommendation endpoint)
-    -    (Registered the new reports router)
-    -    (Updated Shop by Category UI)
+    -    (Added OTP verification logic)
+    -    (Registered new customer routes)
+    -    (Rebuilt to support a multi-step OTP flow)
+    -    (Removed share buttons, added meta tags hook)
+    -    (Added Customers to the navigation)
+    -    &  (Integrated new logo)
+    -    (Removed HelmetProvider)
+    -    (Added OTP endpoints)
 
 **Areas that need refactoring**:
--   None.
+-   None identified.
 
 **key api endpoints**
+-    (POST)
+-    (POST)
+-    (POST)
 -    (GET)
 -    (GET)
+-    (PUT)
 -    (GET)
 -    (GET)
--    (GET)
--    (GET)
+-    (POST) - **To be modified**
 
 **Critical Info for New Agent**
--   Your immediate and highest priority task is to **fix the Share Product feature**.
--   The root cause is a  blocking the Clipboard API () in the preview environment.
--   You need to investigate a fallback solution for the copy functionality in the  component located inside . A simple failing button is a poor user experience.
+-   Your immediate and highest priority task is to **implement the new pincode serviceability logic**.
+-   The goal is to make all pincodes serviceable by default (free shipping, COD available). The database entries for pincodes should only act as *overrides* to this default behavior, not as a whitelist.
+-   The main file to modify will be , specifically the endpoint that handles pincode checks.
 
 **documents and test reports created in this job**
 -    (updated)
 -   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User**: Reported the runtime error with the Clipboard API.
-2.  **User**: Requested share product buttons for social media.
-3.  **User**: Requested a centered and different UI for the Shop by Category section.
-4.  **User**: Requested the Shop by Category list on the home page to be displayed one by one.
-5.  **User**: Requested an increase in the mobile menu text size.
-6.  **User**: Requested removing the GST percentage from the admin report view.
-7.  **User**: Requested to build the comprehensive GST & Financial Reporting module.
-8.  **User**: Requested to change the wishlist heart icon style to be an outline.
-9.  **User**: Requested to remove the button from the banner and make the image clickable.
-10. **User**: Requested to make the logo link to the home page.
+1.  **User**: Requested to update the pincode logic to make all pincodes serviceable by default. (Pending)
+2.  **User**: Requested to implement email verification on signup using OTP. (Completed)
+3.  **User**: Provided a new logo image and asked for it to be aligned. (Completed)
+4.  **User**: Provided a Facebook profile URL to be added to the site. (Completed)
+5.  **User**: Requested that the JOIN THE CULTURE signup button should redirect to WhatsApp. (Completed)
+6.  **User**: Initiated the task to build a full admin-level customer management system. (Completed)
+7.  **User**: Requested to add a tagline to the link preview and ensure the preview loads when sharing. (Completed)
+8.  **User**: Requested to remove the Instagram share button as well. (Completed)
+9.  **User**: Requested to remove the Facebook share button and make the Instagram share button copy the link instead. (Completed)
+10. **User**: Confirmed the clipboard fix was working and asked to continue. (Completed)
 
 **Project Health Check:**
--   **Broken**: The Share Product feature on the product detail page due to the Clipboard API permissions error.
+-   **Broken**: None
 -   **Mocked**: None
 
 **3rd Party Integrations**
 -   **Google OAuth**: Server-side implementation.
 -   **Razorpay**: Live in test mode.
--   **Resend**: For transactional emails.
+-   **Resend**: For transactional emails (including OTP).
 -   **bcrypt**: For password hashing.
 -   **Framer Motion**: For frontend animations.
 -   **Recharts**: For data visualization.
 -   **lucide-react**: For UI icons.
--   **react-share**: For social share links.
+-   **react-share**: For social share links (WhatsApp only).
 
 **Testing status**
--   Testing agent used after significant changes: YES (For the product recommendation feature).
+-   Testing agent used after significant changes: YES (For the Customer Management Module, which passed 100%).
 -   Troubleshoot agent used after agent stuck in loop: NO
 -   Test files created: None.
--   Known regressions: The Share Product functionality is currently broken.
+-   Known regressions: None.
 
 **Credentials to test flow:**
 -   **Admin User**:
@@ -179,4 +181,4 @@ Key systems include:
     -   Password: 
 
 **What agent forgot to execute**
--   The agent was executing user requests sequentially and was interrupted by a bug report. Nothing was forgotten.</analysis>
+-   The agent correctly followed all user requests in sequence and did not forget to execute any tasks.</analysis>
