@@ -216,16 +216,18 @@ async def create_order(order_data: OrderCreate, request: Request):
     """
     user = await get_current_user(request)
     
-    # Validate pincode (for COD availability only)
+    # Check pincode for COD availability
+    # Default: All pincodes serviceable with COD available
+    # Database entries act as overrides only
     pincode_data = await db.pincodes.find_one(
         {"pincode": order_data.pincode},
         {"_id": 0}
     )
     
-    if not pincode_data:
-        raise HTTPException(status_code=400, detail="Delivery not available for this pincode")
+    # Default COD availability is True unless overridden
+    cod_available = pincode_data.get("cod_available", True) if pincode_data else True
     
-    if order_data.payment_method == PaymentMethod.COD and not pincode_data["cod_available"]:
+    if order_data.payment_method == PaymentMethod.COD and not cod_available:
         raise HTTPException(status_code=400, detail="COD not available for this pincode")
     
     # 1. Calculate base subtotal
