@@ -155,6 +155,7 @@ app.include_router(google_oauth_routes.router)
 app.include_router(user_profile_routes.router)
 app.include_router(sizes_routes.router)
 app.include_router(reports_routes.router)
+app.include_router(customers_routes.router)
 
 # Health check endpoint
 @app.get("/api/")
