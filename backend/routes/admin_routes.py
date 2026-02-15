@@ -7,11 +7,17 @@ from datetime import datetime, timezone
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
-# Pincode Management
+# Pincode Override Rules Management
+# NOTE: By default, ALL pincodes are serviceable with FREE shipping and COD available.
+# These entries act as OVERRIDE rules to customize behavior for specific pincodes.
+
 @router.get("/pincodes", response_model=List[Pincode])
 async def get_pincodes(request: Request):
     """
-    Get all serviceable pincodes (Admin only).
+    Get all pincode override rules (Admin only).
+    
+    Note: These are OVERRIDE rules. Pincodes NOT in this list 
+    default to: serviceable=True, shipping=0, cod=True
     """
     await require_admin(request)
     
@@ -21,7 +27,10 @@ async def get_pincodes(request: Request):
 @router.post("/pincodes", response_model=Pincode)
 async def create_pincode(pincode_data: PincodeCreate, request: Request):
     """
-    Add serviceable pincode (Admin only).
+    Add pincode override rule (Admin only).
+    
+    Use this to customize shipping charge or disable COD for specific pincodes.
+    Pincodes without override rules default to free shipping and COD available.
     """
     await require_admin(request)
     
