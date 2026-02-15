@@ -83,16 +83,23 @@ A complete, production-ready, minimalistic Gen-Z fashion e-commerce platform for
   - GST Summary Reports (date-filtered)
   - Sales Reports
   - Payment Reports
+- [x] **Customer Management Module** ✅ NEW
+  - Paginated customer list with search (name/email/phone)
+  - Filters: date range, status (active/inactive)
+  - Customer detail page: profile, addresses, orders, returns, financial summary
+  - Activate/Deactivate customer toggle
+  - CSV & Excel export with date filters
+  - MongoDB aggregation pipelines for performance
 - [x] Product CRUD with image uploads
-- [x] **Dynamic Size Management** (NEW)
+- [x] **Dynamic Size Management**
   - Admin CRUD for sizes
   - Pre-seeded sizes: XS, S, M, L, XL, XXL, 28, 30, 32, 34, 36, 38
   - Grouped by category type (clothing, bottomwear)
   - Soft-delete protection if used in products
-- [x] **Size Chart PDF per Product** (NEW)
+- [x] **Size Chart PDF per Product**
   - PDF upload per product
   - "View Size Chart" button on product page (opens in new tab)
-- [x] **Banner & Popup Image Upload** (NEW)
+- [x] **Banner & Popup Image Upload**
   - Server-side file storage instead of URL only
   - Secure MIME validation
   - Preview thumbnails in admin
