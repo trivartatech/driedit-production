@@ -235,4 +235,19 @@ export const profileAPI = {
   setDefaultAddress: (addressId) => axiosInstance.put(`/user/addresses/${addressId}/set-default`)
 };
 
+// Customers API (Admin)
+export const customersAPI = {
+  getAll: (params = {}) => axiosInstance.get('/admin/customers', { params }),
+  getById: (customerId) => axiosInstance.get(`/admin/customers/${customerId}`),
+  updateStatus: (customerId, isActive) => axiosInstance.put(`/admin/customers/${customerId}/status`, { is_active: isActive }),
+  exportCSV: (params = {}) => axiosInstance.get('/admin/customers/export/csv', { 
+    params, 
+    responseType: 'blob' 
+  }),
+  exportExcel: (params = {}) => axiosInstance.get('/admin/customers/export/excel', { 
+    params, 
+    responseType: 'blob' 
+  })
+};
+
 export default axiosInstance;
